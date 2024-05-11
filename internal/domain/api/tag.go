@@ -11,13 +11,10 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-// Tag represents the interface for managing tags.
-type Tag interface {
-	Create(ctx context.Context, tag CreateTagRequest) error
-	Update(ctx context.Context, uuid string, updates UpdateTagRequest) error
-	Find(ctx context.Context, uuid string) (*pkg.TagResponse, error)
-	FindAll(ctx context.Context) ([]*pkg.TagResponse, error)
-	Delete(ctx context.Context, uuid string) error
+// CreateTagRequest represents the interface for creating tags.
+type CreateTagRequest interface {
+	Name() string
+	Description() string
 }
 
 // UpdateTagRequest represents the interface for updating tags.
@@ -26,15 +23,29 @@ type UpdateTagRequest interface {
 	Description() string
 }
 
+// Tag represents the interface for managing tags.
+type Tag interface {
+	Create(ctx context.Context, tag CreateTagRequest) error
+	Update(ctx context.Context, uuid string, updates UpdateTagRequest) error
+	Find(ctx context.Context, uuid string) (*pkg.TagResponse, error)
+	FindAll(ctx context.Context) ([]*pkg.TagResponse, error)
+	Delete(ctx context.Context, uuid string) error
+	FindPrograms(ctx context.Context, uuid string) ([]*pkg.ProgramResponse, error)
+}
+
 // tagApi is an implementation of the Tag interface.
 type tagApi struct {
-	tagAdapter port.TagPersister
+	tagAdapter        port.TagPersister
+	programTagAdapter port.ProgramTagPersister
+	programAdapter    port.ProgramPersister
 }
 
 // NewTagApi creates a new instance of Tag.
-func NewTagApi(tagAdapter port.TagPersister) Tag {
+func NewTagApi(tagAdapter port.TagPersister, programTagAdapter port.ProgramTagPersister, programAdapter port.ProgramPersister) Tag {
 	return &tagApi{
-		tagAdapter: tagAdapter,
+		tagAdapter:        tagAdapter,
+		programTagAdapter: programTagAdapter,
+		programAdapter:    programAdapter,
 	}
 }
 
@@ -161,8 +172,28 @@ func (api tagApi) Delete(ctx context.Context, uuid string) error {
 	return nil
 }
 
-// CreateTagRequest represents the interface for creating tags.
-type CreateTagRequest interface {
-	Name() string
-	Description() string
+// FindPrograms finds programs associated with a tag.
+func (api tagApi) FindPrograms(ctx context.Context, uuid string) ([]*pkg.ProgramResponse, error) {
+
+	associations, err := api.programTagAdapter.FindByTagID(ctx, uuid)
+	if err != nil {
+		return nil, err
+	}
+
+	var response []*pkg.ProgramResponse
+	for _, association := range associations {
+		program, err := api.programAdapter.Find(ctx, association.ProgramID)
+		if err != nil {
+			return nil, err
+		}
+
+		response = append(response, &pkg.ProgramResponse{
+			ID:          program.ID,
+			Name:        program.Name,
+			Description: program.Description,
+		})
+
+	}
+
+	return response, nil
 }

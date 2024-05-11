@@ -25,6 +25,8 @@ type Tag interface {
 
 	// Delete returns a Gin handler function for deleting a tag by its UUID.
 	Delete() gin.HandlerFunc
+
+	FindPrograms() gin.HandlerFunc
 }
 
 type tagHandler struct {
@@ -181,5 +183,35 @@ func (handler tagHandler) Delete() gin.HandlerFunc {
 
 		// Return response
 		c.JSON(http.StatusOK, "deleted")
+	}
+}
+
+// FindPrograms returns a Gin handler function for finding all block's programs.
+//
+// @Summary Find all tag's programs
+// @Description Find all tag's programs
+// @Tags tags
+// @ID find-tag-programs
+// @Param uuid path string true "uuid"
+// @Produce json
+// @Success 200 {string} string "ok"
+// @Failure 500 {object} pkg.ErrorJSON
+// @Router /private/tags/{uuid}/programs [get]
+func (handler tagHandler) FindPrograms() gin.HandlerFunc {
+	return func(c *gin.Context) {
+
+		// Extract tag UUID from path
+		tagUUID := c.Param("uuid")
+
+		// Call API to find all walls
+		programs, err := handler.api.FindPrograms(c, tagUUID)
+		if err != nil {
+			log.Error().Msg("error finding all tag's programs: " + err.Error())
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+
+		// Return response
+		c.JSON(http.StatusOK, programs)
 	}
 }

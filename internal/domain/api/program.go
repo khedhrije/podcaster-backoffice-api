@@ -11,13 +11,10 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-// Program represents the interface for managing programs.
-type Program interface {
-	Create(ctx context.Context, program CreateProgramRequest) error
-	Update(ctx context.Context, uuid string, updates UpdateProgramRequest) error
-	Find(ctx context.Context, uuid string) (*pkg.ProgramResponse, error)
-	FindAll(ctx context.Context) ([]*pkg.ProgramResponse, error)
-	Delete(ctx context.Context, uuid string) error
+// CreateProgramRequest represents the interface for creating programs.
+type CreateProgramRequest interface {
+	Name() string
+	Description() string
 }
 
 // UpdateProgramRequest represents the interface for updating programs.
@@ -26,15 +23,44 @@ type UpdateProgramRequest interface {
 	Description() string
 }
 
+// Program represents the interface for managing programs.
+type Program interface {
+	Create(ctx context.Context, program CreateProgramRequest) error
+	Update(ctx context.Context, uuid string, updates UpdateProgramRequest) error
+	Find(ctx context.Context, uuid string) (*pkg.ProgramResponse, error)
+	FindAll(ctx context.Context) ([]*pkg.ProgramResponse, error)
+	Delete(ctx context.Context, uuid string) error
+	FindEpisodes(ctx context.Context, uuid string) ([]*pkg.EpisodeResponse, error)
+	FindTags(ctx context.Context, uuid string) ([]*pkg.TagResponse, error)
+	FindCats(ctx context.Context, uuid string) ([]*pkg.CategoryResponse, error)
+}
+
 // programApi is an implementation of the Program interface.
 type programApi struct {
-	programAdapter port.ProgramPersister
+	programAdapter    port.ProgramPersister
+	episodeAdapter    port.EpisodePersister
+	programTagAdapter port.ProgramTagPersister
+	tagAdapter        port.TagPersister
+	programCatAdapter port.ProgramCategoryPersister
+	catAdapter        port.CategoryPersister
 }
 
 // NewProgramApi creates a new instance of Program.
-func NewProgramApi(programAdapter port.ProgramPersister) Program {
+func NewProgramApi(
+	programAdapter port.ProgramPersister,
+	episodeAdapter port.EpisodePersister,
+	programTagAdapter port.ProgramTagPersister,
+	tagAdapter port.TagPersister,
+	programCatAdapter port.ProgramCategoryPersister,
+	catAdapter port.CategoryPersister,
+) Program {
 	return programApi{
-		programAdapter: programAdapter,
+		programAdapter:    programAdapter,
+		episodeAdapter:    episodeAdapter,
+		programTagAdapter: programTagAdapter,
+		tagAdapter:        tagAdapter,
+		programCatAdapter: programCatAdapter,
+		catAdapter:        catAdapter,
 	}
 }
 
@@ -161,8 +187,82 @@ func (api programApi) Delete(ctx context.Context, uuid string) error {
 	return nil
 }
 
-// CreateProgramRequest represents the interface for creating programs.
-type CreateProgramRequest interface {
-	Name() string
-	Description() string
+// FindEpisodes finds a program's episodes.
+func (api programApi) FindEpisodes(ctx context.Context, uuid string) ([]*pkg.EpisodeResponse, error) {
+
+	// Call adapter
+	episodes, err := api.episodeAdapter.FindByProgramID(ctx, uuid)
+	if err != nil {
+		log.Ctx(ctx).Error().Err(err).Interface("uuid", uuid).Msg("error while finding program")
+		return nil, fmt.Errorf("error occurred while finding program: %w", err)
+	}
+
+	// Map to response
+	var response []*pkg.EpisodeResponse
+	for _, episode := range episodes {
+		response = append(response, &pkg.EpisodeResponse{
+			ID:          episode.ID,
+			Name:        episode.Name,
+			Description: episode.Description,
+		})
+	}
+
+	// return result
+	return response, nil
+}
+
+// FindTags finds a program's tags.
+func (api programApi) FindTags(ctx context.Context, uuid string) ([]*pkg.TagResponse, error) {
+
+	// Call adapter
+	associations, err := api.programTagAdapter.FindByProgramID(ctx, uuid)
+	if err != nil {
+		log.Ctx(ctx).Error().Err(err).Interface("uuid", uuid).Msg("error while finding program")
+		return nil, fmt.Errorf("error occurred while finding program's tags: %w", err)
+	}
+
+	// Map to response
+	var response []*pkg.TagResponse
+	for _, association := range associations {
+		tag, err := api.tagAdapter.Find(ctx, association.TagID)
+		if err != nil {
+			return nil, err
+		}
+		response = append(response, &pkg.TagResponse{
+			ID:          tag.ID,
+			Name:        tag.Name,
+			Description: tag.Description,
+		})
+	}
+
+	// return result
+	return response, nil
+}
+
+// FindCats finds a program's tags.
+func (api programApi) FindCats(ctx context.Context, uuid string) ([]*pkg.CategoryResponse, error) {
+
+	// Call adapter
+	associations, err := api.programCatAdapter.FindByProgramID(ctx, uuid)
+	if err != nil {
+		log.Ctx(ctx).Error().Err(err).Interface("uuid", uuid).Msg("error while finding program's cats")
+		return nil, fmt.Errorf("error occurred while finding program's cats: %w", err)
+	}
+
+	// Map to response
+	var response []*pkg.CategoryResponse
+	for _, association := range associations {
+		cat, err := api.catAdapter.Find(ctx, association.CategoryID)
+		if err != nil {
+			return nil, err
+		}
+		response = append(response, &pkg.CategoryResponse{
+			ID:          cat.ID,
+			Name:        cat.Name,
+			Description: cat.Description,
+		})
+	}
+
+	// return result
+	return response, nil
 }

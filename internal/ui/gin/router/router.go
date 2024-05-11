@@ -32,7 +32,8 @@ func CreateRouter(wall handlers.Wall, block handlers.Block, program handlers.Pro
 			walls.PUT("/:uuid", wall.Update())
 			walls.GET("/:uuid", wall.Find())
 			walls.GET("", wall.FindAll())
-			walls.DELETE("/:uuid", wall.Delete()) // Added route for deleting a specific wall by UUID
+			walls.DELETE("/:uuid", wall.Delete())
+			walls.GET("/:uuid/blocks", wall.FindBlocks())
 		}
 
 		// Routes for managing blocks
@@ -42,7 +43,8 @@ func CreateRouter(wall handlers.Wall, block handlers.Block, program handlers.Pro
 			blocks.PUT("/:uuid", block.Update())
 			blocks.GET("/:uuid", block.Find())
 			blocks.GET("", block.FindAll())
-			blocks.DELETE("/:uuid", block.Delete()) // Added route for deleting a specific block by UUID
+			blocks.DELETE("/:uuid", block.Delete())
+			blocks.GET("/:uuid/programs", block.FindPrograms())
 		}
 
 		// Routes for managing programs
@@ -52,7 +54,10 @@ func CreateRouter(wall handlers.Wall, block handlers.Block, program handlers.Pro
 			programs.PUT("/:uuid", program.Update())
 			programs.GET("/:uuid", program.Find())
 			programs.GET("", program.FindAll())
-			programs.DELETE("/:uuid", program.Delete()) // Added route for deleting a specific program by UUID
+			programs.DELETE("/:uuid", program.Delete())
+			programs.GET("/:uuid/episodes", program.FindEpisodes())
+			programs.GET("/:uuid/tags", program.FindTags())
+			programs.GET("/:uuid/categories", program.FindCategories())
 		}
 
 		// Routes for managing episodes
@@ -62,7 +67,7 @@ func CreateRouter(wall handlers.Wall, block handlers.Block, program handlers.Pro
 			episodes.PUT("/:uuid", episode.Update())
 			episodes.GET("/:uuid", episode.Find())
 			episodes.GET("", episode.FindAll())
-			episodes.DELETE("/:uuid", episode.Delete()) // Added route for deleting a specific episode by UUID
+			episodes.DELETE("/:uuid", episode.Delete())
 		}
 
 		// Routes for managing media
@@ -72,7 +77,7 @@ func CreateRouter(wall handlers.Wall, block handlers.Block, program handlers.Pro
 			mediaRoutes.PUT("/:uuid", media.Update())
 			mediaRoutes.GET("/:uuid", media.Find())
 			mediaRoutes.GET("", media.FindAll())
-			mediaRoutes.DELETE("/:uuid", media.Delete()) // Added route for deleting a specific media by UUID
+			mediaRoutes.DELETE("/:uuid", media.Delete())
 		}
 
 		// Routes for managing tags
@@ -82,7 +87,8 @@ func CreateRouter(wall handlers.Wall, block handlers.Block, program handlers.Pro
 			tags.PUT("/:uuid", tag.Update())
 			tags.GET("/:uuid", tag.Find())
 			tags.GET("", tag.FindAll())
-			tags.DELETE("/:uuid", tag.Delete()) // Added route for deleting a specific tag by UUID
+			tags.DELETE("/:uuid", tag.Delete())
+			tags.GET("/:uuid/programs", tag.FindPrograms())
 		}
 
 		// Routes for managing categories
@@ -92,7 +98,8 @@ func CreateRouter(wall handlers.Wall, block handlers.Block, program handlers.Pro
 			categories.PUT("/:uuid", category.Update())
 			categories.GET("/:uuid", category.Find())
 			categories.GET("", category.FindAll())
-			categories.DELETE("/:uuid", category.Delete()) // Added route for deleting a specific category by UUID
+			categories.DELETE("/:uuid", category.Delete())
+			categories.GET("/:uuid/programs", category.FindPrograms())
 		}
 	}
 

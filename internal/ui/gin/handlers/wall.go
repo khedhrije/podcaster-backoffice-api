@@ -25,6 +25,8 @@ type Wall interface {
 
 	// Delete returns a Gin handler function for deleting a wall by its UUID.
 	Delete() gin.HandlerFunc
+
+	FindBlocks() gin.HandlerFunc
 }
 
 type wallHandler struct {
@@ -181,5 +183,35 @@ func (handler wallHandler) Delete() gin.HandlerFunc {
 
 		// Return response
 		c.JSON(http.StatusOK, "deleted")
+	}
+}
+
+// FindBlocks returns a Gin handler function for finding all wall's blocks.
+//
+// @Summary Find all wall's blocks
+// @Description Find all wall's blocks
+// @Tags walls
+// @ID find-wall-block
+// @Param uuid path string true "uuid"
+// @Produce json
+// @Success 200 {string} string "ok"
+// @Failure 500 {object} pkg.ErrorJSON
+// @Router /private/walls/{uuid}/blocks [get]
+func (handler wallHandler) FindBlocks() gin.HandlerFunc {
+	return func(c *gin.Context) {
+
+		// Extract wall UUID from path
+		wallUUID := c.Param("uuid")
+
+		// Call API to find all walls
+		walls, err := handler.api.FindBlocks(c, wallUUID)
+		if err != nil {
+			log.Error().Msg("error finding all wall's blocks: " + err.Error())
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+
+		// Return response
+		c.JSON(http.StatusOK, walls)
 	}
 }

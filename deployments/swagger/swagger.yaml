@@ -231,6 +231,30 @@ paths:
       summary: Update block
       tags:
       - blocks
+  /private/blocks/{uuid}/programs:
+    get:
+      description: Find all block's programs
+      operationId: find-block-programs
+      parameters:
+      - description: uuid
+        in: path
+        name: uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/pkg.ErrorJSON'
+      summary: Find all block's programs
+      tags:
+      - walls
   /private/categories:
     post:
       description: Create a new category
@@ -348,6 +372,30 @@ paths:
           schema:
             $ref: '#/definitions/pkg.ErrorJSON'
       summary: Update category
+      tags:
+      - categories
+  /private/categories/{uuid}/programs:
+    get:
+      description: Find all category's programs
+      operationId: find-cat-programs
+      parameters:
+      - description: uuid
+        in: path
+        name: uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/pkg.ErrorJSON'
+      summary: Find all category's programs
       tags:
       - categories
   /private/episodes:
@@ -707,6 +755,78 @@ paths:
       summary: Update program
       tags:
       - programs
+  /private/programs/{uuid}/categories:
+    get:
+      description: Find a program's categories
+      operationId: find-program-categories
+      parameters:
+      - description: uuid
+        in: path
+        name: uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/pkg.ErrorJSON'
+      summary: Find a program's categories
+      tags:
+      - programs
+  /private/programs/{uuid}/episodes:
+    get:
+      description: Find a program's episodes
+      operationId: find-program-episodes
+      parameters:
+      - description: uuid
+        in: path
+        name: uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/pkg.ErrorJSON'
+      summary: Find a program's episodes
+      tags:
+      - programs
+  /private/programs/{uuid}/tags:
+    get:
+      description: Find a program's tags
+      operationId: find-program-tags
+      parameters:
+      - description: uuid
+        in: path
+        name: uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/pkg.ErrorJSON'
+      summary: Find a program's tags
+      tags:
+      - programs
   /private/tags:
     post:
       description: Create a new tag
@@ -826,6 +946,30 @@ paths:
       summary: Update tag
       tags:
       - tags
+  /private/tags/{uuid}/programs:
+    get:
+      description: Find all tag's programs
+      operationId: find-tag-programs
+      parameters:
+      - description: uuid
+        in: path
+        name: uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/pkg.ErrorJSON'
+      summary: Find all tag's programs
+      tags:
+      - tags
   /private/walls:
     post:
       description: Create a new wall
@@ -943,6 +1087,30 @@ paths:
           schema:
             $ref: '#/definitions/pkg.ErrorJSON'
       summary: Update wall
+      tags:
+      - walls
+  /private/walls/{uuid}/blocks:
+    get:
+      description: Find all wall's blocks
+      operationId: find-wall-block
+      parameters:
+      - description: uuid
+        in: path
+        name: uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/pkg.ErrorJSON'
+      summary: Find all wall's blocks
       tags:
       - walls
 securityDefinitions:

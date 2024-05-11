@@ -43,6 +43,7 @@ type CategoryResponse struct {
 type BlockResponse struct {
 	ID          string `json:"ID"`
 	Name        string `json:"name"`
+	Kind        string `json:"kind"`
 	Description string `json:"description"`
 }
 
@@ -51,4 +52,14 @@ type EpisodeResponse struct {
 	ID          string `json:"ID"`
 	Name        string `json:"name"`
 	Description string `json:"description"`
+}
+
+type WallBlocksResponse struct {
+	BlockResponse
+	Position int
+}
+
+type BlockProgramsResponse struct {
+	ProgramResponse
+	Position int
 }

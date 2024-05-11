@@ -40,21 +40,25 @@ func initBootstrap() Bootstrap {
 
 	// Initialize MySQL adapters for different domain models
 	wallAdapter := mysql.NewWallAdapter(mysqlClient)
+	wallBlockAdapter := mysql.NewWallBlockAdapter(mysqlClient)
 	blockAdapter := mysql.NewBlockAdapter(mysqlClient)
+	blockProgramAdapter := mysql.NewBlockProgramAdapter(mysqlClient)
 	programAdapter := mysql.NewProgramAdapter(mysqlClient)
 	episodeAdapter := mysql.NewEpisodeAdapter(mysqlClient)
 	mediaAdapter := mysql.NewMediaAdapter(mysqlClient)
 	tagAdapter := mysql.NewTagAdapter(mysqlClient)
-	catagoryAdapter := mysql.NewCategoryAdapter(mysqlClient)
+	programTagAdapter := mysql.NewProgramTagAdapter(mysqlClient)
+	categoryAdapter := mysql.NewCategoryAdapter(mysqlClient)
+	programCategoryAdapter := mysql.NewProgramCategoryAdapter(mysqlClient)
 
 	// Init apis
-	wallApi := api.NewWallApi(wallAdapter)
-	blockApi := api.NewBlockApi(blockAdapter)
-	programApi := api.NewProgramApi(programAdapter)
+	wallApi := api.NewWallApi(wallAdapter, wallBlockAdapter, blockAdapter)
+	blockApi := api.NewBlockApi(blockAdapter, blockProgramAdapter, programAdapter)
+	programApi := api.NewProgramApi(programAdapter, episodeAdapter, programTagAdapter, tagAdapter, programCategoryAdapter, categoryAdapter)
 	episodeApi := api.NewEpisodeApi(episodeAdapter)
 	mediaApi := api.NewMediaApi(mediaAdapter)
-	tagApi := api.NewTagApi(tagAdapter)
-	catApi := api.NewCategoryApi(catagoryAdapter)
+	tagApi := api.NewTagApi(tagAdapter, programTagAdapter, programAdapter)
+	catApi := api.NewCategoryApi(categoryAdapter, programCategoryAdapter, programAdapter)
 
 	// Init handlers
 	wallHandler := handlers.NewWallHandler(wallApi)

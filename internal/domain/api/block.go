@@ -11,13 +11,10 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-// Block represents the interface for managing blocks.
-type Block interface {
-	Create(ctx context.Context, block CreateBlockRequest) error
-	Update(ctx context.Context, uuid string, updates UpdateBlockRequest) error
-	Find(ctx context.Context, uuid string) (*pkg.BlockResponse, error)
-	FindAll(ctx context.Context) ([]*pkg.BlockResponse, error)
-	Delete(ctx context.Context, uuid string) error
+// CreateBlockRequest represents the interface for creating blocks.
+type CreateBlockRequest interface {
+	Name() string
+	Description() string
 }
 
 // UpdateBlockRequest represents the interface for updating blocks.
@@ -26,15 +23,29 @@ type UpdateBlockRequest interface {
 	Description() string
 }
 
+// Block represents the interface for managing blocks.
+type Block interface {
+	Create(ctx context.Context, block CreateBlockRequest) error
+	Update(ctx context.Context, uuid string, updates UpdateBlockRequest) error
+	Find(ctx context.Context, uuid string) (*pkg.BlockResponse, error)
+	FindAll(ctx context.Context) ([]*pkg.BlockResponse, error)
+	Delete(ctx context.Context, uuid string) error
+	FindPrograms(ctx context.Context, uuid string) ([]*pkg.BlockProgramsResponse, error)
+}
+
 // blockApi is an implementation of the Block interface.
 type blockApi struct {
-	blockAdapter port.BlockPersister
+	blockAdapter        port.BlockPersister
+	blockProgramAdapter port.BlockProgramPersister
+	programAdapter      port.ProgramPersister
 }
 
 // NewBlockApi creates a new instance of Block.
-func NewBlockApi(blockAdapter port.BlockPersister) Block {
+func NewBlockApi(blockAdapter port.BlockPersister, blockProgramAdapter port.BlockProgramPersister, programAdapter port.ProgramPersister) Block {
 	return &blockApi{
-		blockAdapter: blockAdapter,
+		blockAdapter:        blockAdapter,
+		blockProgramAdapter: blockProgramAdapter,
+		programAdapter:      programAdapter,
 	}
 }
 
@@ -161,8 +172,31 @@ func (api blockApi) Delete(ctx context.Context, uuid string) error {
 	return nil
 }
 
-// CreateBlockRequest represents the interface for creating blocks.
-type CreateBlockRequest interface {
-	Name() string
-	Description() string
+// FindPrograms finds programs associated with a block.
+func (api blockApi) FindPrograms(ctx context.Context, uuid string) ([]*pkg.BlockProgramsResponse, error) {
+
+	associations, err := api.blockProgramAdapter.FindByBlockID(ctx, uuid)
+	if err != nil {
+		return nil, err
+	}
+
+	var response []*pkg.BlockProgramsResponse
+	for _, association := range associations {
+		program, err := api.programAdapter.Find(ctx, association.ProgramID)
+		if err != nil {
+			return nil, err
+		}
+		blockProgram := &pkg.BlockProgramsResponse{
+			ProgramResponse: pkg.ProgramResponse{
+				ID:          program.ID,
+				Name:        program.Name,
+				Description: program.Description,
+			},
+			Position: association.Position,
+		}
+
+		response = append(response, blockProgram)
+	}
+
+	return response, nil
 }

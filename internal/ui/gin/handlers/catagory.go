@@ -25,6 +25,8 @@ type Category interface {
 
 	// Delete returns a Gin handler function for deleting a category by its UUID.
 	Delete() gin.HandlerFunc
+
+	FindPrograms() gin.HandlerFunc
 }
 
 type categoryHandler struct {
@@ -181,5 +183,35 @@ func (handler categoryHandler) Delete() gin.HandlerFunc {
 
 		// Return response
 		c.JSON(http.StatusOK, "deleted")
+	}
+}
+
+// FindPrograms returns a Gin handler function for finding all block's programs.
+//
+// @Summary Find all category's programs
+// @Description Find all category's programs
+// @Tags categories
+// @ID find-cat-programs
+// @Param uuid path string true "uuid"
+// @Produce json
+// @Success 200 {string} string "ok"
+// @Failure 500 {object} pkg.ErrorJSON
+// @Router /private/categories/{uuid}/programs [get]
+func (handler categoryHandler) FindPrograms() gin.HandlerFunc {
+	return func(c *gin.Context) {
+
+		// Extract tag UUID from path
+		categoryUUID := c.Param("uuid")
+
+		// Call API to find all walls
+		programs, err := handler.api.FindPrograms(c, categoryUUID)
+		if err != nil {
+			log.Error().Msg("error finding all cat's programs: " + err.Error())
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+
+		// Return response
+		c.JSON(http.StatusOK, programs)
 	}
 }

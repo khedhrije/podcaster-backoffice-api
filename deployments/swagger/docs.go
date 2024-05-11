@@ -198,6 +198,42 @@ const docTemplate = `{
                 }
             }
         },
+        "/private/blocks/{uuid}/programs": {
+            "get": {
+                "description": "Find all block's programs",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "walls"
+                ],
+                "summary": "Find all block's programs",
+                "operationId": "find-block-programs",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "uuid",
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "ok",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.ErrorJSON"
+                        }
+                    }
+                }
+            }
+        },
         "/private/categories": {
             "post": {
                 "description": "Create a new category",
@@ -351,6 +387,42 @@ const docTemplate = `{
                 ],
                 "summary": "Delete a category",
                 "operationId": "delete-category",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "uuid",
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "ok",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.ErrorJSON"
+                        }
+                    }
+                }
+            }
+        },
+        "/private/categories/{uuid}/programs": {
+            "get": {
+                "description": "Find all category's programs",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "categories"
+                ],
+                "summary": "Find all category's programs",
+                "operationId": "find-cat-programs",
                 "parameters": [
                     {
                         "type": "string",
@@ -910,6 +982,114 @@ const docTemplate = `{
                 }
             }
         },
+        "/private/programs/{uuid}/categories": {
+            "get": {
+                "description": "Find a program's categories",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "programs"
+                ],
+                "summary": "Find a program's categories",
+                "operationId": "find-program-categories",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "uuid",
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "ok",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.ErrorJSON"
+                        }
+                    }
+                }
+            }
+        },
+        "/private/programs/{uuid}/episodes": {
+            "get": {
+                "description": "Find a program's episodes",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "programs"
+                ],
+                "summary": "Find a program's episodes",
+                "operationId": "find-program-episodes",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "uuid",
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "ok",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.ErrorJSON"
+                        }
+                    }
+                }
+            }
+        },
+        "/private/programs/{uuid}/tags": {
+            "get": {
+                "description": "Find a program's tags",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "programs"
+                ],
+                "summary": "Find a program's tags",
+                "operationId": "find-program-tags",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "uuid",
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "ok",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.ErrorJSON"
+                        }
+                    }
+                }
+            }
+        },
         "/private/tags": {
             "post": {
                 "description": "Create a new tag",
@@ -1088,6 +1268,42 @@ const docTemplate = `{
                 }
             }
         },
+        "/private/tags/{uuid}/programs": {
+            "get": {
+                "description": "Find all tag's programs",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "tags"
+                ],
+                "summary": "Find all tag's programs",
+                "operationId": "find-tag-programs",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "uuid",
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "ok",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.ErrorJSON"
+                        }
+                    }
+                }
+            }
+        },
         "/private/walls": {
             "post": {
                 "description": "Create a new wall",
@@ -1241,6 +1457,42 @@ const docTemplate = `{
                 ],
                 "summary": "Delete a wall",
                 "operationId": "delete-wall",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "uuid",
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "ok",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.ErrorJSON"
+                        }
+                    }
+                }
+            }
+        },
+        "/private/walls/{uuid}/blocks": {
+            "get": {
+                "description": "Find all wall's blocks",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "walls"
+                ],
+                "summary": "Find all wall's blocks",
+                "operationId": "find-wall-block",
                 "parameters": [
                     {
                         "type": "string",

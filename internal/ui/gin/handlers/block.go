@@ -25,6 +25,8 @@ type Block interface {
 
 	// Delete returns a Gin handler function for deleting a block by its UUID.
 	Delete() gin.HandlerFunc
+
+	FindPrograms() gin.HandlerFunc
 }
 
 type blockHandler struct {
@@ -181,5 +183,35 @@ func (handler blockHandler) Delete() gin.HandlerFunc {
 
 		// Return response
 		c.JSON(http.StatusOK, "deleted")
+	}
+}
+
+// FindPrograms returns a Gin handler function for finding all block's programs.
+//
+// @Summary Find all block's programs
+// @Description Find all block's programs
+// @Tags walls
+// @ID find-block-programs
+// @Param uuid path string true "uuid"
+// @Produce json
+// @Success 200 {string} string "ok"
+// @Failure 500 {object} pkg.ErrorJSON
+// @Router /private/blocks/{uuid}/programs [get]
+func (handler blockHandler) FindPrograms() gin.HandlerFunc {
+	return func(c *gin.Context) {
+
+		// Extract wall UUID from path
+		blockUUID := c.Param("uuid")
+
+		// Call API to find all walls
+		programs, err := handler.api.FindPrograms(c, blockUUID)
+		if err != nil {
+			log.Error().Msg("error finding all block's program: " + err.Error())
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+
+		// Return response
+		c.JSON(http.StatusOK, programs)
 	}
 }

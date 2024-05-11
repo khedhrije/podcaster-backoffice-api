@@ -11,13 +11,10 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-// Category represents the interface for managing categories.
-type Category interface {
-	Create(ctx context.Context, category CreateCategoryRequest) error
-	Update(ctx context.Context, uuid string, updates UpdateCategoryRequest) error
-	Find(ctx context.Context, uuid string) (*pkg.CategoryResponse, error)
-	FindAll(ctx context.Context) ([]*pkg.CategoryResponse, error)
-	Delete(ctx context.Context, uuid string) error
+// CreateCategoryRequest represents the interface for creating categories.
+type CreateCategoryRequest interface {
+	Name() string
+	Description() string
 }
 
 // UpdateCategoryRequest represents the interface for updating categories.
@@ -26,15 +23,29 @@ type UpdateCategoryRequest interface {
 	Description() string
 }
 
+// Category represents the interface for managing categories.
+type Category interface {
+	Create(ctx context.Context, category CreateCategoryRequest) error
+	Update(ctx context.Context, uuid string, updates UpdateCategoryRequest) error
+	Find(ctx context.Context, uuid string) (*pkg.CategoryResponse, error)
+	FindAll(ctx context.Context) ([]*pkg.CategoryResponse, error)
+	Delete(ctx context.Context, uuid string) error
+	FindPrograms(ctx context.Context, uuid string) ([]*pkg.ProgramResponse, error)
+}
+
 // categoryApi is an implementation of the Category interface.
 type categoryApi struct {
-	categoryAdapter port.CategoryPersister
+	categoryAdapter   port.CategoryPersister
+	programCatAdapter port.ProgramCategoryPersister
+	programAdapter    port.ProgramPersister
 }
 
 // NewCategoryApi creates a new instance of Category.
-func NewCategoryApi(categoryAdapter port.CategoryPersister) Category {
+func NewCategoryApi(categoryAdapter port.CategoryPersister, programCatAdapter port.ProgramCategoryPersister, programAdapter port.ProgramPersister) Category {
 	return &categoryApi{
-		categoryAdapter: categoryAdapter,
+		categoryAdapter:   categoryAdapter,
+		programCatAdapter: programCatAdapter,
+		programAdapter:    programAdapter,
 	}
 }
 
@@ -161,8 +172,28 @@ func (api categoryApi) Delete(ctx context.Context, uuid string) error {
 	return nil
 }
 
-// CreateCategoryRequest represents the interface for creating categories.
-type CreateCategoryRequest interface {
-	Name() string
-	Description() string
+// FindPrograms finds programs associated with a cat.
+func (api categoryApi) FindPrograms(ctx context.Context, uuid string) ([]*pkg.ProgramResponse, error) {
+
+	associations, err := api.programCatAdapter.FindByCategoryID(ctx, uuid)
+	if err != nil {
+		return nil, err
+	}
+
+	var response []*pkg.ProgramResponse
+	for _, association := range associations {
+		program, err := api.programAdapter.Find(ctx, association.ProgramID)
+		if err != nil {
+			return nil, err
+		}
+
+		response = append(response, &pkg.ProgramResponse{
+			ID:          program.ID,
+			Name:        program.Name,
+			Description: program.Description,
+		})
+
+	}
+
+	return response, nil
 }

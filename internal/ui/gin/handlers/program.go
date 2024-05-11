@@ -25,6 +25,10 @@ type Program interface {
 
 	// Delete returns a Gin handler function for deleting a program by its UUID.
 	Delete() gin.HandlerFunc
+
+	FindEpisodes() gin.HandlerFunc
+	FindTags() gin.HandlerFunc
+	FindCategories() gin.HandlerFunc
 }
 
 type programHandler struct {
@@ -181,5 +185,92 @@ func (handler programHandler) Delete() gin.HandlerFunc {
 
 		// Return response
 		c.JSON(http.StatusOK, "deleted")
+	}
+}
+
+// FindEpisodes returns a Gin handler function for finding a program's episodes.
+//
+// @Summary Find a program's episodes
+// @Description Find a program's episodes
+// @Tags programs
+// @ID find-program-episodes
+// @Param uuid path string true "uuid"
+// @Produce json
+// @Success 200 {string} string "ok"
+// @Failure 500 {object} pkg.ErrorJSON
+// @Router /private/programs/{uuid}/episodes [get]
+func (handler programHandler) FindEpisodes() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// Extract program UUID from path
+		programUUID := c.Param("uuid")
+
+		// Call API to find program
+		episodes, err := handler.api.FindEpisodes(c, programUUID)
+		if err != nil {
+			log.Error().Msg("error finding program's episodes: " + err.Error())
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+
+		// Return response
+		c.JSON(http.StatusOK, episodes)
+	}
+}
+
+// FindTags returns a Gin handler function for finding a program's tags.
+//
+// @Summary Find a program's tags
+// @Description Find a program's tags
+// @Tags programs
+// @ID find-program-tags
+// @Param uuid path string true "uuid"
+// @Produce json
+// @Success 200 {string} string "ok"
+// @Failure 500 {object} pkg.ErrorJSON
+// @Router /private/programs/{uuid}/tags [get]
+func (handler programHandler) FindTags() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// Extract program UUID from path
+		programUUID := c.Param("uuid")
+
+		// Call API to find program
+		tags, err := handler.api.FindTags(c, programUUID)
+		if err != nil {
+			log.Error().Msg("error finding program's tags: " + err.Error())
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+
+		// Return response
+		c.JSON(http.StatusOK, tags)
+	}
+}
+
+// FindCategories returns a Gin handler function for finding a program's categories.
+//
+// @Summary Find a program's categories
+// @Description Find a program's categories
+// @Tags programs
+// @ID find-program-categories
+// @Param uuid path string true "uuid"
+// @Produce json
+// @Success 200 {string} string "ok"
+// @Failure 500 {object} pkg.ErrorJSON
+// @Router /private/programs/{uuid}/categories [get]
+func (handler programHandler) FindCategories() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// Extract program UUID from path
+		programUUID := c.Param("uuid")
+
+		// Call API to find program
+		categories, err := handler.api.FindCats(c, programUUID)
+		if err != nil {
+			log.Error().Msg("error finding program's categories: " + err.Error())
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+
+		// Return response
+		c.JSON(http.StatusOK, categories)
 	}
 }

@@ -18,24 +18,56 @@ type Wall interface {
 	Find(ctx context.Context, uuid string) (*pkg.WallResponse, error)
 	FindAll(ctx context.Context) ([]*pkg.WallResponse, error)
 	Delete(ctx context.Context, uuid string) error
-}
-
-// UpdateWallRequest represents the interface for updating walls.
-type UpdateWallRequest interface {
-	Name() string
-	Description() string
+	FindBlocks(ctx context.Context, uuid string) ([]*pkg.WallBlocksResponse, error)
 }
 
 // wallApi is an implementation of the Wall interface.
 type wallApi struct {
-	wallAdapter port.WallPersister
+	wallAdapter      port.WallPersister
+	wallBlockAdapter port.WallBlockPersister
+	blockAdapter     port.BlockPersister
 }
 
 // NewWallApi creates a new instance of Wall.
-func NewWallApi(wallAdapter port.WallPersister) Wall {
+func NewWallApi(wallAdapter port.WallPersister, wallBlockAdapter port.WallBlockPersister, blockAdapter port.BlockPersister) Wall {
 	return &wallApi{
-		wallAdapter: wallAdapter,
+		wallAdapter:      wallAdapter,
+		wallBlockAdapter: wallBlockAdapter,
+		blockAdapter:     blockAdapter,
 	}
+}
+
+// FindBlocks finds blocks associated with a wall.
+func (api wallApi) FindBlocks(ctx context.Context, uuid string) ([]*pkg.WallBlocksResponse, error) {
+	// Find associations by wall ID
+	associations, err := api.wallBlockAdapter.FindByWallID(ctx, uuid)
+	if err != nil {
+		return nil, err
+	}
+
+	var response []*pkg.WallBlocksResponse
+	for _, association := range associations {
+		// Find block by ID
+		block, err := api.blockAdapter.Find(ctx, association.BlockID)
+		if err != nil {
+			return nil, err
+		}
+
+		// Map block information to response
+		wallBlocks := &pkg.WallBlocksResponse{
+			BlockResponse: pkg.BlockResponse{
+				ID:          block.ID,
+				Name:        block.Name,
+				Kind:        block.Kind,
+				Description: block.Description,
+			},
+			Position: association.Position,
+		}
+
+		response = append(response, wallBlocks)
+	}
+
+	return response, nil
 }
 
 // Create creates a new wall.
@@ -46,13 +78,15 @@ func (api wallApi) Create(ctx context.Context, req CreateWallRequest) error {
 		log.Ctx(ctx).Error().Err(vErrs).Interface("request", req).Msg("request was not validated")
 		return fmt.Errorf("request was not validated: %w", vErrs)
 	}
-	// Map to domain model
+
+	// Map request to domain model
 	wall := model.Wall{
 		ID:          uuid.New().String(),
 		Name:        req.Name(),
 		Description: req.Description(),
 	}
-	// call adapter
+
+	// Call adapter to create wall
 	if err := api.wallAdapter.Create(ctx, wall); err != nil {
 		log.Ctx(ctx).Error().Err(err).Interface("wall", wall).Msg("error while creating wall")
 		return fmt.Errorf("error occurred while creating wall: %w", err)
@@ -61,7 +95,7 @@ func (api wallApi) Create(ctx context.Context, req CreateWallRequest) error {
 	return nil
 }
 
-// createRequestValidation validates the creation request.
+// createWallRequestValidation validates the creation request.
 func createWallRequestValidation(ctx context.Context, req CreateWallRequest) model.ValidationErrors {
 	var vErrs []model.ValidationError
 	if req.Name() == "" {
@@ -163,6 +197,12 @@ func (api wallApi) Delete(ctx context.Context, uuid string) error {
 
 // CreateWallRequest represents the interface for creating walls.
 type CreateWallRequest interface {
+	Name() string
+	Description() string
+}
+
+// UpdateWallRequest represents the interface for updating walls.
+type UpdateWallRequest interface {
 	Name() string
 	Description() string
 }

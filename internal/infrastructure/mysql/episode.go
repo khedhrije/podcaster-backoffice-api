@@ -21,6 +21,25 @@ func NewEpisodeAdapter(client *client) port.EpisodePersister {
 	}
 }
 
+func (adapter *episodeAdapter) FindByProgramID(ctx context.Context, id string) ([]*model.Episode, error) {
+	// SQL query to select all episode records
+	const query = `
+        SELECT * FROM episode WHERE programID = UUID_TO_BIN(?);
+    `
+	// Execute query and retrieve results
+	var episodesDB []*EpisodeDB
+	if err := adapter.client.db.SelectContext(ctx, &episodesDB, query, id); err != nil {
+		return nil, err
+	}
+	// Convert database models to domain models
+	var episodes []*model.Episode
+	for _, episodeDB := range episodesDB {
+		mappedEpisode := episodeDB.ToDomainModel()
+		episodes = append(episodes, &mappedEpisode)
+	}
+	return episodes, nil
+}
+
 // Create inserts a new episode record into the database.
 func (adapter *episodeAdapter) Create(ctx context.Context, episode model.Episode) error {
 	// SQL query to insert a new episode record
@@ -81,7 +100,7 @@ func (adapter *episodeAdapter) Update(ctx context.Context, episodeUUID string, u
 func (adapter *episodeAdapter) FindAll(ctx context.Context) ([]*model.Episode, error) {
 	// SQL query to select all episode records
 	const query = `
-        SELECT * FROM episode
+        SELECT * FROM episode;
     `
 	// Execute query and retrieve results
 	var episodesDB []*EpisodeDB

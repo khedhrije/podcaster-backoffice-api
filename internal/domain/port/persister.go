@@ -53,6 +53,7 @@ type EpisodePersister interface {
 	Create(ctx context.Context, wall model.Episode) error
 	Update(ctx context.Context, id string, updates model.Episode) error
 	Find(ctx context.Context, id string) (*model.Episode, error)
+	FindByProgramID(ctx context.Context, id string) ([]*model.Episode, error)
 	FindAll(ctx context.Context) ([]*model.Episode, error)
 	Delete(ctx context.Context, id string) error
 }
