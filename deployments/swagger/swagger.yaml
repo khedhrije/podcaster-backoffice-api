@@ -1,0 +1,959 @@
+definitions:
+  pkg.CreateBlockRequestJSON:
+    properties:
+      description:
+        type: string
+      name:
+        type: string
+    type: object
+  pkg.CreateCategoryRequestJSON:
+    properties:
+      description:
+        type: string
+      name:
+        type: string
+    type: object
+  pkg.CreateEpisodeRequestJSON:
+    properties:
+      description:
+        type: string
+      name:
+        type: string
+    type: object
+  pkg.CreateMediaRequestJSON:
+    properties:
+      directLink:
+        type: string
+      kind:
+        type: string
+    type: object
+  pkg.CreateProgramRequestJSON:
+    properties:
+      description:
+        type: string
+      name:
+        type: string
+    type: object
+  pkg.CreateTagRequestJSON:
+    properties:
+      description:
+        type: string
+      name:
+        type: string
+    type: object
+  pkg.CreateWallRequestJSON:
+    properties:
+      description:
+        type: string
+      name:
+        type: string
+    type: object
+  pkg.ErrorJSON:
+    properties:
+      error:
+        type: string
+    type: object
+  pkg.UpdateBlockRequestJSON:
+    properties:
+      description:
+        type: string
+      name:
+        type: string
+    type: object
+  pkg.UpdateCategoryRequestJSON:
+    properties:
+      description:
+        type: string
+      name:
+        type: string
+    type: object
+  pkg.UpdateEpisodeRequestJSON:
+    properties:
+      description:
+        type: string
+      name:
+        type: string
+    type: object
+  pkg.UpdateMediaRequestJSON:
+    properties:
+      directLink:
+        type: string
+      kind:
+        type: string
+    type: object
+  pkg.UpdateProgramRequestJSON:
+    properties:
+      description:
+        type: string
+      name:
+        type: string
+    type: object
+  pkg.UpdateTagRequestJSON:
+    properties:
+      description:
+        type: string
+      name:
+        type: string
+    type: object
+  pkg.UpdateWallRequestJSON:
+    properties:
+      description:
+        type: string
+      name:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: khedhri.je@gmail.com
+    name: API Support
+  description: This is the documentation for the podcaster-backoffice-api.
+  termsOfService: http://swagger.io/terms/
+  title: podcaster-backoffice-api
+  version: 1.0.0
+paths:
+  /private/blocks:
+    post:
+      description: Create a new block
+      operationId: create-block
+      parameters:
+      - description: create request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/pkg.CreateBlockRequestJSON'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/pkg.ErrorJSON'
+      summary: Create a new block
+      tags:
+      - blocks
+  /private/blocks/:
+    get:
+      description: Find all blocks
+      operationId: find-all-blocks
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/pkg.ErrorJSON'
+      summary: Find all blocks
+      tags:
+      - blocks
+  /private/blocks/{uuid}:
+    delete:
+      description: Delete a block
+      operationId: delete-block
+      parameters:
+      - description: uuid
+        in: path
+        name: uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/pkg.ErrorJSON'
+      summary: Delete a block
+      tags:
+      - blocks
+    get:
+      description: Find a block
+      operationId: find-block
+      parameters:
+      - description: uuid
+        in: path
+        name: uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/pkg.ErrorJSON'
+      summary: Find a block
+      tags:
+      - blocks
+    put:
+      description: Update block
+      operationId: update-block
+      parameters:
+      - description: uuid
+        in: path
+        name: uuid
+        required: true
+        type: string
+      - description: update request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/pkg.UpdateBlockRequestJSON'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/pkg.ErrorJSON'
+      summary: Update block
+      tags:
+      - blocks
+  /private/categories:
+    post:
+      description: Create a new category
+      operationId: create-category
+      parameters:
+      - description: create request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/pkg.CreateCategoryRequestJSON'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/pkg.ErrorJSON'
+      summary: Create a new category
+      tags:
+      - categories
+  /private/categories/:
+    get:
+      description: Find all categories
+      operationId: find-all-categories
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/pkg.ErrorJSON'
+      summary: Find all categories
+      tags:
+      - categories
+  /private/categories/{uuid}:
+    delete:
+      description: Delete a category
+      operationId: delete-category
+      parameters:
+      - description: uuid
+        in: path
+        name: uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/pkg.ErrorJSON'
+      summary: Delete a category
+      tags:
+      - categories
+    get:
+      description: Find a category
+      operationId: find-category
+      parameters:
+      - description: uuid
+        in: path
+        name: uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/pkg.ErrorJSON'
+      summary: Find a category
+      tags:
+      - categories
+    put:
+      description: Update category
+      operationId: update-category
+      parameters:
+      - description: uuid
+        in: path
+        name: uuid
+        required: true
+        type: string
+      - description: update request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/pkg.UpdateCategoryRequestJSON'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/pkg.ErrorJSON'
+      summary: Update category
+      tags:
+      - categories
+  /private/episodes:
+    post:
+      description: Create a new episode
+      operationId: create-episode
+      parameters:
+      - description: create request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/pkg.CreateEpisodeRequestJSON'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/pkg.ErrorJSON'
+      summary: Create a new episode
+      tags:
+      - episodes
+  /private/episodes/:
+    get:
+      description: Find all episodes
+      operationId: find-all-episodes
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/pkg.ErrorJSON'
+      summary: Find all episodes
+      tags:
+      - episodes
+  /private/episodes/{uuid}:
+    delete:
+      description: Delete a episode
+      operationId: delete-episode
+      parameters:
+      - description: uuid
+        in: path
+        name: uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/pkg.ErrorJSON'
+      summary: Delete a episode
+      tags:
+      - episodes
+    get:
+      description: Find a episode
+      operationId: find-episode
+      parameters:
+      - description: uuid
+        in: path
+        name: uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/pkg.ErrorJSON'
+      summary: Find a episode
+      tags:
+      - episodes
+    put:
+      description: Update episode
+      operationId: update-episode
+      parameters:
+      - description: uuid
+        in: path
+        name: uuid
+        required: true
+        type: string
+      - description: update request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/pkg.UpdateEpisodeRequestJSON'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/pkg.ErrorJSON'
+      summary: Update episode
+      tags:
+      - episodes
+  /private/medias:
+    post:
+      description: Create a new media
+      operationId: create-media
+      parameters:
+      - description: create request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/pkg.CreateMediaRequestJSON'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/pkg.ErrorJSON'
+      summary: Create a new media
+      tags:
+      - medias
+  /private/medias/:
+    get:
+      description: Find all medias
+      operationId: find-all-medias
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/pkg.ErrorJSON'
+      summary: Find all medias
+      tags:
+      - medias
+  /private/medias/{uuid}:
+    delete:
+      description: Delete a media
+      operationId: delete-media
+      parameters:
+      - description: uuid
+        in: path
+        name: uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/pkg.ErrorJSON'
+      summary: Delete a media
+      tags:
+      - medias
+    get:
+      description: Find a media
+      operationId: find-media
+      parameters:
+      - description: uuid
+        in: path
+        name: uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/pkg.ErrorJSON'
+      summary: Find a media
+      tags:
+      - medias
+    put:
+      description: Update media
+      operationId: update-media
+      parameters:
+      - description: uuid
+        in: path
+        name: uuid
+        required: true
+        type: string
+      - description: update request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/pkg.UpdateMediaRequestJSON'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/pkg.ErrorJSON'
+      summary: Update media
+      tags:
+      - medias
+  /private/programs:
+    post:
+      description: Create a new program
+      operationId: create-program
+      parameters:
+      - description: create request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/pkg.CreateProgramRequestJSON'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/pkg.ErrorJSON'
+      summary: Create a new program
+      tags:
+      - programs
+  /private/programs/:
+    get:
+      description: Find all programs
+      operationId: find-all-programs
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/pkg.ErrorJSON'
+      summary: Find all programs
+      tags:
+      - programs
+  /private/programs/{uuid}:
+    delete:
+      description: Delete a program
+      operationId: delete-program
+      parameters:
+      - description: uuid
+        in: path
+        name: uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/pkg.ErrorJSON'
+      summary: Delete a program
+      tags:
+      - programs
+    get:
+      description: Find a program
+      operationId: find-program
+      parameters:
+      - description: uuid
+        in: path
+        name: uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/pkg.ErrorJSON'
+      summary: Find a program
+      tags:
+      - programs
+    put:
+      description: Update program
+      operationId: update-program
+      parameters:
+      - description: uuid
+        in: path
+        name: uuid
+        required: true
+        type: string
+      - description: update request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/pkg.UpdateProgramRequestJSON'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/pkg.ErrorJSON'
+      summary: Update program
+      tags:
+      - programs
+  /private/tags:
+    post:
+      description: Create a new tag
+      operationId: create-tag
+      parameters:
+      - description: create request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/pkg.CreateTagRequestJSON'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/pkg.ErrorJSON'
+      summary: Create a new tag
+      tags:
+      - tags
+  /private/tags/:
+    get:
+      description: Find all tags
+      operationId: find-all-tags
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/pkg.ErrorJSON'
+      summary: Find all tags
+      tags:
+      - tags
+  /private/tags/{uuid}:
+    delete:
+      description: Delete a tag
+      operationId: delete-tag
+      parameters:
+      - description: uuid
+        in: path
+        name: uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/pkg.ErrorJSON'
+      summary: Delete a tag
+      tags:
+      - tags
+    get:
+      description: Find a tag
+      operationId: find-tag
+      parameters:
+      - description: uuid
+        in: path
+        name: uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/pkg.ErrorJSON'
+      summary: Find a tag
+      tags:
+      - tags
+    put:
+      description: Update tag
+      operationId: update-tag
+      parameters:
+      - description: uuid
+        in: path
+        name: uuid
+        required: true
+        type: string
+      - description: update request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/pkg.UpdateTagRequestJSON'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/pkg.ErrorJSON'
+      summary: Update tag
+      tags:
+      - tags
+  /private/walls:
+    post:
+      description: Create a new wall
+      operationId: create-wall
+      parameters:
+      - description: create request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/pkg.CreateWallRequestJSON'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/pkg.ErrorJSON'
+      summary: Create a new wall
+      tags:
+      - walls
+  /private/walls/:
+    get:
+      description: Find all walls
+      operationId: find-all-walls
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/pkg.ErrorJSON'
+      summary: Find all walls
+      tags:
+      - walls
+  /private/walls/{uuid}:
+    delete:
+      description: Delete a wall
+      operationId: delete-wall
+      parameters:
+      - description: uuid
+        in: path
+        name: uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/pkg.ErrorJSON'
+      summary: Delete a wall
+      tags:
+      - walls
+    get:
+      description: Find a wall
+      operationId: find-wall
+      parameters:
+      - description: uuid
+        in: path
+        name: uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/pkg.ErrorJSON'
+      summary: Find a wall
+      tags:
+      - walls
+    put:
+      description: Update wall
+      operationId: update-wall
+      parameters:
+      - description: uuid
+        in: path
+        name: uuid
+        required: true
+        type: string
+      - description: update request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/pkg.UpdateWallRequestJSON'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/pkg.ErrorJSON'
+      summary: Update wall
+      tags:
+      - walls
+securityDefinitions:
+  Bearer-APIKey:
+    description: Type "Bearer" followed by a space and a valid API key.
+    in: header
+    name: Authorization
+    type: apiKey
+  Bearer-JWT:
+    description: Type "Bearer" followed by a space and a valid JWT token.
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
