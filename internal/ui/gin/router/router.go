@@ -28,7 +28,7 @@ func CreateRouter(wall handlers.Wall, block handlers.Block, program handlers.Pro
 		// Routes for managing walls
 		walls := private.Group("/walls")
 		{
-			walls.POST("/", wall.Create())
+			walls.POST("", wall.Create())
 			walls.PUT("/:uuid", wall.Update())
 			walls.GET("/:uuid", wall.Find())
 			walls.GET("", wall.FindAll())
@@ -38,7 +38,7 @@ func CreateRouter(wall handlers.Wall, block handlers.Block, program handlers.Pro
 		// Routes for managing blocks
 		blocks := private.Group("/blocks")
 		{
-			blocks.POST("/", block.Create())
+			blocks.POST("", block.Create())
 			blocks.PUT("/:uuid", block.Update())
 			blocks.GET("/:uuid", block.Find())
 			blocks.GET("", block.FindAll())
@@ -48,7 +48,7 @@ func CreateRouter(wall handlers.Wall, block handlers.Block, program handlers.Pro
 		// Routes for managing programs
 		programs := private.Group("/programs")
 		{
-			programs.POST("/", program.Create())
+			programs.POST("", program.Create())
 			programs.PUT("/:uuid", program.Update())
 			programs.GET("/:uuid", program.Find())
 			programs.GET("", program.FindAll())
@@ -58,7 +58,7 @@ func CreateRouter(wall handlers.Wall, block handlers.Block, program handlers.Pro
 		// Routes for managing episodes
 		episodes := private.Group("/episodes")
 		{
-			episodes.POST("/", episode.Create())
+			episodes.POST("", episode.Create())
 			episodes.PUT("/:uuid", episode.Update())
 			episodes.GET("/:uuid", episode.Find())
 			episodes.GET("", episode.FindAll())
@@ -68,7 +68,7 @@ func CreateRouter(wall handlers.Wall, block handlers.Block, program handlers.Pro
 		// Routes for managing media
 		mediaRoutes := private.Group("/media")
 		{
-			mediaRoutes.POST("/", media.Create())
+			mediaRoutes.POST("", media.Create())
 			mediaRoutes.PUT("/:uuid", media.Update())
 			mediaRoutes.GET("/:uuid", media.Find())
 			mediaRoutes.GET("", media.FindAll())
@@ -78,7 +78,7 @@ func CreateRouter(wall handlers.Wall, block handlers.Block, program handlers.Pro
 		// Routes for managing tags
 		tags := private.Group("/tags")
 		{
-			tags.POST("/", tag.Create())
+			tags.POST("", tag.Create())
 			tags.PUT("/:uuid", tag.Update())
 			tags.GET("/:uuid", tag.Find())
 			tags.GET("", tag.FindAll())
@@ -88,7 +88,7 @@ func CreateRouter(wall handlers.Wall, block handlers.Block, program handlers.Pro
 		// Routes for managing categories
 		categories := private.Group("/categories")
 		{
-			categories.POST("/", category.Create())
+			categories.POST("", category.Create())
 			categories.PUT("/:uuid", category.Update())
 			categories.GET("/:uuid", category.Find())
 			categories.GET("", category.FindAll())
