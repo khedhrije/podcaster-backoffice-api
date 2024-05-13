@@ -21,6 +21,34 @@ const docTemplate = `{
     "basePath": "{{.BasePath}}",
     "paths": {
         "/private/blocks": {
+            "get": {
+                "description": "Find all blocks",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "blocks"
+                ],
+                "summary": "Find all blocks",
+                "operationId": "find-all-blocks",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/pkg.BlockResponse"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.ErrorJSON"
+                        }
+                    }
+                }
+            },
             "post": {
                 "description": "Create a new block",
                 "produces": [
@@ -42,33 +70,6 @@ const docTemplate = `{
                         }
                     }
                 ],
-                "responses": {
-                    "200": {
-                        "description": "ok",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/pkg.ErrorJSON"
-                        }
-                    }
-                }
-            }
-        },
-        "/private/blocks/": {
-            "get": {
-                "description": "Find all blocks",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "blocks"
-                ],
-                "summary": "Find all blocks",
-                "operationId": "find-all-blocks",
                 "responses": {
                     "200": {
                         "description": "ok",
@@ -107,9 +108,9 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "ok",
+                        "description": "OK",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/pkg.BlockResponse"
                         }
                     },
                     "500": {
@@ -184,7 +185,7 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "ok",
+                        "description": "deleted",
                         "schema": {
                             "type": "string"
                         }
@@ -200,14 +201,14 @@ const docTemplate = `{
         },
         "/private/blocks/{uuid}/programs": {
             "get": {
-                "description": "Find all block's programs",
+                "description": "Find all programs of a block",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "walls"
+                    "blocks"
                 ],
-                "summary": "Find all block's programs",
+                "summary": "Find all programs of a block",
                 "operationId": "find-block-programs",
                 "parameters": [
                     {
@@ -220,9 +221,12 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "ok",
+                        "description": "OK",
                         "schema": {
-                            "type": "string"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/pkg.BlockProgramsResponse"
+                            }
                         }
                     },
                     "500": {
@@ -286,6 +290,34 @@ const docTemplate = `{
             }
         },
         "/private/categories": {
+            "get": {
+                "description": "Find all categories",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "categories"
+                ],
+                "summary": "Find all categories",
+                "operationId": "find-all-categories",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/pkg.CategoryResponse"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.ErrorJSON"
+                        }
+                    }
+                }
+            },
             "post": {
                 "description": "Create a new category",
                 "produces": [
@@ -307,33 +339,6 @@ const docTemplate = `{
                         }
                     }
                 ],
-                "responses": {
-                    "200": {
-                        "description": "ok",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/pkg.ErrorJSON"
-                        }
-                    }
-                }
-            }
-        },
-        "/private/categories/": {
-            "get": {
-                "description": "Find all categories",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "categories"
-                ],
-                "summary": "Find all categories",
-                "operationId": "find-all-categories",
                 "responses": {
                     "200": {
                         "description": "ok",
@@ -372,9 +377,9 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "ok",
+                        "description": "OK",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/pkg.CategoryResponse"
                         }
                     },
                     "500": {
@@ -449,7 +454,7 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "ok",
+                        "description": "deleted",
                         "schema": {
                             "type": "string"
                         }
@@ -473,7 +478,7 @@ const docTemplate = `{
                     "categories"
                 ],
                 "summary": "Find all category's programs",
-                "operationId": "find-cat-programs",
+                "operationId": "find-category-programs",
                 "parameters": [
                     {
                         "type": "string",
@@ -485,9 +490,12 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "ok",
+                        "description": "OK",
                         "schema": {
-                            "type": "string"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/pkg.ProgramResponse"
+                            }
                         }
                     },
                     "500": {
@@ -500,6 +508,34 @@ const docTemplate = `{
             }
         },
         "/private/episodes": {
+            "get": {
+                "description": "Find all episodes",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "episodes"
+                ],
+                "summary": "Find all episodes",
+                "operationId": "find-all-episodes",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/pkg.EpisodeResponse"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.ErrorJSON"
+                        }
+                    }
+                }
+            },
             "post": {
                 "description": "Create a new episode",
                 "produces": [
@@ -537,43 +573,16 @@ const docTemplate = `{
                 }
             }
         },
-        "/private/episodes/": {
-            "get": {
-                "description": "Find all episodes",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "episodes"
-                ],
-                "summary": "Find all episodes",
-                "operationId": "find-all-episodes",
-                "responses": {
-                    "200": {
-                        "description": "ok",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/pkg.ErrorJSON"
-                        }
-                    }
-                }
-            }
-        },
         "/private/episodes/{uuid}": {
             "get": {
-                "description": "Find a episode",
+                "description": "Find an episode",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "episodes"
                 ],
-                "summary": "Find a episode",
+                "summary": "Find an episode",
                 "operationId": "find-episode",
                 "parameters": [
                     {
@@ -586,9 +595,9 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "ok",
+                        "description": "OK",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/pkg.EpisodeResponse"
                         }
                     },
                     "500": {
@@ -643,14 +652,14 @@ const docTemplate = `{
                 }
             },
             "delete": {
-                "description": "Delete a episode",
+                "description": "Delete an episode",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "episodes"
                 ],
-                "summary": "Delete a episode",
+                "summary": "Delete an episode",
                 "operationId": "delete-episode",
                 "parameters": [
                     {
@@ -663,7 +672,7 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "ok",
+                        "description": "deleted",
                         "schema": {
                             "type": "string"
                         }
@@ -678,6 +687,34 @@ const docTemplate = `{
             }
         },
         "/private/medias": {
+            "get": {
+                "description": "Find all medias",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "medias"
+                ],
+                "summary": "Find all medias",
+                "operationId": "find-all-medias",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/pkg.MediaResponse"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.ErrorJSON"
+                        }
+                    }
+                }
+            },
             "post": {
                 "description": "Create a new media",
                 "produces": [
@@ -699,33 +736,6 @@ const docTemplate = `{
                         }
                     }
                 ],
-                "responses": {
-                    "200": {
-                        "description": "ok",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/pkg.ErrorJSON"
-                        }
-                    }
-                }
-            }
-        },
-        "/private/medias/": {
-            "get": {
-                "description": "Find all medias",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "medias"
-                ],
-                "summary": "Find all medias",
-                "operationId": "find-all-medias",
                 "responses": {
                     "200": {
                         "description": "ok",
@@ -764,9 +774,9 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "ok",
+                        "description": "OK",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/pkg.MediaResponse"
                         }
                     },
                     "500": {
@@ -841,7 +851,7 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "ok",
+                        "description": "deleted",
                         "schema": {
                             "type": "string"
                         }
@@ -856,6 +866,34 @@ const docTemplate = `{
             }
         },
         "/private/programs": {
+            "get": {
+                "description": "Find all programs",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "programs"
+                ],
+                "summary": "Find all programs",
+                "operationId": "find-all-programs",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/pkg.ProgramResponse"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.ErrorJSON"
+                        }
+                    }
+                }
+            },
             "post": {
                 "description": "Create a new program",
                 "produces": [
@@ -877,33 +915,6 @@ const docTemplate = `{
                         }
                     }
                 ],
-                "responses": {
-                    "200": {
-                        "description": "ok",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/pkg.ErrorJSON"
-                        }
-                    }
-                }
-            }
-        },
-        "/private/programs/": {
-            "get": {
-                "description": "Find all programs",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "programs"
-                ],
-                "summary": "Find all programs",
-                "operationId": "find-all-programs",
                 "responses": {
                     "200": {
                         "description": "ok",
@@ -942,9 +953,9 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "ok",
+                        "description": "OK",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/pkg.ProgramResponse"
                         }
                     },
                     "500": {
@@ -1019,7 +1030,7 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "ok",
+                        "description": "deleted",
                         "schema": {
                             "type": "string"
                         }
@@ -1055,9 +1066,12 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "ok",
+                        "description": "OK",
                         "schema": {
-                            "type": "string"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/pkg.CategoryResponse"
+                            }
                         }
                     },
                     "500": {
@@ -1145,9 +1159,12 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "ok",
+                        "description": "OK",
                         "schema": {
-                            "type": "string"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/pkg.EpisodeResponse"
+                            }
                         }
                     },
                     "500": {
@@ -1181,9 +1198,12 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "ok",
+                        "description": "OK",
                         "schema": {
-                            "type": "string"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/pkg.TagResponse"
+                            }
                         }
                     },
                     "500": {
@@ -1250,6 +1270,34 @@ const docTemplate = `{
             }
         },
         "/private/tags": {
+            "get": {
+                "description": "Find all tags",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "tags"
+                ],
+                "summary": "Find all tags",
+                "operationId": "find-all-tags",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/pkg.TagResponse"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.ErrorJSON"
+                        }
+                    }
+                }
+            },
             "post": {
                 "description": "Create a new tag",
                 "produces": [
@@ -1271,33 +1319,6 @@ const docTemplate = `{
                         }
                     }
                 ],
-                "responses": {
-                    "200": {
-                        "description": "ok",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/pkg.ErrorJSON"
-                        }
-                    }
-                }
-            }
-        },
-        "/private/tags/": {
-            "get": {
-                "description": "Find all tags",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "tags"
-                ],
-                "summary": "Find all tags",
-                "operationId": "find-all-tags",
                 "responses": {
                     "200": {
                         "description": "ok",
@@ -1336,9 +1357,9 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "ok",
+                        "description": "OK",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/pkg.TagResponse"
                         }
                     },
                     "500": {
@@ -1413,7 +1434,7 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "ok",
+                        "description": "deleted",
                         "schema": {
                             "type": "string"
                         }
@@ -1449,9 +1470,12 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "ok",
+                        "description": "OK",
                         "schema": {
-                            "type": "string"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/pkg.ProgramResponse"
+                            }
                         }
                     },
                     "500": {
@@ -1464,6 +1488,34 @@ const docTemplate = `{
             }
         },
         "/private/walls": {
+            "get": {
+                "description": "Find all walls",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "walls"
+                ],
+                "summary": "Find all walls",
+                "operationId": "find-all-walls",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/pkg.WallResponse"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.ErrorJSON"
+                        }
+                    }
+                }
+            },
             "post": {
                 "description": "Create a new wall",
                 "produces": [
@@ -1485,33 +1537,6 @@ const docTemplate = `{
                         }
                     }
                 ],
-                "responses": {
-                    "200": {
-                        "description": "ok",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/pkg.ErrorJSON"
-                        }
-                    }
-                }
-            }
-        },
-        "/private/walls/": {
-            "get": {
-                "description": "Find all walls",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "walls"
-                ],
-                "summary": "Find all walls",
-                "operationId": "find-all-walls",
                 "responses": {
                     "200": {
                         "description": "ok",
@@ -1550,9 +1575,9 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "ok",
+                        "description": "OK",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/pkg.WallResponse"
                         }
                     },
                     "500": {
@@ -1627,7 +1652,7 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "ok",
+                        "description": "deleted",
                         "schema": {
                             "type": "string"
                         }
@@ -1663,9 +1688,12 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "ok",
+                        "description": "OK",
                         "schema": {
-                            "type": "string"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/pkg.BlockResponse"
+                            }
                         }
                     },
                     "500": {
@@ -1730,6 +1758,57 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "pkg.BlockProgramsResponse": {
+            "type": "object",
+            "properties": {
+                "ID": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "position": {
+                    "type": "integer"
+                }
+            }
+        },
+        "pkg.BlockResponse": {
+            "type": "object",
+            "properties": {
+                "ID": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "kind": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "pkg.CategoryResponse": {
+            "type": "object",
+            "properties": {
+                "ID": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "parentID": {
+                    "type": "string"
+                }
+            }
+        },
         "pkg.CreateBlockRequestJSON": {
             "type": "object",
             "properties": {
@@ -1822,10 +1901,47 @@ const docTemplate = `{
                 }
             }
         },
+        "pkg.EpisodeResponse": {
+            "type": "object",
+            "properties": {
+                "ID": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "position": {
+                    "type": "integer"
+                },
+                "programID": {
+                    "type": "string"
+                }
+            }
+        },
         "pkg.ErrorJSON": {
             "type": "object",
             "properties": {
                 "error": {
+                    "type": "string"
+                }
+            }
+        },
+        "pkg.MediaResponse": {
+            "type": "object",
+            "properties": {
+                "ID": {
+                    "type": "string"
+                },
+                "directLink": {
+                    "type": "string"
+                },
+                "episodeID": {
+                    "type": "string"
+                },
+                "kind": {
                     "type": "string"
                 }
             }
@@ -1855,6 +1971,34 @@ const docTemplate = `{
                     "additionalProperties": {
                         "type": "integer"
                     }
+                }
+            }
+        },
+        "pkg.ProgramResponse": {
+            "type": "object",
+            "properties": {
+                "ID": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "pkg.TagResponse": {
+            "type": "object",
+            "properties": {
+                "ID": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
                 }
             }
         },
@@ -1942,6 +2086,20 @@ const docTemplate = `{
         "pkg.UpdateWallRequestJSON": {
             "type": "object",
             "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "pkg.WallResponse": {
+            "type": "object",
+            "properties": {
+                "ID": {
+                    "type": "string"
+                },
                 "description": {
                     "type": "string"
                 },

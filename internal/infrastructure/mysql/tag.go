@@ -1,3 +1,4 @@
+// Package mysql provides MySQL implementations of the persistence interfaces.
 package mysql
 
 import (
@@ -15,6 +16,7 @@ type tagAdapter struct {
 }
 
 // NewTagAdapter creates a new tag adapter with the provided MySQL client.
+// It returns an instance of tagAdapter.
 func NewTagAdapter(client *client) port.TagPersister {
 	return &tagAdapter{
 		client: client,
@@ -22,71 +24,54 @@ func NewTagAdapter(client *client) port.TagPersister {
 }
 
 // Create inserts a new tag record into the database.
+// It takes a context and a model.Tag, and returns an error if the operation fails.
 func (adapter *tagAdapter) Create(ctx context.Context, tag model.Tag) error {
-	// SQL query to insert a new tag record
 	const query = `
         INSERT INTO tag (UUID, name, description)
         VALUES (UUID_TO_BIN(:UUID), :name, :description)
     `
-	// Convert domain model to database model
 	var tagDB TagDB
 	tagDB.FromDomainModel(tag)
-	// Execute named query
 	_, err := adapter.client.db.NamedExecContext(ctx, query, tagDB)
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }
 
 // Delete removes a tag record from the database based on its UUID.
+// It takes a context and the tag's UUID, and returns an error if the operation fails.
 func (adapter *tagAdapter) Delete(ctx context.Context, tagUUID string) error {
-	// SQL query to delete a tag record by UUID
 	const query = `
         DELETE FROM tag WHERE UUID = UUID_TO_BIN(?)
     `
-	// Execute named query
 	_, err := adapter.client.db.ExecContext(ctx, query, tagUUID)
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }
 
 // Update updates an existing tag record in the database.
+// It takes a context, the tag's UUID, and the updated model.Tag, and returns an error if the operation fails.
 func (adapter *tagAdapter) Update(ctx context.Context, tagUUID string, updates model.Tag) error {
-	// SQL query to update a tag record
 	const query = `
         UPDATE tag SET 
                              name = COALESCE(:name, name), 
                              description = COALESCE(:description, description) 
                         WHERE UUID = UUID_TO_BIN(:UUID)
     `
-	// Set UUID for updates
 	updates.ID = tagUUID
-	// Convert domain model to database model
 	var tagDB TagDB
 	tagDB.FromDomainModel(updates)
-	// Execute named query
 	_, err := adapter.client.db.NamedExecContext(ctx, query, tagDB)
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }
 
 // FindAll retrieves all tag records from the database.
+// It takes a context and returns a slice of model.Tag and an error if the operation fails.
 func (adapter *tagAdapter) FindAll(ctx context.Context) ([]*model.Tag, error) {
-	// SQL query to select all tag records
 	const query = `
         SELECT * FROM tag
     `
-	// Execute query and retrieve results
 	var tagsDB []*TagDB
 	if err := adapter.client.db.SelectContext(ctx, &tagsDB, query); err != nil {
 		return nil, err
 	}
-	// Convert database models to domain models
 	var tags []*model.Tag
 	for _, tagDB := range tagsDB {
 		mappedTag := tagDB.ToDomainModel()
@@ -95,22 +80,19 @@ func (adapter *tagAdapter) FindAll(ctx context.Context) ([]*model.Tag, error) {
 	return tags, nil
 }
 
-// FindByUUID retrieves a tag record from the database by its UUID.
+// Find retrieves a tag record from the database by its UUID.
+// It takes a context and the tag's UUID, and returns a model.Tag and an error if the operation fails.
 func (adapter *tagAdapter) Find(ctx context.Context, tagUUID string) (*model.Tag, error) {
-	// SQL query to select a tag record by UUID
 	const query = `
         SELECT * FROM tag WHERE UUID = UUID_TO_BIN(?)
     `
-	// Execute query and retrieve results
 	var tagsDB []*TagDB
 	if err := adapter.client.db.SelectContext(ctx, &tagsDB, query, tagUUID); err != nil {
 		return nil, err
 	}
-	// Check if the record exists
 	if len(tagsDB) == 0 {
 		return nil, nil
 	}
-	// Convert database model to domain model
 	result := tagsDB[0].ToDomainModel()
 	return &result, nil
 }
@@ -125,6 +107,7 @@ type TagDB struct {
 }
 
 // ToDomainModel converts a TagDB database model to a model.Tag domain model.
+// It returns the corresponding model.Tag.
 func (db *TagDB) ToDomainModel() model.Tag {
 	return model.Tag{
 		ID:          db.UUID.String(),
@@ -134,6 +117,7 @@ func (db *TagDB) ToDomainModel() model.Tag {
 }
 
 // FromDomainModel converts a model.Tag domain model to a TagDB database model.
+// It sets the fields of the TagDB based on the given model.Tag.
 func (db *TagDB) FromDomainModel(domain model.Tag) {
 	db.UUID = uuid.MustParse(domain.ID)
 	db.Name = sql.NullString{String: domain.Name, Valid: domain.Name != ""}

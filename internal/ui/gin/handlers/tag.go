@@ -27,9 +27,11 @@ type Tag interface {
 	// Delete returns a Gin handler function for deleting a tag by its UUID.
 	Delete() gin.HandlerFunc
 
+	// FindPrograms returns a Gin handler function for finding all programs associated with a tag.
 	FindPrograms() gin.HandlerFunc
 }
 
+// tagHandler is an implementation of the Tag interface.
 type tagHandler struct {
 	api api.Tag
 }
@@ -68,6 +70,7 @@ func (handler tagHandler) Create() gin.HandlerFunc {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
+		c.JSON(http.StatusOK, "ok")
 	}
 }
 
@@ -102,6 +105,7 @@ func (handler tagHandler) Update() gin.HandlerFunc {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
+		c.JSON(http.StatusOK, "ok")
 	}
 }
 
@@ -113,7 +117,7 @@ func (handler tagHandler) Update() gin.HandlerFunc {
 // @ID find-tag
 // @Param uuid path string true "uuid"
 // @Produce json
-// @Success 200 {string} string "ok"
+// @Success 200 {object} pkg.TagResponse
 // @Failure 500 {object} pkg.ErrorJSON
 // @Router /private/tags/{uuid} [get]
 func (handler tagHandler) Find() gin.HandlerFunc {
@@ -141,9 +145,9 @@ func (handler tagHandler) Find() gin.HandlerFunc {
 // @Tags tags
 // @ID find-all-tags
 // @Produce json
-// @Success 200 {string} string "ok"
+// @Success 200 {array} pkg.TagResponse
 // @Failure 500 {object} pkg.ErrorJSON
-// @Router /private/tags/ [get]
+// @Router /private/tags [get]
 func (handler tagHandler) FindAll() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Call API to find all tags
@@ -167,7 +171,7 @@ func (handler tagHandler) FindAll() gin.HandlerFunc {
 // @ID delete-tag
 // @Param uuid path string true "uuid"
 // @Produce json
-// @Success 200 {string} string "ok"
+// @Success 200 {string} string "deleted"
 // @Failure 500 {object} pkg.ErrorJSON
 // @Router /private/tags/{uuid} [delete]
 func (handler tagHandler) Delete() gin.HandlerFunc {
@@ -187,7 +191,7 @@ func (handler tagHandler) Delete() gin.HandlerFunc {
 	}
 }
 
-// FindPrograms returns a Gin handler function for finding all block's programs.
+// FindPrograms returns a Gin handler function for finding all programs associated with a tag.
 //
 // @Summary Find all tag's programs
 // @Description Find all tag's programs
@@ -195,16 +199,15 @@ func (handler tagHandler) Delete() gin.HandlerFunc {
 // @ID find-tag-programs
 // @Param uuid path string true "uuid"
 // @Produce json
-// @Success 200 {string} string "ok"
+// @Success 200 {array} pkg.ProgramResponse
 // @Failure 500 {object} pkg.ErrorJSON
 // @Router /private/tags/{uuid}/programs [get]
 func (handler tagHandler) FindPrograms() gin.HandlerFunc {
 	return func(c *gin.Context) {
-
 		// Extract tag UUID from path
 		tagUUID := c.Param("uuid")
 
-		// Call API to find all walls
+		// Call API to find all programs associated with the tag
 		programs, err := handler.api.FindPrograms(c, tagUUID)
 		if err != nil {
 			log.Error().Msg("error finding all tag's programs: " + err.Error())

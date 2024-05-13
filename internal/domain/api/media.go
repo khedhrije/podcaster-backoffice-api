@@ -1,4 +1,4 @@
-// Package media provides functionality for managing medias.
+// Package api provides functionality for managing medias.
 package api
 
 import (
@@ -26,6 +26,7 @@ type mediaApi struct {
 }
 
 // NewMediaApi creates a new instance of Media.
+// It takes a MediaPersister as a dependency.
 func NewMediaApi(mediaAdapter port.MediaPersister) Media {
 	return &mediaApi{
 		mediaAdapter: mediaAdapter,
@@ -33,6 +34,7 @@ func NewMediaApi(mediaAdapter port.MediaPersister) Media {
 }
 
 // Create creates a new media.
+// It takes the context and CreateMediaRequest, and returns an error if any.
 func (api mediaApi) Create(ctx context.Context, req CreateMediaRequest) error {
 	// Validate request
 	vErrs := createMediaRequestValidation(ctx, req)
@@ -47,7 +49,7 @@ func (api mediaApi) Create(ctx context.Context, req CreateMediaRequest) error {
 		Kind:       req.Kind(),
 		EpisodeID:  req.EpisodeID(),
 	}
-	// call adapter
+	// Call adapter
 	if err := api.mediaAdapter.Create(ctx, media); err != nil {
 		log.Ctx(ctx).Error().Err(err).Interface("media", media).Msg("error while creating media")
 		return fmt.Errorf("error occurred while creating media: %w", err)
@@ -56,14 +58,12 @@ func (api mediaApi) Create(ctx context.Context, req CreateMediaRequest) error {
 	return nil
 }
 
-// createRequestValidation validates the creation request.
+// createMediaRequestValidation validates the creation request.
+// It takes the context and CreateMediaRequest, and returns a slice of ValidationErrors.
 func createMediaRequestValidation(ctx context.Context, req CreateMediaRequest) model.ValidationErrors {
 	var vErrs []model.ValidationError
 	if req.DirectLink() == "" {
 		vErrs = append(vErrs, model.ValidationError{Field: "directLink", Message: "is required"})
-	}
-	if req.Kind() == "" {
-		vErrs = append(vErrs, model.ValidationError{Field: "kind", Message: "is required"})
 	}
 	if req.Kind() == "" {
 		vErrs = append(vErrs, model.ValidationError{Field: "kind", Message: "is required"})
@@ -75,6 +75,7 @@ func createMediaRequestValidation(ctx context.Context, req CreateMediaRequest) m
 }
 
 // Update updates an existing media.
+// It takes the context, media UUID, and UpdateMediaRequest, and returns an error if any.
 func (api mediaApi) Update(ctx context.Context, uuid string, updates UpdateMediaRequest) error {
 	// Validate request
 	vErrs := updateMediaRequestValidation(ctx, uuid, updates)
@@ -94,7 +95,7 @@ func (api mediaApi) Update(ctx context.Context, uuid string, updates UpdateMedia
 		media.EpisodeID = updates.EpisodeID()
 	}
 
-	// call adapter
+	// Call adapter
 	if err := api.mediaAdapter.Update(ctx, uuid, media); err != nil {
 		log.Ctx(ctx).Error().Err(err).Interface("media", media).Msg("error while updating media")
 		return fmt.Errorf("error occurred while updating media: %w", err)
@@ -103,19 +104,19 @@ func (api mediaApi) Update(ctx context.Context, uuid string, updates UpdateMedia
 	return nil
 }
 
-// updateRequestValidation validates the update request.
+// updateMediaRequestValidation validates the update request.
+// It takes the context, media UUID, and UpdateMediaRequest, and returns a slice of ValidationErrors.
 func updateMediaRequestValidation(ctx context.Context, uuid string, req UpdateMediaRequest) model.ValidationErrors {
 	var vErrs []model.ValidationError
 	if uuid == "" {
 		vErrs = append(vErrs, model.ValidationError{Field: "uuid", Message: "cannot be empty"})
 	}
-
 	return vErrs
 }
 
 // Find finds a media by UUID.
+// It takes the context and media UUID, and returns a MediaResponse or an error.
 func (api mediaApi) Find(ctx context.Context, uuid string) (*pkg.MediaResponse, error) {
-
 	// Call adapter
 	media, err := api.mediaAdapter.Find(ctx, uuid)
 	if err != nil {
@@ -130,17 +131,18 @@ func (api mediaApi) Find(ctx context.Context, uuid string) (*pkg.MediaResponse, 
 		Kind:       media.Kind,
 		EpisodeID:  media.EpisodeID,
 	}
-	// return result
+	// Return result
 	return response, nil
 }
 
 // FindAll finds all medias.
+// It takes the context and returns a slice of MediaResponse or an error.
 func (api mediaApi) FindAll(ctx context.Context) ([]*pkg.MediaResponse, error) {
 	// Call adapter
 	mediaSlice, err := api.mediaAdapter.FindAll(ctx)
 	if err != nil {
-		log.Ctx(ctx).Error().Err(err).Msg("error while finding media")
-		return nil, fmt.Errorf("error occurred while finding media: %w", err)
+		log.Ctx(ctx).Error().Err(err).Msg("error while finding medias")
+		return nil, fmt.Errorf("error occurred while finding medias: %w", err)
 	}
 
 	// Map to response
@@ -153,11 +155,12 @@ func (api mediaApi) FindAll(ctx context.Context) ([]*pkg.MediaResponse, error) {
 			EpisodeID:  media.EpisodeID,
 		})
 	}
-	// return result
+	// Return result
 	return response, nil
 }
 
 // Delete deletes a media by UUID.
+// It takes the context and media UUID, and returns an error if any.
 func (api mediaApi) Delete(ctx context.Context, uuid string) error {
 	if err := api.mediaAdapter.Delete(ctx, uuid); err != nil {
 		log.Ctx(ctx).Error().Err(err).Interface("uuid", uuid).Msg("error while deleting media")

@@ -1,3 +1,4 @@
+// Package mysql provides MySQL implementations of the persistence interfaces.
 package mysql
 
 import (
@@ -15,6 +16,7 @@ type programAdapter struct {
 }
 
 // NewProgramAdapter creates a new program adapter with the provided MySQL client.
+// It returns an implementation of the ProgramPersister interface.
 func NewProgramAdapter(client *client) port.ProgramPersister {
 	return &programAdapter{
 		client: client,
@@ -22,71 +24,54 @@ func NewProgramAdapter(client *client) port.ProgramPersister {
 }
 
 // Create inserts a new program record into the database.
+// It takes a context and a model.Program, and returns an error if the operation fails.
 func (adapter *programAdapter) Create(ctx context.Context, program model.Program) error {
-	// SQL query to insert a new program record
 	const query = `
         INSERT INTO program (UUID, name, description)
         VALUES (UUID_TO_BIN(:UUID), :name, :description)
     `
-	// Convert domain model to database model
 	var programDB ProgramDB
 	programDB.FromDomainModel(program)
-	// Execute named query
 	_, err := adapter.client.db.NamedExecContext(ctx, query, programDB)
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }
 
 // Delete removes a program record from the database based on its UUID.
+// It takes a context and the program's UUID, and returns an error if the operation fails.
 func (adapter *programAdapter) Delete(ctx context.Context, programUUID string) error {
-	// SQL query to delete a program record by UUID
 	const query = `
         DELETE FROM program WHERE UUID = UUID_TO_BIN(?)
     `
-	// Execute named query
 	_, err := adapter.client.db.ExecContext(ctx, query, programUUID)
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }
 
 // Update updates an existing program record in the database.
+// It takes a context, the program's UUID, and the updated model.Program, and returns an error if the operation fails.
 func (adapter *programAdapter) Update(ctx context.Context, programUUID string, updates model.Program) error {
-	// SQL query to update a program record
 	const query = `
         UPDATE program SET 
                              name = COALESCE(:name, name), 
                              description = COALESCE(:description, description) 
                         WHERE UUID = UUID_TO_BIN(:UUID)
     `
-	// Set UUID for updates
 	updates.ID = programUUID
-	// Convert domain model to database model
 	var programDB ProgramDB
 	programDB.FromDomainModel(updates)
-	// Execute named query
 	_, err := adapter.client.db.NamedExecContext(ctx, query, programDB)
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }
 
 // FindAll retrieves all program records from the database.
+// It takes a context and returns a slice of model.Program and an error if the operation fails.
 func (adapter *programAdapter) FindAll(ctx context.Context) ([]*model.Program, error) {
-	// SQL query to select all program records
 	const query = `
         SELECT * FROM program
     `
-	// Execute query and retrieve results
 	var programsDB []*ProgramDB
 	if err := adapter.client.db.SelectContext(ctx, &programsDB, query); err != nil {
 		return nil, err
 	}
-	// Convert database models to domain models
 	var programs []*model.Program
 	for _, programDB := range programsDB {
 		mappedProgram := programDB.ToDomainModel()
@@ -95,22 +80,19 @@ func (adapter *programAdapter) FindAll(ctx context.Context) ([]*model.Program, e
 	return programs, nil
 }
 
-// FindByUUID retrieves a program record from the database by its UUID.
+// Find retrieves a program record from the database by its UUID.
+// It takes a context and the program's UUID, and returns a model.Program and an error if the operation fails.
 func (adapter *programAdapter) Find(ctx context.Context, programUUID string) (*model.Program, error) {
-	// SQL query to select a program record by UUID
 	const query = `
         SELECT * FROM program WHERE UUID = UUID_TO_BIN(?)
     `
-	// Execute query and retrieve results
 	var programsDB []*ProgramDB
 	if err := adapter.client.db.SelectContext(ctx, &programsDB, query, programUUID); err != nil {
 		return nil, err
 	}
-	// Check if the record exists
 	if len(programsDB) == 0 {
 		return nil, nil
 	}
-	// Convert database model to domain model
 	result := programsDB[0].ToDomainModel()
 	return &result, nil
 }
@@ -125,6 +107,7 @@ type ProgramDB struct {
 }
 
 // ToDomainModel converts a ProgramDB database model to a model.Program domain model.
+// It returns the corresponding model.Program.
 func (db *ProgramDB) ToDomainModel() model.Program {
 	return model.Program{
 		ID:          db.UUID.String(),
@@ -134,6 +117,7 @@ func (db *ProgramDB) ToDomainModel() model.Program {
 }
 
 // FromDomainModel converts a model.Program domain model to a ProgramDB database model.
+// It sets the fields of the ProgramDB based on the given model.Program.
 func (db *ProgramDB) FromDomainModel(domain model.Program) {
 	db.UUID = uuid.MustParse(domain.ID)
 	db.Name = sql.NullString{String: domain.Name, Valid: domain.Name != ""}

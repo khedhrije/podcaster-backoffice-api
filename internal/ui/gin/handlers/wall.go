@@ -27,7 +27,10 @@ type Wall interface {
 	// Delete returns a Gin handler function for deleting a wall by its UUID.
 	Delete() gin.HandlerFunc
 
+	// FindBlocks returns a Gin handler function for finding all blocks associated with a wall.
 	FindBlocks() gin.HandlerFunc
+
+	// OverwriteBlocks returns a Gin handler function for overwriting the blocks of a wall.
 	OverwriteBlocks() gin.HandlerFunc
 }
 
@@ -55,7 +58,6 @@ func NewWallHandler(api api.Wall) Wall {
 // @Router /private/walls [post]
 func (handler wallHandler) Create() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		// Extract body request
 		var jsonRequest pkg.CreateWallRequestJSON
 		if err := c.ShouldBindJSON(&jsonRequest); err != nil {
 			log.Ctx(c).Error().Err(err).Msg("error binding request")
@@ -63,12 +65,13 @@ func (handler wallHandler) Create() gin.HandlerFunc {
 			return
 		}
 
-		// Call API to create wall
 		if err := handler.api.Create(c, jsonRequest); err != nil {
 			log.Error().Msg("error creating wall: " + err.Error())
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
+
+		c.JSON(http.StatusOK, "ok")
 	}
 }
 
@@ -86,23 +89,22 @@ func (handler wallHandler) Create() gin.HandlerFunc {
 // @Router /private/walls/{uuid} [put]
 func (handler wallHandler) Update() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		// Extract wall UUID from path
 		wallUUID := c.Param("uuid")
 
-		// Extract body request
-		var jsonRequest pkg.CreateWallRequestJSON
+		var jsonRequest pkg.UpdateWallRequestJSON
 		if err := c.ShouldBindJSON(&jsonRequest); err != nil {
 			log.Ctx(c).Error().Err(err).Msg("error binding request")
 			c.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
 			return
 		}
 
-		// Call API to update wall
 		if err := handler.api.Update(c, wallUUID, jsonRequest); err != nil {
 			log.Error().Msg("error updating wall: " + err.Error())
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
+
+		c.JSON(http.StatusOK, "ok")
 	}
 }
 
@@ -114,15 +116,13 @@ func (handler wallHandler) Update() gin.HandlerFunc {
 // @ID find-wall
 // @Param uuid path string true "uuid"
 // @Produce json
-// @Success 200 {string} string "ok"
+// @Success 200 {object} pkg.WallResponse
 // @Failure 500 {object} pkg.ErrorJSON
 // @Router /private/walls/{uuid} [get]
 func (handler wallHandler) Find() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		// Extract wall UUID from path
 		wallUUID := c.Param("uuid")
 
-		// Call API to find wall
 		wall, err := handler.api.Find(c, wallUUID)
 		if err != nil {
 			log.Error().Msg("error finding wall: " + err.Error())
@@ -130,7 +130,6 @@ func (handler wallHandler) Find() gin.HandlerFunc {
 			return
 		}
 
-		// Return response
 		c.JSON(http.StatusOK, wall)
 	}
 }
@@ -142,12 +141,11 @@ func (handler wallHandler) Find() gin.HandlerFunc {
 // @Tags walls
 // @ID find-all-walls
 // @Produce json
-// @Success 200 {string} string "ok"
+// @Success 200 {array} pkg.WallResponse
 // @Failure 500 {object} pkg.ErrorJSON
-// @Router /private/walls/ [get]
+// @Router /private/walls [get]
 func (handler wallHandler) FindAll() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		// Call API to find all walls
 		walls, err := handler.api.FindAll(c)
 		if err != nil {
 			log.Error().Msg("error finding all walls: " + err.Error())
@@ -155,7 +153,6 @@ func (handler wallHandler) FindAll() gin.HandlerFunc {
 			return
 		}
 
-		// Return response
 		c.JSON(http.StatusOK, walls)
 	}
 }
@@ -168,27 +165,24 @@ func (handler wallHandler) FindAll() gin.HandlerFunc {
 // @ID delete-wall
 // @Param uuid path string true "uuid"
 // @Produce json
-// @Success 200 {string} string "ok"
+// @Success 200 {string} string "deleted"
 // @Failure 500 {object} pkg.ErrorJSON
 // @Router /private/walls/{uuid} [delete]
 func (handler wallHandler) Delete() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		// Extract wall UUID from path
 		wallUUID := c.Param("uuid")
 
-		// Call API to delete wall
 		if err := handler.api.Delete(c, wallUUID); err != nil {
 			log.Error().Msg("error deleting wall: " + err.Error())
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
 
-		// Return response
 		c.JSON(http.StatusOK, "deleted")
 	}
 }
 
-// FindBlocks returns a Gin handler function for finding all wall's blocks.
+// FindBlocks returns a Gin handler function for finding all blocks associated with a wall.
 //
 // @Summary Find all wall's blocks
 // @Description Find all wall's blocks
@@ -196,29 +190,25 @@ func (handler wallHandler) Delete() gin.HandlerFunc {
 // @ID find-wall-block
 // @Param uuid path string true "uuid"
 // @Produce json
-// @Success 200 {string} string "ok"
+// @Success 200 {array} pkg.BlockResponse
 // @Failure 500 {object} pkg.ErrorJSON
 // @Router /private/walls/{uuid}/blocks [get]
 func (handler wallHandler) FindBlocks() gin.HandlerFunc {
 	return func(c *gin.Context) {
-
-		// Extract wall UUID from path
 		wallUUID := c.Param("uuid")
 
-		// Call API to find all walls
-		walls, err := handler.api.FindBlocks(c, wallUUID)
+		blocks, err := handler.api.FindBlocks(c, wallUUID)
 		if err != nil {
 			log.Error().Msg("error finding all wall's blocks: " + err.Error())
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
 
-		// Return response
-		c.JSON(http.StatusOK, walls)
+		c.JSON(http.StatusOK, blocks)
 	}
 }
 
-// OverwriteBlocks returns a Gin handler function for overwriting blocks.
+// OverwriteBlocks returns a Gin handler function for overwriting the blocks of a wall.
 //
 // @Summary Overwrite blocks of a wall
 // @Description Overwrite the blocks of a specific wall by replacing all existing blocks with new ones
@@ -233,11 +223,8 @@ func (handler wallHandler) FindBlocks() gin.HandlerFunc {
 // @Router /private/walls/{uuid}/blocks/overwrite [put]
 func (handler wallHandler) OverwriteBlocks() gin.HandlerFunc {
 	return func(c *gin.Context) {
-
-		// Extract wall UUID from path
 		wallUUID := c.Param("uuid")
 
-		// Extract body request
 		var jsonRequest pkg.OverwriteBlocksRequestJSON
 		if err := c.ShouldBindJSON(&jsonRequest); err != nil {
 			log.Ctx(c).Error().Err(err).Msg("error binding request")
@@ -245,14 +232,12 @@ func (handler wallHandler) OverwriteBlocks() gin.HandlerFunc {
 			return
 		}
 
-		// Call API to overwrite blocks
 		if err := handler.api.OverwriteBlocks(c, wallUUID, jsonRequest); err != nil {
 			log.Error().Msg("error overwriting blocks: " + err.Error())
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
 
-		// Return response
 		c.JSON(http.StatusOK, "ok")
 	}
 }

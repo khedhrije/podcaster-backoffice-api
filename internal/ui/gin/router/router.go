@@ -1,3 +1,4 @@
+// Package router sets up the routes for the API using the Gin framework.
 package router
 
 import (
@@ -10,22 +11,25 @@ import (
 	"strings"
 )
 
+// CreateRouter sets up and returns a new Gin router with the defined routes.
 func CreateRouter(wall handlers.Wall, block handlers.Block, program handlers.Program, episode handlers.Episode, media handlers.Media, tag handlers.Tag, category handlers.Category) *gin.Engine {
 	// Initialize a new Gin router without any middleware by default.
 	r := gin.New()
 
+	// Configure Swagger documentation URL based on the environment.
 	if configuration.Config.Env == "dev" {
 		spec.SwaggerInfo.Host = configuration.Config.DocsAddress
 	} else {
 		spec.SwaggerInfo.Host = removeHTTPS(configuration.Config.DocsAddress)
 	}
 
+	// Set up the route for Swagger documentation.
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 
-	// Define private routes
+	// Define private routes that require authentication.
 	private := r.Group("/private")
 	{
-		// Routes for managing walls
+		// Routes for managing walls.
 		walls := private.Group("/walls")
 		{
 			walls.POST("", wall.Create())
@@ -37,7 +41,7 @@ func CreateRouter(wall handlers.Wall, block handlers.Block, program handlers.Pro
 			walls.PUT("/:uuid/blocks/overwrite", wall.OverwriteBlocks())
 		}
 
-		// Routes for managing blocks
+		// Routes for managing blocks.
 		blocks := private.Group("/blocks")
 		{
 			blocks.POST("", block.Create())
@@ -49,7 +53,7 @@ func CreateRouter(wall handlers.Wall, block handlers.Block, program handlers.Pro
 			blocks.PUT("/:uuid/programs/overwrite", block.OverwritePrograms())
 		}
 
-		// Routes for managing programs
+		// Routes for managing programs.
 		programs := private.Group("/programs")
 		{
 			programs.POST("", program.Create())
@@ -64,7 +68,7 @@ func CreateRouter(wall handlers.Wall, block handlers.Block, program handlers.Pro
 			programs.PUT("/:uuid/categories/overwrite", program.OverwriteCategories())
 		}
 
-		// Routes for managing episodes
+		// Routes for managing episodes.
 		episodes := private.Group("/episodes")
 		{
 			episodes.POST("", episode.Create())
@@ -74,7 +78,7 @@ func CreateRouter(wall handlers.Wall, block handlers.Block, program handlers.Pro
 			episodes.DELETE("/:uuid", episode.Delete())
 		}
 
-		// Routes for managing media
+		// Routes for managing media.
 		mediaRoutes := private.Group("/medias")
 		{
 			mediaRoutes.POST("", media.Create())
@@ -84,7 +88,7 @@ func CreateRouter(wall handlers.Wall, block handlers.Block, program handlers.Pro
 			mediaRoutes.DELETE("/:uuid", media.Delete())
 		}
 
-		// Routes for managing tags
+		// Routes for managing tags.
 		tags := private.Group("/tags")
 		{
 			tags.POST("", tag.Create())
@@ -95,7 +99,7 @@ func CreateRouter(wall handlers.Wall, block handlers.Block, program handlers.Pro
 			tags.GET("/:uuid/programs", tag.FindPrograms())
 		}
 
-		// Routes for managing categories
+		// Routes for managing categories.
 		categories := private.Group("/categories")
 		{
 			categories.POST("", category.Create())
@@ -111,6 +115,7 @@ func CreateRouter(wall handlers.Wall, block handlers.Block, program handlers.Pro
 	return r
 }
 
+// removeHTTPS removes the "https://" prefix from a URL string.
 func removeHTTPS(url string) string {
 	// Check if the URL starts with "https://"
 	if strings.HasPrefix(url, "https://") {

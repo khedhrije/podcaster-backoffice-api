@@ -1,4 +1,4 @@
-// Package category provides functionality for managing categories.
+// Package api provides functionality for managing categories.
 package api
 
 import (
@@ -43,6 +43,7 @@ type categoryApi struct {
 }
 
 // NewCategoryApi creates a new instance of Category.
+// It takes adapters for category, program-category, and program persistence as dependencies.
 func NewCategoryApi(categoryAdapter port.CategoryPersister, programCatAdapter port.ProgramCategoryPersister, programAdapter port.ProgramPersister) Category {
 	return &categoryApi{
 		categoryAdapter:   categoryAdapter,
@@ -52,6 +53,7 @@ func NewCategoryApi(categoryAdapter port.CategoryPersister, programCatAdapter po
 }
 
 // Create creates a new category.
+// It takes the context and CreateCategoryRequest, and returns an error if any.
 func (api categoryApi) Create(ctx context.Context, req CreateCategoryRequest) error {
 	// Validate request
 	vErrs := createCategoryRequestValidation(ctx, req)
@@ -68,7 +70,7 @@ func (api categoryApi) Create(ctx context.Context, req CreateCategoryRequest) er
 			ID: req.ParentID(),
 		},
 	}
-	// call adapter
+	// Call adapter
 	if err := api.categoryAdapter.Create(ctx, category); err != nil {
 		log.Ctx(ctx).Error().Err(err).Interface("category", category).Msg("error while creating category")
 		return fmt.Errorf("error occurred while creating category: %w", err)
@@ -77,7 +79,8 @@ func (api categoryApi) Create(ctx context.Context, req CreateCategoryRequest) er
 	return nil
 }
 
-// createRequestValidation validates the creation request.
+// createCategoryRequestValidation validates the creation request.
+// It takes the context and CreateCategoryRequest, and returns a slice of ValidationErrors.
 func createCategoryRequestValidation(ctx context.Context, req CreateCategoryRequest) model.ValidationErrors {
 	var vErrs []model.ValidationError
 	if req.Name() == "" {
@@ -90,16 +93,12 @@ func createCategoryRequestValidation(ctx context.Context, req CreateCategoryRequ
 }
 
 // Update updates an existing category.
+// It takes the context, category UUID, and UpdateCategoryRequest, and returns an error if any.
 func (api categoryApi) Update(ctx context.Context, uuid string, updates UpdateCategoryRequest) error {
 	// Validate request
 	vErrs := updateCategoryRequestValidation(ctx, uuid, updates)
 	if len(vErrs) > 0 {
-		log.
-			Ctx(ctx).
-			Error().
-			Err(vErrs).
-			Interface("updates", updates).
-			Msg("request was not validated")
+		log.Ctx(ctx).Error().Err(vErrs).Interface("updates", updates).Msg("request was not validated")
 		return fmt.Errorf("request was not validated: %w", vErrs)
 	}
 
@@ -117,7 +116,7 @@ func (api categoryApi) Update(ctx context.Context, uuid string, updates UpdateCa
 		}
 	}
 
-	// call adapter
+	// Call adapter
 	if err := api.categoryAdapter.Update(ctx, uuid, category); err != nil {
 		log.Ctx(ctx).Error().Err(err).Interface("category", category).Msg("error while updating category")
 		return fmt.Errorf("error occurred while updating category: %w", err)
@@ -126,7 +125,8 @@ func (api categoryApi) Update(ctx context.Context, uuid string, updates UpdateCa
 	return nil
 }
 
-// updateRequestValidation validates the update request.
+// updateCategoryRequestValidation validates the update request.
+// It takes the context, category UUID, and UpdateCategoryRequest, and returns a slice of ValidationErrors.
 func updateCategoryRequestValidation(ctx context.Context, uuid string, req UpdateCategoryRequest) model.ValidationErrors {
 	var vErrs []model.ValidationError
 	if uuid == "" {
@@ -136,8 +136,8 @@ func updateCategoryRequestValidation(ctx context.Context, uuid string, req Updat
 }
 
 // Find finds a category by UUID.
+// It takes the context and category UUID, and returns a CategoryResponse or an error.
 func (api categoryApi) Find(ctx context.Context, uuid string) (*pkg.CategoryResponse, error) {
-
 	// Call adapter
 	category, err := api.categoryAdapter.Find(ctx, uuid)
 	if err != nil {
@@ -156,22 +156,23 @@ func (api categoryApi) Find(ctx context.Context, uuid string) (*pkg.CategoryResp
 		Description: category.Description,
 		ParentID:    parentID,
 	}
-	// return result
+	// Return result
 	return response, nil
 }
 
 // FindAll finds all categories.
+// It takes the context and returns a slice of CategoryResponse or an error.
 func (api categoryApi) FindAll(ctx context.Context) ([]*pkg.CategoryResponse, error) {
 	// Call adapter
-	categorieslice, err := api.categoryAdapter.FindAll(ctx)
+	categories, err := api.categoryAdapter.FindAll(ctx)
 	if err != nil {
-		log.Ctx(ctx).Error().Err(err).Msg("error while finding category")
-		return nil, fmt.Errorf("error occurred while finding category: %w", err)
+		log.Ctx(ctx).Error().Err(err).Msg("error while finding categories")
+		return nil, fmt.Errorf("error occurred while finding categories: %w", err)
 	}
 
 	// Map to response
 	var response []*pkg.CategoryResponse
-	for _, category := range categorieslice {
+	for _, category := range categories {
 		parentID := ""
 		if category.Parent != nil {
 			parentID = category.Parent.ID
@@ -183,11 +184,12 @@ func (api categoryApi) FindAll(ctx context.Context) ([]*pkg.CategoryResponse, er
 			ParentID:    parentID,
 		})
 	}
-	// return result
+	// Return result
 	return response, nil
 }
 
 // Delete deletes a category by UUID.
+// It takes the context and category UUID, and returns an error if any.
 func (api categoryApi) Delete(ctx context.Context, uuid string) error {
 	if err := api.categoryAdapter.Delete(ctx, uuid); err != nil {
 		log.Ctx(ctx).Error().Err(err).Interface("uuid", uuid).Msg("error while deleting category")
@@ -196,9 +198,9 @@ func (api categoryApi) Delete(ctx context.Context, uuid string) error {
 	return nil
 }
 
-// FindPrograms finds programs associated with a cat.
+// FindPrograms finds programs associated with a category.
+// It takes the context and category UUID, and returns a slice of ProgramResponse or an error.
 func (api categoryApi) FindPrograms(ctx context.Context, uuid string) ([]*pkg.ProgramResponse, error) {
-
 	associations, err := api.programCatAdapter.FindByCategoryID(ctx, uuid)
 	if err != nil {
 		return nil, err
@@ -216,7 +218,6 @@ func (api categoryApi) FindPrograms(ctx context.Context, uuid string) ([]*pkg.Pr
 			Name:        program.Name,
 			Description: program.Description,
 		})
-
 	}
 
 	return response, nil

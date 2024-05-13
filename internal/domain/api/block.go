@@ -1,4 +1,4 @@
-// Package block provides functionality for managing blocks.
+// Package api provides functionality for managing blocks.
 package api
 
 import (
@@ -44,6 +44,7 @@ type blockApi struct {
 }
 
 // NewBlockApi creates a new instance of Block.
+// It takes blockAdapter, blockProgramAdapter, and programAdapter as dependencies.
 func NewBlockApi(blockAdapter port.BlockPersister, blockProgramAdapter port.BlockProgramPersister, programAdapter port.ProgramPersister) Block {
 	return &blockApi{
 		blockAdapter:        blockAdapter,
@@ -53,6 +54,7 @@ func NewBlockApi(blockAdapter port.BlockPersister, blockProgramAdapter port.Bloc
 }
 
 // Create creates a new block.
+// It takes the context and CreateBlockRequest, and returns an error if any.
 func (api blockApi) Create(ctx context.Context, req CreateBlockRequest) error {
 	// Validate request
 	vErrs := createBlockRequestValidation(ctx, req)
@@ -67,7 +69,7 @@ func (api blockApi) Create(ctx context.Context, req CreateBlockRequest) error {
 		Description: req.Description(),
 		Kind:        req.Kind(),
 	}
-	// call adapter
+	// Call adapter
 	if err := api.blockAdapter.Create(ctx, block); err != nil {
 		log.Ctx(ctx).Error().Err(err).Interface("block", block).Msg("error while creating block")
 		return fmt.Errorf("error occurred while creating block: %w", err)
@@ -76,7 +78,8 @@ func (api blockApi) Create(ctx context.Context, req CreateBlockRequest) error {
 	return nil
 }
 
-// createRequestValidation validates the creation request.
+// createBlockRequestValidation validates the creation request.
+// It takes the context and CreateBlockRequest, and returns a slice of ValidationErrors.
 func createBlockRequestValidation(ctx context.Context, req CreateBlockRequest) model.ValidationErrors {
 	var vErrs []model.ValidationError
 	if req.Name() == "" {
@@ -89,6 +92,7 @@ func createBlockRequestValidation(ctx context.Context, req CreateBlockRequest) m
 }
 
 // Update updates an existing block.
+// It takes the context, block UUID, and UpdateBlockRequest, and returns an error if any.
 func (api blockApi) Update(ctx context.Context, uuid string, updates UpdateBlockRequest) error {
 	// Validate request
 	vErrs := updateBlockRequestValidation(ctx, uuid, updates)
@@ -108,7 +112,7 @@ func (api blockApi) Update(ctx context.Context, uuid string, updates UpdateBlock
 		block.Kind = updates.Kind()
 	}
 
-	// call adapter
+	// Call adapter
 	if err := api.blockAdapter.Update(ctx, uuid, block); err != nil {
 		log.Ctx(ctx).Error().Err(err).Interface("block", block).Msg("error while updating block")
 		return fmt.Errorf("error occurred while updating block: %w", err)
@@ -117,7 +121,8 @@ func (api blockApi) Update(ctx context.Context, uuid string, updates UpdateBlock
 	return nil
 }
 
-// updateRequestValidation validates the update request.
+// updateBlockRequestValidation validates the update request.
+// It takes the context, block UUID, and UpdateBlockRequest, and returns a slice of ValidationErrors.
 func updateBlockRequestValidation(ctx context.Context, uuid string, req UpdateBlockRequest) model.ValidationErrors {
 	var vErrs []model.ValidationError
 	if uuid == "" {
@@ -127,8 +132,8 @@ func updateBlockRequestValidation(ctx context.Context, uuid string, req UpdateBl
 }
 
 // Find finds a block by UUID.
+// It takes the context and block UUID, and returns a BlockResponse or an error.
 func (api blockApi) Find(ctx context.Context, uuid string) (*pkg.BlockResponse, error) {
-
 	// Call adapter
 	block, err := api.blockAdapter.Find(ctx, uuid)
 	if err != nil {
@@ -143,17 +148,18 @@ func (api blockApi) Find(ctx context.Context, uuid string) (*pkg.BlockResponse, 
 		Description: block.Description,
 		Kind:        block.Kind,
 	}
-	// return result
+	// Return result
 	return response, nil
 }
 
 // FindAll finds all blocks.
+// It takes the context and returns a slice of BlockResponse or an error.
 func (api blockApi) FindAll(ctx context.Context) ([]*pkg.BlockResponse, error) {
 	// Call adapter
 	blockSlice, err := api.blockAdapter.FindAll(ctx)
 	if err != nil {
-		log.Ctx(ctx).Error().Err(err).Msg("error while finding block")
-		return nil, fmt.Errorf("error occurred while finding block: %w", err)
+		log.Ctx(ctx).Error().Err(err).Msg("error while finding blocks")
+		return nil, fmt.Errorf("error occurred while finding blocks: %w", err)
 	}
 
 	// Map to response
@@ -166,11 +172,12 @@ func (api blockApi) FindAll(ctx context.Context) ([]*pkg.BlockResponse, error) {
 			Kind:        block.Kind,
 		})
 	}
-	// return result
+	// Return result
 	return response, nil
 }
 
 // Delete deletes a block by UUID.
+// It takes the context and block UUID, and returns an error if any.
 func (api blockApi) Delete(ctx context.Context, uuid string) error {
 	if err := api.blockAdapter.Delete(ctx, uuid); err != nil {
 		log.Ctx(ctx).Error().Err(err).Interface("uuid", uuid).Msg("error while deleting block")
@@ -180,8 +187,8 @@ func (api blockApi) Delete(ctx context.Context, uuid string) error {
 }
 
 // FindPrograms finds programs associated with a block.
+// It takes the context and block UUID, and returns a slice of BlockProgramsResponse or an error.
 func (api blockApi) FindPrograms(ctx context.Context, uuid string) ([]*pkg.BlockProgramsResponse, error) {
-
 	associations, err := api.blockProgramAdapter.FindByBlockID(ctx, uuid)
 	if err != nil {
 		return nil, err
@@ -208,15 +215,16 @@ func (api blockApi) FindPrograms(ctx context.Context, uuid string) ([]*pkg.Block
 	return response, nil
 }
 
+// OverwritePrograms overwrites the programs associated with a block.
+// It takes the context, block ID, and OverwriteProgramsRequest, and returns an error if any.
 func (api blockApi) OverwritePrograms(ctx context.Context, blockID string, req OverwriteProgramsRequest) error {
-
-	// Find all existing associations by wallID
+	// Find all existing associations by blockID
 	associations, err := api.blockProgramAdapter.FindByBlockID(ctx, blockID)
 	if err != nil {
 		return err
 	}
 
-	// Remove all existing association for the wall
+	// Remove all existing associations for the block
 	for _, association := range associations {
 		err = api.blockProgramAdapter.Delete(ctx, association.ID)
 		if err != nil {
@@ -226,23 +234,24 @@ func (api blockApi) OverwritePrograms(ctx context.Context, blockID string, req O
 
 	// Create all new associations
 	for programID, position := range req.OrderedPrograms() {
-		wallBlock := model.BlockProgram{
+		blockProgram := model.BlockProgram{
 			ID:        uuid.New().String(),
 			BlockID:   blockID,
 			ProgramID: programID,
 			Position:  position,
 		}
 
-		// Call adapter to create wall
-		if err := api.blockProgramAdapter.Create(ctx, wallBlock); err != nil {
-			log.Ctx(ctx).Error().Err(err).Interface("wallBlock", wallBlock).Msg("error while creating wall")
-			return fmt.Errorf("error occurred while creating wall: %w", err)
+		// Call adapter to create block program
+		if err := api.blockProgramAdapter.Create(ctx, blockProgram); err != nil {
+			log.Ctx(ctx).Error().Err(err).Interface("blockProgram", blockProgram).Msg("error while creating block program")
+			return fmt.Errorf("error occurred while creating block program: %w", err)
 		}
 	}
 
 	return nil
 }
 
+// OverwriteProgramsRequest represents the interface for overwriting block program associations.
 type OverwriteProgramsRequest interface {
 	OrderedPrograms() map[string]int
 }

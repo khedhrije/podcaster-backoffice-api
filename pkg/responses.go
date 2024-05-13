@@ -1,5 +1,7 @@
+// Package pkg provides the response structs for handling JSON responses.
 package pkg
 
+// ErrorJSON represents the structure for error messages in JSON responses.
 type ErrorJSON struct {
 	Error string `json:"error" description:"error message"`
 }
@@ -58,12 +60,16 @@ type EpisodeResponse struct {
 	Position    int    `json:"position"`
 }
 
+// WallBlocksResponse represents the response structure for blocks within a wall,
+// including positional information.
 type WallBlocksResponse struct {
 	BlockResponse
-	Position int
+	Position int `json:"position"`
 }
 
+// BlockProgramsResponse represents the response structure for programs within a block,
+// including positional information.
 type BlockProgramsResponse struct {
 	ProgramResponse
-	Position int
+	Position int `json:"position"`
 }

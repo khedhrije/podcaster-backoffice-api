@@ -27,11 +27,19 @@ type Program interface {
 	// Delete returns a Gin handler function for deleting a program by its UUID.
 	Delete() gin.HandlerFunc
 
+	// FindEpisodes returns a Gin handler function for finding a program's episodes.
 	FindEpisodes() gin.HandlerFunc
+
+	// FindTags returns a Gin handler function for finding a program's tags.
 	FindTags() gin.HandlerFunc
+
+	// FindCategories returns a Gin handler function for finding a program's categories.
 	FindCategories() gin.HandlerFunc
 
+	// OverwriteCategories returns a Gin handler function for overwriting categories of a program.
 	OverwriteCategories() gin.HandlerFunc
+
+	// OverwriteTags returns a Gin handler function for overwriting tags of a program.
 	OverwriteTags() gin.HandlerFunc
 }
 
@@ -73,6 +81,7 @@ func (handler programHandler) Create() gin.HandlerFunc {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
+		c.JSON(http.StatusOK, "ok")
 	}
 }
 
@@ -107,6 +116,7 @@ func (handler programHandler) Update() gin.HandlerFunc {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
+		c.JSON(http.StatusOK, "ok")
 	}
 }
 
@@ -118,7 +128,7 @@ func (handler programHandler) Update() gin.HandlerFunc {
 // @ID find-program
 // @Param uuid path string true "uuid"
 // @Produce json
-// @Success 200 {string} string "ok"
+// @Success 200 {object} pkg.ProgramResponse
 // @Failure 500 {object} pkg.ErrorJSON
 // @Router /private/programs/{uuid} [get]
 func (handler programHandler) Find() gin.HandlerFunc {
@@ -146,9 +156,9 @@ func (handler programHandler) Find() gin.HandlerFunc {
 // @Tags programs
 // @ID find-all-programs
 // @Produce json
-// @Success 200 {string} string "ok"
+// @Success 200 {array} pkg.ProgramResponse
 // @Failure 500 {object} pkg.ErrorJSON
-// @Router /private/programs/ [get]
+// @Router /private/programs [get]
 func (handler programHandler) FindAll() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Call API to find all programs
@@ -172,7 +182,7 @@ func (handler programHandler) FindAll() gin.HandlerFunc {
 // @ID delete-program
 // @Param uuid path string true "uuid"
 // @Produce json
-// @Success 200 {string} string "ok"
+// @Success 200 {string} string "deleted"
 // @Failure 500 {object} pkg.ErrorJSON
 // @Router /private/programs/{uuid} [delete]
 func (handler programHandler) Delete() gin.HandlerFunc {
@@ -200,7 +210,7 @@ func (handler programHandler) Delete() gin.HandlerFunc {
 // @ID find-program-episodes
 // @Param uuid path string true "uuid"
 // @Produce json
-// @Success 200 {string} string "ok"
+// @Success 200 {array} pkg.EpisodeResponse
 // @Failure 500 {object} pkg.ErrorJSON
 // @Router /private/programs/{uuid}/episodes [get]
 func (handler programHandler) FindEpisodes() gin.HandlerFunc {
@@ -208,7 +218,7 @@ func (handler programHandler) FindEpisodes() gin.HandlerFunc {
 		// Extract program UUID from path
 		programUUID := c.Param("uuid")
 
-		// Call API to find program
+		// Call API to find program's episodes
 		episodes, err := handler.api.FindEpisodes(c, programUUID)
 		if err != nil {
 			log.Error().Msg("error finding program's episodes: " + err.Error())
@@ -229,7 +239,7 @@ func (handler programHandler) FindEpisodes() gin.HandlerFunc {
 // @ID find-program-tags
 // @Param uuid path string true "uuid"
 // @Produce json
-// @Success 200 {string} string "ok"
+// @Success 200 {array} pkg.TagResponse
 // @Failure 500 {object} pkg.ErrorJSON
 // @Router /private/programs/{uuid}/tags [get]
 func (handler programHandler) FindTags() gin.HandlerFunc {
@@ -237,7 +247,7 @@ func (handler programHandler) FindTags() gin.HandlerFunc {
 		// Extract program UUID from path
 		programUUID := c.Param("uuid")
 
-		// Call API to find program
+		// Call API to find program's tags
 		tags, err := handler.api.FindTags(c, programUUID)
 		if err != nil {
 			log.Error().Msg("error finding program's tags: " + err.Error())
@@ -258,7 +268,7 @@ func (handler programHandler) FindTags() gin.HandlerFunc {
 // @ID find-program-categories
 // @Param uuid path string true "uuid"
 // @Produce json
-// @Success 200 {string} string "ok"
+// @Success 200 {array} pkg.CategoryResponse
 // @Failure 500 {object} pkg.ErrorJSON
 // @Router /private/programs/{uuid}/categories [get]
 func (handler programHandler) FindCategories() gin.HandlerFunc {
@@ -266,7 +276,7 @@ func (handler programHandler) FindCategories() gin.HandlerFunc {
 		// Extract program UUID from path
 		programUUID := c.Param("uuid")
 
-		// Call API to find program
+		// Call API to find program's categories
 		categories, err := handler.api.FindCats(c, programUUID)
 		if err != nil {
 			log.Error().Msg("error finding program's categories: " + err.Error())
@@ -294,7 +304,6 @@ func (handler programHandler) FindCategories() gin.HandlerFunc {
 // @Router /private/programs/{uuid}/categories/overwrite [put]
 func (handler programHandler) OverwriteCategories() gin.HandlerFunc {
 	return func(c *gin.Context) {
-
 		// Extract program UUID from path
 		programUUID := c.Param("uuid")
 
@@ -306,16 +315,19 @@ func (handler programHandler) OverwriteCategories() gin.HandlerFunc {
 			return
 		}
 
-		// Call API
+		// Call API to overwrite categories
 		if err := handler.api.OverwriteCategories(c, programUUID, jsonRequest); err != nil {
-			log.Error().Msg("error finding program's categories: " + err.Error())
+			log.Error().Msg("error overwriting program's categories: " + err.Error())
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
+
+		// Return response
+		c.JSON(http.StatusOK, "ok")
 	}
 }
 
-// OverwriteTags returns a Gin handler function for overwriting categories.
+// OverwriteTags returns a Gin handler function for overwriting tags.
 //
 // @Summary Overwrite tags of a program
 // @Description Overwrite the tags of a specific program by replacing all existing tags with new ones
@@ -330,7 +342,6 @@ func (handler programHandler) OverwriteCategories() gin.HandlerFunc {
 // @Router /private/programs/{uuid}/tags/overwrite [put]
 func (handler programHandler) OverwriteTags() gin.HandlerFunc {
 	return func(c *gin.Context) {
-
 		// Extract program UUID from path
 		programUUID := c.Param("uuid")
 
@@ -342,11 +353,14 @@ func (handler programHandler) OverwriteTags() gin.HandlerFunc {
 			return
 		}
 
-		// Call API
+		// Call API to overwrite tags
 		if err := handler.api.OverwriteTags(c, programUUID, jsonRequest); err != nil {
-			log.Error().Msg("error finding program's tags: " + err.Error())
+			log.Error().Msg("error overwriting program's tags: " + err.Error())
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
+
+		// Return response
+		c.JSON(http.StatusOK, "ok")
 	}
 }

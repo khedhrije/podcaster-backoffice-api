@@ -1,4 +1,4 @@
-// Package tag provides functionality for managing tags.
+// Package api provides functionality for managing tags.
 package api
 
 import (
@@ -41,6 +41,7 @@ type tagApi struct {
 }
 
 // NewTagApi creates a new instance of Tag.
+// It takes adapters for tag, program-tag, and program persistence as dependencies.
 func NewTagApi(tagAdapter port.TagPersister, programTagAdapter port.ProgramTagPersister, programAdapter port.ProgramPersister) Tag {
 	return &tagApi{
 		tagAdapter:        tagAdapter,
@@ -50,6 +51,7 @@ func NewTagApi(tagAdapter port.TagPersister, programTagAdapter port.ProgramTagPe
 }
 
 // Create creates a new tag.
+// It takes the context and CreateTagRequest, and returns an error if any.
 func (api tagApi) Create(ctx context.Context, req CreateTagRequest) error {
 	// Validate request
 	vErrs := createTagRequestValidation(ctx, req)
@@ -63,7 +65,7 @@ func (api tagApi) Create(ctx context.Context, req CreateTagRequest) error {
 		Name:        req.Name(),
 		Description: req.Description(),
 	}
-	// call adapter
+	// Call adapter
 	if err := api.tagAdapter.Create(ctx, tag); err != nil {
 		log.Ctx(ctx).Error().Err(err).Interface("tag", tag).Msg("error while creating tag")
 		return fmt.Errorf("error occurred while creating tag: %w", err)
@@ -72,7 +74,8 @@ func (api tagApi) Create(ctx context.Context, req CreateTagRequest) error {
 	return nil
 }
 
-// createRequestValidation validates the creation request.
+// createTagRequestValidation validates the creation request.
+// It takes the context and CreateTagRequest, and returns a slice of ValidationErrors.
 func createTagRequestValidation(ctx context.Context, req CreateTagRequest) model.ValidationErrors {
 	var vErrs []model.ValidationError
 	if req.Name() == "" {
@@ -85,6 +88,7 @@ func createTagRequestValidation(ctx context.Context, req CreateTagRequest) model
 }
 
 // Update updates an existing tag.
+// It takes the context, tag UUID, and UpdateTagRequest, and returns an error if any.
 func (api tagApi) Update(ctx context.Context, uuid string, updates UpdateTagRequest) error {
 	// Validate request
 	vErrs := updateTagRequestValidation(ctx, uuid, updates)
@@ -97,7 +101,7 @@ func (api tagApi) Update(ctx context.Context, uuid string, updates UpdateTagRequ
 		Name:        updates.Name(),
 		Description: updates.Description(),
 	}
-	// call adapter
+	// Call adapter
 	if err := api.tagAdapter.Update(ctx, uuid, tag); err != nil {
 		log.Ctx(ctx).Error().Err(err).Interface("tag", tag).Msg("error while updating tag")
 		return fmt.Errorf("error occurred while updating tag: %w", err)
@@ -106,7 +110,8 @@ func (api tagApi) Update(ctx context.Context, uuid string, updates UpdateTagRequ
 	return nil
 }
 
-// updateRequestValidation validates the update request.
+// updateTagRequestValidation validates the update request.
+// It takes the context, tag UUID, and UpdateTagRequest, and returns a slice of ValidationErrors.
 func updateTagRequestValidation(ctx context.Context, uuid string, req UpdateTagRequest) model.ValidationErrors {
 	var vErrs []model.ValidationError
 	if uuid == "" {
@@ -122,8 +127,8 @@ func updateTagRequestValidation(ctx context.Context, uuid string, req UpdateTagR
 }
 
 // Find finds a tag by UUID.
+// It takes the context and tag UUID, and returns a TagResponse or an error.
 func (api tagApi) Find(ctx context.Context, uuid string) (*pkg.TagResponse, error) {
-
 	// Call adapter
 	tag, err := api.tagAdapter.Find(ctx, uuid)
 	if err != nil {
@@ -137,17 +142,18 @@ func (api tagApi) Find(ctx context.Context, uuid string) (*pkg.TagResponse, erro
 		Name:        tag.Name,
 		Description: tag.Description,
 	}
-	// return result
+	// Return result
 	return response, nil
 }
 
 // FindAll finds all tags.
+// It takes the context and returns a slice of TagResponse or an error.
 func (api tagApi) FindAll(ctx context.Context) ([]*pkg.TagResponse, error) {
 	// Call adapter
 	tagSlice, err := api.tagAdapter.FindAll(ctx)
 	if err != nil {
-		log.Ctx(ctx).Error().Err(err).Msg("error while finding tag")
-		return nil, fmt.Errorf("error occurred while finding tag: %w", err)
+		log.Ctx(ctx).Error().Err(err).Msg("error while finding tags")
+		return nil, fmt.Errorf("error occurred while finding tags: %w", err)
 	}
 
 	// Map to response
@@ -159,11 +165,12 @@ func (api tagApi) FindAll(ctx context.Context) ([]*pkg.TagResponse, error) {
 			Description: tag.Description,
 		})
 	}
-	// return result
+	// Return result
 	return response, nil
 }
 
 // Delete deletes a tag by UUID.
+// It takes the context and tag UUID, and returns an error if any.
 func (api tagApi) Delete(ctx context.Context, uuid string) error {
 	if err := api.tagAdapter.Delete(ctx, uuid); err != nil {
 		log.Ctx(ctx).Error().Err(err).Interface("uuid", uuid).Msg("error while deleting tag")
@@ -173,8 +180,8 @@ func (api tagApi) Delete(ctx context.Context, uuid string) error {
 }
 
 // FindPrograms finds programs associated with a tag.
+// It takes the context and tag UUID, and returns a slice of ProgramResponse or an error.
 func (api tagApi) FindPrograms(ctx context.Context, uuid string) ([]*pkg.ProgramResponse, error) {
-
 	associations, err := api.programTagAdapter.FindByTagID(ctx, uuid)
 	if err != nil {
 		return nil, err
@@ -192,7 +199,6 @@ func (api tagApi) FindPrograms(ctx context.Context, uuid string) ([]*pkg.Program
 			Name:        program.Name,
 			Description: program.Description,
 		})
-
 	}
 
 	return response, nil

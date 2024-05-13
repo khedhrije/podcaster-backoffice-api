@@ -1,3 +1,4 @@
+// Package mysql provides MySQL implementations of the persistence interfaces.
 package mysql
 
 import (
@@ -15,6 +16,7 @@ type wallBlockAdapter struct {
 }
 
 // NewWallBlockAdapter creates a new wallBlock adapter with the provided MySQL client.
+// It returns an implementation of the WallBlockPersister interface.
 func NewWallBlockAdapter(client *client) port.WallBlockPersister {
 	return &wallBlockAdapter{
 		client: client,
@@ -22,40 +24,31 @@ func NewWallBlockAdapter(client *client) port.WallBlockPersister {
 }
 
 // Create inserts a new wallBlock record into the database.
+// It takes a context and a model.WallBlock, and returns an error if the operation fails.
 func (adapter *wallBlockAdapter) Create(ctx context.Context, wallBlock model.WallBlock) error {
-	// SQL query to insert a new wallBlock record
 	const query = `
         INSERT INTO wall_block (UUID, wallUUID, blockUUID, position)
         VALUES (UUID_TO_BIN(:UUID), UUID_TO_BIN(:wallUUID), UUID_TO_BIN(:blockUUID), :position)
     `
-	// Convert domain model to database model
 	var wallBlockDB WallBlockDB
 	wallBlockDB.FromDomainModel(wallBlock)
-	// Execute named query
 	_, err := adapter.client.db.NamedExecContext(ctx, query, wallBlockDB)
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }
 
 // Delete removes a wallBlock record from the database based on its UUID.
+// It takes a context and the wallBlock's UUID, and returns an error if the operation fails.
 func (adapter *wallBlockAdapter) Delete(ctx context.Context, wallBlockUUID string) error {
-	// SQL query to delete a wallBlock record by UUID
 	const query = `
         DELETE FROM wall_block WHERE UUID = UUID_TO_BIN(?)
     `
-	// Execute named query
 	_, err := adapter.client.db.ExecContext(ctx, query, wallBlockUUID)
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }
 
 // Update updates an existing wallBlock record in the database.
+// It takes a context, the wallBlock's UUID, and the updated model.WallBlock, and returns an error if the operation fails.
 func (adapter *wallBlockAdapter) Update(ctx context.Context, wallBlockUUID string, updates model.WallBlock) error {
-	// SQL query to update a wallBlock record
 	const query = `
         UPDATE wall_block SET 
                              wallUUID = UUID_TO_BIN(:wallUUID), 
@@ -63,51 +56,40 @@ func (adapter *wallBlockAdapter) Update(ctx context.Context, wallBlockUUID strin
                              position = :position
                         WHERE UUID = UUID_TO_BIN(:UUID)
     `
-	// Set UUID for updates
 	updates.ID = wallBlockUUID
-	// Convert domain model to database model
 	var wallBlockDB WallBlockDB
 	wallBlockDB.FromDomainModel(updates)
-	// Execute named query
 	_, err := adapter.client.db.NamedExecContext(ctx, query, wallBlockDB)
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }
 
 // Find retrieves a wallBlock record from the database by its UUID.
+// It takes a context and the wallBlock's UUID, and returns a model.WallBlock and an error if the operation fails.
 func (adapter *wallBlockAdapter) Find(ctx context.Context, wallBlockUUID string) (*model.WallBlock, error) {
-	// SQL query to select a wallBlock record by UUID
 	const query = `
         SELECT * FROM wall_block WHERE UUID = UUID_TO_BIN(?)
     `
-	// Execute query and retrieve result
 	var wallBlockDB WallBlockDB
 	if err := adapter.client.db.GetContext(ctx, &wallBlockDB, query, wallBlockUUID); err != nil {
 		return nil, err
 	}
-	// Check if the record exists
 	if wallBlockDB.UUID == uuid.Nil {
 		return nil, fmt.Errorf("wallBlock with ID %s not found", wallBlockUUID)
 	}
-	// Convert database model to domain model
 	result := wallBlockDB.ToDomainModel()
 	return &result, nil
 }
 
 // FindByWallID retrieves all wallBlock records from the database for a given wall ID.
+// It takes a context and the wall's ID, and returns a slice of model.WallBlock and an error if the operation fails.
 func (adapter *wallBlockAdapter) FindByWallID(ctx context.Context, wallID string) ([]*model.WallBlock, error) {
-	// SQL query to select wallBlock records by wall ID
 	const query = `
         SELECT * FROM wall_block WHERE wallUUID = UUID_TO_BIN(?)
     `
-	// Execute query and retrieve results
 	var wallBlocksDB []*WallBlockDB
 	if err := adapter.client.db.SelectContext(ctx, &wallBlocksDB, query, wallID); err != nil {
 		return nil, err
 	}
-	// Convert database models to domain models
 	var wallBlocks []*model.WallBlock
 	for _, wallBlockDB := range wallBlocksDB {
 		mappedWallBlock := wallBlockDB.ToDomainModel()
@@ -117,17 +99,15 @@ func (adapter *wallBlockAdapter) FindByWallID(ctx context.Context, wallID string
 }
 
 // FindByBlockID retrieves all wallBlock records from the database for a given block ID.
+// It takes a context and the block's ID, and returns a slice of model.WallBlock and an error if the operation fails.
 func (adapter *wallBlockAdapter) FindByBlockID(ctx context.Context, blockID string) ([]*model.WallBlock, error) {
-	// SQL query to select wallBlock records by block ID
 	const query = `
         SELECT * FROM wall_block WHERE blockUUID = UUID_TO_BIN(?)
     `
-	// Execute query and retrieve results
 	var wallBlocksDB []*WallBlockDB
 	if err := adapter.client.db.SelectContext(ctx, &wallBlocksDB, query, blockID); err != nil {
 		return nil, err
 	}
-	// Convert database models to domain models
 	var wallBlocks []*model.WallBlock
 	for _, wallBlockDB := range wallBlocksDB {
 		mappedWallBlock := wallBlockDB.ToDomainModel()
@@ -137,17 +117,15 @@ func (adapter *wallBlockAdapter) FindByBlockID(ctx context.Context, blockID stri
 }
 
 // FindByWallIDAndBlockID retrieves all wallBlock records from the database for a given wall ID and block ID.
+// It takes a context, the wall's ID, and the block's ID, and returns a slice of model.WallBlock and an error if the operation fails.
 func (adapter *wallBlockAdapter) FindByWallIDAndBlockID(ctx context.Context, wallID, blockID string) ([]*model.WallBlock, error) {
-	// SQL query to select wallBlock records by wall ID and block ID
 	const query = `
         SELECT * FROM wall_block WHERE wallUUID = UUID_TO_BIN(?) AND blockUUID = UUID_TO_BIN(?)
     `
-	// Execute query and retrieve results
 	var wallBlocksDB []*WallBlockDB
 	if err := adapter.client.db.SelectContext(ctx, &wallBlocksDB, query, wallID, blockID); err != nil {
 		return nil, err
 	}
-	// Convert database models to domain models
 	var wallBlocks []*model.WallBlock
 	for _, wallBlockDB := range wallBlocksDB {
 		mappedWallBlock := wallBlockDB.ToDomainModel()
@@ -165,6 +143,7 @@ type WallBlockDB struct {
 }
 
 // ToDomainModel converts a WallBlockDB database model to a model.WallBlock domain model.
+// It returns the corresponding model.WallBlock.
 func (db *WallBlockDB) ToDomainModel() model.WallBlock {
 	return model.WallBlock{
 		ID:       db.UUID.String(),
@@ -175,6 +154,7 @@ func (db *WallBlockDB) ToDomainModel() model.WallBlock {
 }
 
 // FromDomainModel converts a model.WallBlock domain model to a WallBlockDB database model.
+// It sets the fields of the WallBlockDB based on the given model.WallBlock.
 func (db *WallBlockDB) FromDomainModel(domain model.WallBlock) {
 	db.UUID = uuid.MustParse(domain.ID)
 	db.WallID = uuid.MustParse(domain.WallID)

@@ -1,4 +1,4 @@
-// Package episode provides functionality for managing episodes.
+// Package api provides functionality for managing episodes.
 package api
 
 import (
@@ -26,6 +26,7 @@ type episodeApi struct {
 }
 
 // NewEpisodeApi creates a new instance of Episode.
+// It takes an EpisodePersister as a dependency.
 func NewEpisodeApi(episodeAdapter port.EpisodePersister) Episode {
 	return &episodeApi{
 		episodeAdapter: episodeAdapter,
@@ -33,6 +34,7 @@ func NewEpisodeApi(episodeAdapter port.EpisodePersister) Episode {
 }
 
 // Create creates a new episode.
+// It takes the context and CreateEpisodeRequest, and returns an error if any.
 func (api episodeApi) Create(ctx context.Context, req CreateEpisodeRequest) error {
 	// Validate request
 	vErrs := createEpisodeRequestValidation(ctx, req)
@@ -49,7 +51,7 @@ func (api episodeApi) Create(ctx context.Context, req CreateEpisodeRequest) erro
 		ProgramID:   req.ProgramID(),
 		Position:    req.Position(),
 	}
-	// call adapter
+	// Call adapter
 	if err := api.episodeAdapter.Create(ctx, episode); err != nil {
 		log.Ctx(ctx).Error().Err(err).Interface("episode", episode).Msg("error while creating episode")
 		return fmt.Errorf("error occurred while creating episode: %w", err)
@@ -58,7 +60,8 @@ func (api episodeApi) Create(ctx context.Context, req CreateEpisodeRequest) erro
 	return nil
 }
 
-// createRequestValidation validates the creation request.
+// createEpisodeRequestValidation validates the creation request.
+// It takes the context and CreateEpisodeRequest, and returns a slice of ValidationErrors.
 func createEpisodeRequestValidation(ctx context.Context, req CreateEpisodeRequest) model.ValidationErrors {
 	var vErrs []model.ValidationError
 	if req.Name() == "" {
@@ -67,7 +70,6 @@ func createEpisodeRequestValidation(ctx context.Context, req CreateEpisodeReques
 	if req.Description() == "" {
 		vErrs = append(vErrs, model.ValidationError{Field: "description", Message: "is required"})
 	}
-
 	if req.Position() <= 0 {
 		vErrs = append(vErrs, model.ValidationError{Field: "position", Message: "should be greater than 0"})
 	}
@@ -75,6 +77,7 @@ func createEpisodeRequestValidation(ctx context.Context, req CreateEpisodeReques
 }
 
 // Update updates an existing episode.
+// It takes the context, episode UUID, and UpdateEpisodeRequest, and returns an error if any.
 func (api episodeApi) Update(ctx context.Context, uuid string, updates UpdateEpisodeRequest) error {
 	// Validate request
 	vErrs := updateEpisodeRequestValidation(ctx, uuid, updates)
@@ -96,7 +99,7 @@ func (api episodeApi) Update(ctx context.Context, uuid string, updates UpdateEpi
 	if updates.Position() != 0 {
 		episode.Position = updates.Position()
 	}
-	// call adapter
+	// Call adapter
 	if err := api.episodeAdapter.Update(ctx, uuid, episode); err != nil {
 		log.Ctx(ctx).Error().Err(err).Interface("episode", episode).Msg("error while updating episode")
 		return fmt.Errorf("error occurred while updating episode: %w", err)
@@ -105,7 +108,8 @@ func (api episodeApi) Update(ctx context.Context, uuid string, updates UpdateEpi
 	return nil
 }
 
-// updateRequestValidation validates the update request.
+// updateEpisodeRequestValidation validates the update request.
+// It takes the context, episode UUID, and UpdateEpisodeRequest, and returns a slice of ValidationErrors.
 func updateEpisodeRequestValidation(ctx context.Context, uuid string, req UpdateEpisodeRequest) model.ValidationErrors {
 	var vErrs []model.ValidationError
 	if uuid == "" {
@@ -114,9 +118,9 @@ func updateEpisodeRequestValidation(ctx context.Context, uuid string, req Update
 	return vErrs
 }
 
-// Find finds a episode by UUID.
+// Find finds an episode by UUID.
+// It takes the context and episode UUID, and returns an EpisodeResponse or an error.
 func (api episodeApi) Find(ctx context.Context, uuid string) (*pkg.EpisodeResponse, error) {
-
 	// Call adapter
 	episode, err := api.episodeAdapter.Find(ctx, uuid)
 	if err != nil {
@@ -132,17 +136,18 @@ func (api episodeApi) Find(ctx context.Context, uuid string) (*pkg.EpisodeRespon
 		ProgramID:   episode.ProgramID,
 		Position:    episode.Position,
 	}
-	// return result
+	// Return result
 	return response, nil
 }
 
 // FindAll finds all episodes.
+// It takes the context and returns a slice of EpisodeResponse or an error.
 func (api episodeApi) FindAll(ctx context.Context) ([]*pkg.EpisodeResponse, error) {
 	// Call adapter
 	episodeSlice, err := api.episodeAdapter.FindAll(ctx)
 	if err != nil {
-		log.Ctx(ctx).Error().Err(err).Msg("error while finding episode")
-		return nil, fmt.Errorf("error occurred while finding episode: %w", err)
+		log.Ctx(ctx).Error().Err(err).Msg("error while finding episodes")
+		return nil, fmt.Errorf("error occurred while finding episodes: %w", err)
 	}
 
 	// Map to response
@@ -156,11 +161,12 @@ func (api episodeApi) FindAll(ctx context.Context) ([]*pkg.EpisodeResponse, erro
 			Position:    episode.Position,
 		})
 	}
-	// return result
+	// Return result
 	return response, nil
 }
 
-// Delete deletes a episode by UUID.
+// Delete deletes an episode by UUID.
+// It takes the context and episode UUID, and returns an error if any.
 func (api episodeApi) Delete(ctx context.Context, uuid string) error {
 	if err := api.episodeAdapter.Delete(ctx, uuid); err != nil {
 		log.Ctx(ctx).Error().Err(err).Interface("uuid", uuid).Msg("error while deleting episode")

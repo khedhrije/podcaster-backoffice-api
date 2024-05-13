@@ -1,3 +1,4 @@
+// Package mysql provides MySQL implementations of the persistence interfaces.
 package mysql
 
 import (
@@ -15,6 +16,7 @@ type blockAdapter struct {
 }
 
 // NewBlockAdapter creates a new block adapter with the provided MySQL client.
+// It returns an implementation of the BlockPersister interface.
 func NewBlockAdapter(client *client) port.BlockPersister {
 	return &blockAdapter{
 		client: client,
@@ -22,40 +24,31 @@ func NewBlockAdapter(client *client) port.BlockPersister {
 }
 
 // Create inserts a new block record into the database.
+// It takes a context and a model.Block, and returns an error if the operation fails.
 func (adapter *blockAdapter) Create(ctx context.Context, block model.Block) error {
-	// SQL query to insert a new block record
 	const query = `
         INSERT INTO block (UUID, name, description, kind)
         VALUES (UUID_TO_BIN(:UUID), :name, :description, :kind)
     `
-	// Convert domain model to database model
 	var blockDB BlockDB
 	blockDB.FromDomainModel(block)
-	// Execute named query
 	_, err := adapter.client.db.NamedExecContext(ctx, query, blockDB)
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }
 
 // Delete removes a block record from the database based on its UUID.
+// It takes a context and the block's UUID, and returns an error if the operation fails.
 func (adapter *blockAdapter) Delete(ctx context.Context, blockUUID string) error {
-	// SQL query to delete a block record by UUID
 	const query = `
         DELETE FROM block WHERE UUID = UUID_TO_BIN(?)
     `
-	// Execute named query
 	_, err := adapter.client.db.ExecContext(ctx, query, blockUUID)
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }
 
 // Update updates an existing block record in the database.
+// It takes a context, the block's UUID, and the updated model.Block, and returns an error if the operation fails.
 func (adapter *blockAdapter) Update(ctx context.Context, blockUUID string, updates model.Block) error {
-	// SQL query to update a block record
 	const query = `
         UPDATE block SET 
                              name = COALESCE(:name, name), 
@@ -63,31 +56,23 @@ func (adapter *blockAdapter) Update(ctx context.Context, blockUUID string, updat
                              kind = COALESCE(:kind, kind) 
                         WHERE UUID = UUID_TO_BIN(:UUID)
     `
-	// Set UUID for updates
 	updates.ID = blockUUID
-	// Convert domain model to database model
 	var blockDB BlockDB
 	blockDB.FromDomainModel(updates)
-	// Execute named query
 	_, err := adapter.client.db.NamedExecContext(ctx, query, blockDB)
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }
 
 // FindAll retrieves all block records from the database.
+// It takes a context and returns a slice of model.Block and an error if the operation fails.
 func (adapter *blockAdapter) FindAll(ctx context.Context) ([]*model.Block, error) {
-	// SQL query to select all block records
 	const query = `
         SELECT * FROM block;
     `
-	// Execute query and retrieve results
 	var blocksDB []*BlockDB
 	if err := adapter.client.db.SelectContext(ctx, &blocksDB, query); err != nil {
 		return nil, err
 	}
-	// Convert database models to domain models
 	var blocks []*model.Block
 	for _, blockDB := range blocksDB {
 		mappedBlock := blockDB.ToDomainModel()
@@ -97,21 +82,18 @@ func (adapter *blockAdapter) FindAll(ctx context.Context) ([]*model.Block, error
 }
 
 // Find retrieves a block record from the database by its UUID.
+// It takes a context and the block's UUID, and returns a model.Block and an error if the operation fails.
 func (adapter *blockAdapter) Find(ctx context.Context, blockUUID string) (*model.Block, error) {
-	// SQL query to select a block record by UUID
 	const query = `
         SELECT * FROM block WHERE UUID = UUID_TO_BIN(?);
     `
-	// Execute query and retrieve results
 	var blocksDB []*BlockDB
 	if err := adapter.client.db.SelectContext(ctx, &blocksDB, query, blockUUID); err != nil {
 		return nil, err
 	}
-	// Check if the record exists
 	if len(blocksDB) == 0 {
 		return nil, nil
 	}
-	// Convert database model to domain model
 	result := blocksDB[0].ToDomainModel()
 	return &result, nil
 }
@@ -127,6 +109,7 @@ type BlockDB struct {
 }
 
 // ToDomainModel converts a BlockDB database model to a model.Block domain model.
+// It returns the corresponding model.Block.
 func (db *BlockDB) ToDomainModel() model.Block {
 	return model.Block{
 		ID:          db.UUID.String(),
@@ -137,6 +120,7 @@ func (db *BlockDB) ToDomainModel() model.Block {
 }
 
 // FromDomainModel converts a model.Block domain model to a BlockDB database model.
+// It sets the fields of the BlockDB based on the given model.Block.
 func (db *BlockDB) FromDomainModel(domain model.Block) {
 	db.UUID = uuid.MustParse(domain.ID)
 	db.Name = sql.NullString{String: domain.Name, Valid: domain.Name != ""}

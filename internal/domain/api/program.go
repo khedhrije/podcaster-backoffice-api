@@ -1,4 +1,4 @@
-// Package program provides functionality for managing programs.
+// Package api provides functionality for managing programs.
 package api
 
 import (
@@ -48,6 +48,7 @@ type programApi struct {
 }
 
 // NewProgramApi creates a new instance of Program.
+// It takes adapters for program, episode, tag, and category persistence as dependencies.
 func NewProgramApi(
 	programAdapter port.ProgramPersister,
 	episodeAdapter port.EpisodePersister,
@@ -67,6 +68,7 @@ func NewProgramApi(
 }
 
 // Create creates a new program.
+// It takes the context and CreateProgramRequest, and returns an error if any.
 func (api programApi) Create(ctx context.Context, req CreateProgramRequest) error {
 	// Validate request
 	vErrs := createProgramRequestValidation(ctx, req)
@@ -80,7 +82,7 @@ func (api programApi) Create(ctx context.Context, req CreateProgramRequest) erro
 		Name:        req.Name(),
 		Description: req.Description(),
 	}
-	// call adapter
+	// Call adapter
 	if err := api.programAdapter.Create(ctx, program); err != nil {
 		log.Ctx(ctx).Error().Err(err).Interface("program", program).Msg("error while creating program")
 		return fmt.Errorf("error occurred while creating program: %w", err)
@@ -89,7 +91,8 @@ func (api programApi) Create(ctx context.Context, req CreateProgramRequest) erro
 	return nil
 }
 
-// createRequestValidation validates the creation request.
+// createProgramRequestValidation validates the creation request.
+// It takes the context and CreateProgramRequest, and returns a slice of ValidationErrors.
 func createProgramRequestValidation(ctx context.Context, req CreateProgramRequest) model.ValidationErrors {
 	var vErrs []model.ValidationError
 	if req.Name() == "" {
@@ -102,6 +105,7 @@ func createProgramRequestValidation(ctx context.Context, req CreateProgramReques
 }
 
 // Update updates an existing program.
+// It takes the context, program UUID, and UpdateProgramRequest, and returns an error if any.
 func (api programApi) Update(ctx context.Context, uuid string, updates UpdateProgramRequest) error {
 	// Validate request
 	vErrs := updateProgramRequestValidation(ctx, uuid, updates)
@@ -114,7 +118,7 @@ func (api programApi) Update(ctx context.Context, uuid string, updates UpdatePro
 		Name:        updates.Name(),
 		Description: updates.Description(),
 	}
-	// call adapter
+	// Call adapter
 	if err := api.programAdapter.Update(ctx, uuid, program); err != nil {
 		log.Ctx(ctx).Error().Err(err).Interface("program", program).Msg("error while updating program")
 		return fmt.Errorf("error occurred while updating program: %w", err)
@@ -123,7 +127,8 @@ func (api programApi) Update(ctx context.Context, uuid string, updates UpdatePro
 	return nil
 }
 
-// updateRequestValidation validates the update request.
+// updateProgramRequestValidation validates the update request.
+// It takes the context, program UUID, and UpdateProgramRequest, and returns a slice of ValidationErrors.
 func updateProgramRequestValidation(ctx context.Context, uuid string, req UpdateProgramRequest) model.ValidationErrors {
 	var vErrs []model.ValidationError
 	if uuid == "" {
@@ -139,8 +144,8 @@ func updateProgramRequestValidation(ctx context.Context, uuid string, req Update
 }
 
 // Find finds a program by UUID.
+// It takes the context and program UUID, and returns a ProgramResponse or an error.
 func (api programApi) Find(ctx context.Context, uuid string) (*pkg.ProgramResponse, error) {
-
 	// Call adapter
 	program, err := api.programAdapter.Find(ctx, uuid)
 	if err != nil {
@@ -154,17 +159,18 @@ func (api programApi) Find(ctx context.Context, uuid string) (*pkg.ProgramRespon
 		Name:        program.Name,
 		Description: program.Description,
 	}
-	// return result
+	// Return result
 	return response, nil
 }
 
 // FindAll finds all programs.
+// It takes the context and returns a slice of ProgramResponse or an error.
 func (api programApi) FindAll(ctx context.Context) ([]*pkg.ProgramResponse, error) {
 	// Call adapter
 	programSlice, err := api.programAdapter.FindAll(ctx)
 	if err != nil {
-		log.Ctx(ctx).Error().Err(err).Msg("error while finding program")
-		return nil, fmt.Errorf("error occurred while finding program: %w", err)
+		log.Ctx(ctx).Error().Err(err).Msg("error while finding programs")
+		return nil, fmt.Errorf("error occurred while finding programs: %w", err)
 	}
 
 	// Map to response
@@ -176,11 +182,12 @@ func (api programApi) FindAll(ctx context.Context) ([]*pkg.ProgramResponse, erro
 			Description: program.Description,
 		})
 	}
-	// return result
+	// Return result
 	return response, nil
 }
 
 // Delete deletes a program by UUID.
+// It takes the context and program UUID, and returns an error if any.
 func (api programApi) Delete(ctx context.Context, uuid string) error {
 	if err := api.programAdapter.Delete(ctx, uuid); err != nil {
 		log.Ctx(ctx).Error().Err(err).Interface("uuid", uuid).Msg("error while deleting program")
@@ -190,13 +197,13 @@ func (api programApi) Delete(ctx context.Context, uuid string) error {
 }
 
 // FindEpisodes finds a program's episodes.
+// It takes the context and program UUID, and returns a slice of EpisodeResponse or an error.
 func (api programApi) FindEpisodes(ctx context.Context, uuid string) ([]*pkg.EpisodeResponse, error) {
-
 	// Call adapter
 	episodes, err := api.episodeAdapter.FindByProgramID(ctx, uuid)
 	if err != nil {
-		log.Ctx(ctx).Error().Err(err).Interface("uuid", uuid).Msg("error while finding program")
-		return nil, fmt.Errorf("error occurred while finding program: %w", err)
+		log.Ctx(ctx).Error().Err(err).Interface("uuid", uuid).Msg("error while finding program episodes")
+		return nil, fmt.Errorf("error occurred while finding program episodes: %w", err)
 	}
 
 	// Map to response
@@ -209,17 +216,17 @@ func (api programApi) FindEpisodes(ctx context.Context, uuid string) ([]*pkg.Epi
 		})
 	}
 
-	// return result
+	// Return result
 	return response, nil
 }
 
 // FindTags finds a program's tags.
+// It takes the context and program UUID, and returns a slice of TagResponse or an error.
 func (api programApi) FindTags(ctx context.Context, uuid string) ([]*pkg.TagResponse, error) {
-
 	// Call adapter
 	associations, err := api.programTagAdapter.FindByProgramID(ctx, uuid)
 	if err != nil {
-		log.Ctx(ctx).Error().Err(err).Interface("uuid", uuid).Msg("error while finding program")
+		log.Ctx(ctx).Error().Err(err).Interface("uuid", uuid).Msg("error while finding program tags")
 		return nil, fmt.Errorf("error occurred while finding program's tags: %w", err)
 	}
 
@@ -237,18 +244,18 @@ func (api programApi) FindTags(ctx context.Context, uuid string) ([]*pkg.TagResp
 		})
 	}
 
-	// return result
+	// Return result
 	return response, nil
 }
 
-// FindCats finds a program's tags.
+// FindCats finds a program's categories.
+// It takes the context and program UUID, and returns a slice of CategoryResponse or an error.
 func (api programApi) FindCats(ctx context.Context, uuid string) ([]*pkg.CategoryResponse, error) {
-
 	// Call adapter
 	associations, err := api.programCatAdapter.FindByProgramID(ctx, uuid)
 	if err != nil {
-		log.Ctx(ctx).Error().Err(err).Interface("uuid", uuid).Msg("error while finding program's cats")
-		return nil, fmt.Errorf("error occurred while finding program's cats: %w", err)
+		log.Ctx(ctx).Error().Err(err).Interface("uuid", uuid).Msg("error while finding program categories")
+		return nil, fmt.Errorf("error occurred while finding program's categories: %w", err)
 	}
 
 	// Map to response
@@ -265,72 +272,72 @@ func (api programApi) FindCats(ctx context.Context, uuid string) ([]*pkg.Categor
 		})
 	}
 
-	// return result
+	// Return result
 	return response, nil
 }
 
+// OverwriteCategories overwrites the categories associated with a program.
+// It takes the context, program ID, and a slice of category IDs, and returns an error if any.
 func (api programApi) OverwriteCategories(ctx context.Context, programID string, catIDs []string) error {
-
-	// Find all existing associations by wallID
+	// Find all existing associations by programID
 	associations, err := api.programCatAdapter.FindByProgramID(ctx, programID)
 	if err != nil {
 		return err
 	}
 
-	// Remove all existing association for the wall
+	// Remove all existing associations for the program
 	for _, association := range associations {
-		err = api.programCatAdapter.Delete(ctx, association.ID)
-		if err != nil {
+		if err = api.programCatAdapter.Delete(ctx, association.ID); err != nil {
 			return err
 		}
 	}
 
 	// Create all new associations
 	for _, catID := range catIDs {
-		wallBlock := model.ProgramCategory{
+		programCategory := model.ProgramCategory{
 			ID:         uuid.New().String(),
 			ProgramID:  programID,
 			CategoryID: catID,
 		}
 
-		// Call adapter to create wall
-		if err := api.programCatAdapter.Create(ctx, wallBlock); err != nil {
-			log.Ctx(ctx).Error().Err(err).Interface("wallBlock", wallBlock).Msg("error while creating wall")
-			return fmt.Errorf("error occurred while creating wall: %w", err)
+		// Call adapter to create program category
+		if err := api.programCatAdapter.Create(ctx, programCategory); err != nil {
+			log.Ctx(ctx).Error().Err(err).Interface("programCategory", programCategory).Msg("error while creating program category")
+			return fmt.Errorf("error occurred while creating program category: %w", err)
 		}
 	}
 
 	return nil
 }
 
+// OverwriteTags overwrites the tags associated with a program.
+// It takes the context, program ID, and a slice of tag IDs, and returns an error if any.
 func (api programApi) OverwriteTags(ctx context.Context, programID string, tagIDs []string) error {
-
-	// Find all existing associations by wallID
+	// Find all existing associations by programID
 	associations, err := api.programTagAdapter.FindByProgramID(ctx, programID)
 	if err != nil {
 		return err
 	}
 
-	// Remove all existing association for the wall
+	// Remove all existing associations for the program
 	for _, association := range associations {
-		err = api.programTagAdapter.Delete(ctx, association.ID)
-		if err != nil {
+		if err = api.programTagAdapter.Delete(ctx, association.ID); err != nil {
 			return err
 		}
 	}
 
 	// Create all new associations
-	for _, catID := range tagIDs {
-		programCategory := model.ProgramTag{
+	for _, tagID := range tagIDs {
+		programTag := model.ProgramTag{
 			ID:        uuid.New().String(),
 			ProgramID: programID,
-			TagID:     catID,
+			TagID:     tagID,
 		}
 
-		// Call adapter to create wall
-		if err := api.programTagAdapter.Create(ctx, programCategory); err != nil {
-			log.Ctx(ctx).Error().Err(err).Interface("programCategory", programCategory).Msg("error while creating wall")
-			return fmt.Errorf("error occurred while creating wall: %w", err)
+		// Call adapter to create program tag
+		if err := api.programTagAdapter.Create(ctx, programTag); err != nil {
+			log.Ctx(ctx).Error().Err(err).Interface("programTag", programTag).Msg("error while creating program tag")
+			return fmt.Errorf("error occurred while creating program tag: %w", err)
 		}
 	}
 

@@ -1,3 +1,4 @@
+// Package pkg provides the request structs for handling JSON requests.
 package pkg
 
 // CreateWallRequestJSON represents a JSON request for creating walls.
@@ -103,7 +104,7 @@ type CreateMediaRequestJSON struct {
 	EpisodeIDJSON  string `json:"episodeID"`
 }
 
-// DirectLink returns the directLink of the media.
+// DirectLink returns the direct link of the media.
 func (req CreateMediaRequestJSON) DirectLink() string {
 	return req.DirectLinkJSON
 }
@@ -113,7 +114,7 @@ func (req CreateMediaRequestJSON) Kind() string {
 	return req.KindJSON
 }
 
-// EpisodeID returns the epiosdeID of the media.
+// EpisodeID returns the episode ID of the media.
 func (req CreateMediaRequestJSON) EpisodeID() string {
 	return req.EpisodeIDJSON
 }
@@ -125,7 +126,7 @@ type UpdateMediaRequestJSON struct {
 	EpisodeIDJSON  string `json:"episodeID"`
 }
 
-// DirectLink returns the directLink of the media update request.
+// DirectLink returns the direct link of the media update request.
 func (req UpdateMediaRequestJSON) DirectLink() string {
 	return req.DirectLinkJSON
 }
@@ -135,7 +136,7 @@ func (req UpdateMediaRequestJSON) Kind() string {
 	return req.KindJSON
 }
 
-// EpisodeID returns the epiosdeID of the media.
+// EpisodeID returns the episode ID of the media update request.
 func (req UpdateMediaRequestJSON) EpisodeID() string {
 	return req.EpisodeIDJSON
 }
@@ -157,7 +158,7 @@ func (req CreateCategoryRequestJSON) Description() string {
 	return req.DescriptionJSON
 }
 
-// ParentID returns the parentID of the category.
+// ParentID returns the parent ID of the category.
 func (req CreateCategoryRequestJSON) ParentID() string {
 	return req.ParentIDJSON
 }
@@ -179,7 +180,7 @@ func (req UpdateCategoryRequestJSON) Description() string {
 	return req.DescriptionJSON
 }
 
-// ParentID returns the parentID of the category.
+// ParentID returns the parent ID of the category update request.
 func (req UpdateCategoryRequestJSON) ParentID() string {
 	return req.ParentIDJSON
 }
@@ -223,7 +224,7 @@ func (req UpdateBlockRequestJSON) Description() string {
 	return req.DescriptionJSON
 }
 
-// Kind returns the kind of the block.
+// Kind returns the kind of the block update request.
 func (req UpdateBlockRequestJSON) Kind() string {
 	return req.KindJSON
 }
@@ -246,7 +247,7 @@ func (req CreateEpisodeRequestJSON) Description() string {
 	return req.DescriptionJSON
 }
 
-// ProgramID returns the programID of the episode.
+// ProgramID returns the program ID of the episode.
 func (req CreateEpisodeRequestJSON) ProgramID() string {
 	return req.ProgramIDJSON
 }
@@ -274,38 +275,44 @@ func (req UpdateEpisodeRequestJSON) Description() string {
 	return req.DescriptionJSON
 }
 
-// ProgramID returns the programID of the episode.
+// ProgramID returns the program ID of the episode update request.
 func (req UpdateEpisodeRequestJSON) ProgramID() string {
 	return req.ProgramIDJSON
 }
 
-// Position returns the position of the episode.
+// Position returns the position of the episode update request.
 func (req UpdateEpisodeRequestJSON) Position() int {
 	return req.PositionJSON
 }
 
+// OverwriteBlocksRequestJSON represents a JSON request for overwriting blocks in a wall.
 type OverwriteBlocksRequestJSON struct {
 	WallIDJSON        string         `json:"wallID"`
 	OrderedBlocksJSON map[string]int `json:"orderedBlocks"`
 }
 
+// WallID returns the wall ID of the overwrite blocks request.
 func (req OverwriteBlocksRequestJSON) WallID() string {
 	return req.WallIDJSON
 }
 
+// OrderedBlocks returns the ordered blocks map of the overwrite blocks request.
 func (req OverwriteBlocksRequestJSON) OrderedBlocks() map[string]int {
 	return req.OrderedBlocksJSON
 }
 
+// OverwriteProgramsRequestJSON represents a JSON request for overwriting programs in a block.
 type OverwriteProgramsRequestJSON struct {
 	BlockIDJSON         string         `json:"blockID"`
 	OrderedProgramsJSON map[string]int `json:"orderedPrograms"`
 }
 
+// BlockID returns the block ID of the overwrite programs request.
 func (req OverwriteProgramsRequestJSON) BlockID() string {
 	return req.BlockIDJSON
 }
 
+// OrderedPrograms returns the ordered programs map of the overwrite programs request.
 func (req OverwriteProgramsRequestJSON) OrderedPrograms() map[string]int {
 	return req.OrderedProgramsJSON
 }

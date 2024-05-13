@@ -1,3 +1,4 @@
+// Package mysql provides MySQL implementations of the persistence interfaces.
 package mysql
 
 import (
@@ -15,6 +16,7 @@ type programCategoryAdapter struct {
 }
 
 // NewProgramCategoryAdapter creates a new programCategory adapter with the provided MySQL client.
+// It returns an implementation of the ProgramCategoryPersister interface.
 func NewProgramCategoryAdapter(client *client) port.ProgramCategoryPersister {
 	return &programCategoryAdapter{
 		client: client,
@@ -22,91 +24,71 @@ func NewProgramCategoryAdapter(client *client) port.ProgramCategoryPersister {
 }
 
 // Create inserts a new programCategory record into the database.
+// It takes a context and a model.ProgramCategory, and returns an error if the operation fails.
 func (adapter *programCategoryAdapter) Create(ctx context.Context, programCategory model.ProgramCategory) error {
-	// SQL query to insert a new programCategory record
 	const query = `
         INSERT INTO program_category (UUID, programUUID, categoryUUID)
         VALUES (UUID_TO_BIN(:UUID), UUID_TO_BIN(:programUUID), UUID_TO_BIN(:categoryUUID))
     `
-	// Convert domain model to database model
 	var programCategoryDB ProgramCategoryDB
 	programCategoryDB.FromDomainModel(programCategory)
-	// Execute named query
 	_, err := adapter.client.db.NamedExecContext(ctx, query, programCategoryDB)
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }
 
 // Delete removes a programCategory record from the database based on its UUID.
+// It takes a context and the programCategory's UUID, and returns an error if the operation fails.
 func (adapter *programCategoryAdapter) Delete(ctx context.Context, programCategoryUUID string) error {
-	// SQL query to delete a programCategory record by UUID
 	const query = `
         DELETE FROM program_category WHERE UUID = UUID_TO_BIN(?)
     `
-	// Execute named query
 	_, err := adapter.client.db.ExecContext(ctx, query, programCategoryUUID)
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }
 
 // Update updates an existing programCategory record in the database.
+// It takes a context, the programCategory's UUID, and the updated model.ProgramCategory, and returns an error if the operation fails.
 func (adapter *programCategoryAdapter) Update(ctx context.Context, programCategoryUUID string, updates model.ProgramCategory) error {
-	// SQL query to update a programCategory record
 	const query = `
         UPDATE program_category SET 
                              programUUID = UUID_TO_BIN(:programUUID), 
                              categoryUUID = UUID_TO_BIN(:categoryUUID)
                         WHERE UUID = UUID_TO_BIN(:UUID)
     `
-	// Set UUID for updates
 	updates.ID = programCategoryUUID
-	// Convert domain model to database model
 	var programCategoryDB ProgramCategoryDB
 	programCategoryDB.FromDomainModel(updates)
-	// Execute named query
 	_, err := adapter.client.db.NamedExecContext(ctx, query, programCategoryDB)
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }
 
 // Find retrieves a programCategory record from the database by its UUID.
+// It takes a context and the programCategory's UUID, and returns a model.ProgramCategory and an error if the operation fails.
 func (adapter *programCategoryAdapter) Find(ctx context.Context, programCategoryUUID string) (*model.ProgramCategory, error) {
-	// SQL query to select a programCategory record by UUID
 	const query = `
         SELECT * FROM program_category WHERE UUID = UUID_TO_BIN(?)
     `
-	// Execute query and retrieve result
 	var programCategoryDB ProgramCategoryDB
 	if err := adapter.client.db.GetContext(ctx, &programCategoryDB, query, programCategoryUUID); err != nil {
 		return nil, err
 	}
-	// Check if the record exists
 	if programCategoryDB.UUID == uuid.Nil {
 		return nil, fmt.Errorf("programCategory with ID %s not found", programCategoryUUID)
 	}
-	// Convert database model to domain model
 	result := programCategoryDB.ToDomainModel()
 	return &result, nil
 }
 
 // FindByProgramID retrieves all programCategory records from the database for a given program ID.
+// It takes a context and the program's UUID, and returns a slice of model.ProgramCategory and an error if the operation fails.
 func (adapter *programCategoryAdapter) FindByProgramID(ctx context.Context, programID string) ([]*model.ProgramCategory, error) {
-	// SQL query to select programCategory records by program ID
 	const query = `
         SELECT * FROM program_category WHERE programUUID = UUID_TO_BIN(?)
     `
-	// Execute query and retrieve results
 	var programCategoriesDB []*ProgramCategoryDB
 	if err := adapter.client.db.SelectContext(ctx, &programCategoriesDB, query, programID); err != nil {
 		return nil, err
 	}
-	// Convert database models to domain models
 	var programCategories []*model.ProgramCategory
 	for _, programCategoryDB := range programCategoriesDB {
 		mappedProgramCategory := programCategoryDB.ToDomainModel()
@@ -117,17 +99,15 @@ func (adapter *programCategoryAdapter) FindByProgramID(ctx context.Context, prog
 
 // FindByCategoryIDAndProgramID retrieves all programCategory records from the database
 // for a given category ID and program ID.
+// It takes a context, the category's UUID, and the program's UUID, and returns a slice of model.ProgramCategory and an error if the operation fails.
 func (adapter *programCategoryAdapter) FindByCategoryIDAndProgramID(ctx context.Context, categoryID, programID string) ([]*model.ProgramCategory, error) {
-	// SQL query to select programCategory records by category ID and program ID
 	const query = `
         SELECT * FROM program_category WHERE categoryUUID = UUID_TO_BIN(?) AND programUUID = UUID_TO_BIN(?)
     `
-	// Execute query and retrieve results
 	var programCategoriesDB []*ProgramCategoryDB
 	if err := adapter.client.db.SelectContext(ctx, &programCategoriesDB, query, categoryID, programID); err != nil {
 		return nil, err
 	}
-	// Convert database models to domain models
 	var programCategories []*model.ProgramCategory
 	for _, programCategoryDB := range programCategoriesDB {
 		mappedProgramCategory := programCategoryDB.ToDomainModel()
@@ -137,17 +117,15 @@ func (adapter *programCategoryAdapter) FindByCategoryIDAndProgramID(ctx context.
 }
 
 // FindByCategoryID retrieves all programCategory records from the database for a given category ID.
+// It takes a context and the category's UUID, and returns a slice of model.ProgramCategory and an error if the operation fails.
 func (adapter *programCategoryAdapter) FindByCategoryID(ctx context.Context, categoryID string) ([]*model.ProgramCategory, error) {
-	// SQL query to select programCategory records by category ID
 	const query = `
         SELECT * FROM program_category WHERE categoryUUID = UUID_TO_BIN(?)
     `
-	// Execute query and retrieve results
 	var programCategoriesDB []*ProgramCategoryDB
 	if err := adapter.client.db.SelectContext(ctx, &programCategoriesDB, query, categoryID); err != nil {
 		return nil, err
 	}
-	// Convert database models to domain models
 	var programCategories []*model.ProgramCategory
 	for _, programCategoryDB := range programCategoriesDB {
 		mappedProgramCategory := programCategoryDB.ToDomainModel()
@@ -164,6 +142,7 @@ type ProgramCategoryDB struct {
 }
 
 // ToDomainModel converts a ProgramCategoryDB database model to a model.ProgramCategory domain model.
+// It returns the corresponding model.ProgramCategory.
 func (db *ProgramCategoryDB) ToDomainModel() model.ProgramCategory {
 	return model.ProgramCategory{
 		ID:         db.UUID.String(),
@@ -173,6 +152,7 @@ func (db *ProgramCategoryDB) ToDomainModel() model.ProgramCategory {
 }
 
 // FromDomainModel converts a model.ProgramCategory domain model to a ProgramCategoryDB database model.
+// It sets the fields of the ProgramCategoryDB based on the given model.ProgramCategory.
 func (db *ProgramCategoryDB) FromDomainModel(domain model.ProgramCategory) {
 	db.UUID = uuid.MustParse(domain.ID)
 	db.ProgramID = uuid.MustParse(domain.ProgramID)

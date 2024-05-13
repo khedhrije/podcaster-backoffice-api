@@ -1,3 +1,4 @@
+// Package mysql provides MySQL implementations of the persistence interfaces.
 package mysql
 
 import (
@@ -14,6 +15,7 @@ type programTagAdapter struct {
 }
 
 // NewProgramTagAdapter creates a new programTag adapter with the provided MySQL client.
+// It returns an instance of programTagAdapter.
 func NewProgramTagAdapter(client *client) *programTagAdapter {
 	return &programTagAdapter{
 		client: client,
@@ -21,114 +23,90 @@ func NewProgramTagAdapter(client *client) *programTagAdapter {
 }
 
 // Create inserts a new programTag record into the database.
+// It takes a context and a model.ProgramTag, and returns an error if the operation fails.
 func (adapter *programTagAdapter) Create(ctx context.Context, programTag model.ProgramTag) error {
-	// SQL query to insert a new programTag record
 	const query = `
         INSERT INTO program_tag (UUID, programUUID, tagUUID)
         VALUES (UUID_TO_BIN(:UUID), UUID_TO_BIN(:programUUID), UUID_TO_BIN(:tagUUID))
     `
-	// Convert domain model to database model
 	var programTagDB ProgramTagDB
 	programTagDB.FromDomainModel(programTag)
-	// Execute named query
 	_, err := adapter.client.db.NamedExecContext(ctx, query, programTagDB)
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }
 
 // Delete removes a programTag record from the database based on its UUID.
+// It takes a context and the programTag's UUID, and returns an error if the operation fails.
 func (adapter *programTagAdapter) Delete(ctx context.Context, programTagUUID string) error {
-	// SQL query to delete a programTag record by UUID
 	const query = `
         DELETE FROM program_tag WHERE UUID = UUID_TO_BIN(?)
     `
-	// Execute named query
 	_, err := adapter.client.db.ExecContext(ctx, query, programTagUUID)
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }
 
 // Update updates an existing programTag record in the database.
+// It takes a context, the programTag's UUID, and the updated model.ProgramTag, and returns an error if the operation fails.
 func (adapter *programTagAdapter) Update(ctx context.Context, programTagUUID string, updates model.ProgramTag) error {
-	// SQL query to update a programTag record
 	const query = `
         UPDATE program_tag SET 
                              programUUID = UUID_TO_BIN(:programUUID), 
                              tagUUID = UUID_TO_BIN(:tagUUID)
                         WHERE UUID = UUID_TO_BIN(:UUID)
     `
-	// Set UUID for updates
 	updates.ID = programTagUUID
-	// Convert domain model to database model
 	var programTagDB ProgramTagDB
 	programTagDB.FromDomainModel(updates)
-	// Execute named query
 	_, err := adapter.client.db.NamedExecContext(ctx, query, programTagDB)
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }
 
 // Find retrieves a programTag record from the database by its UUID.
+// It takes a context and the programTag's UUID, and returns a model.ProgramTag and an error if the operation fails.
 func (adapter *programTagAdapter) Find(ctx context.Context, programTagUUID string) (*model.ProgramTag, error) {
-	// SQL query to select a programTag record by UUID
 	const query = `
         SELECT * FROM program_tag WHERE UUID = UUID_TO_BIN(?)
     `
-	// Execute query and retrieve result
 	var programTagDB ProgramTagDB
 	if err := adapter.client.db.GetContext(ctx, &programTagDB, query, programTagUUID); err != nil {
 		return nil, err
 	}
-	// Check if the record exists
 	if programTagDB.UUID == uuid.Nil {
 		return nil, fmt.Errorf("programTag with ID %s not found", programTagUUID)
 	}
-	// Convert database model to domain model
 	result := programTagDB.ToDomainModel()
 	return &result, nil
 }
 
 // FindByProgramID retrieves all programTag records from the database for a given program ID.
+// It takes a context and the program's UUID, and returns a slice of model.ProgramTag and an error if the operation fails.
 func (adapter *programTagAdapter) FindByProgramID(ctx context.Context, programID string) ([]*model.ProgramTag, error) {
-	// SQL query to select programTag records by program ID
 	const query = `
         SELECT * FROM program_tag WHERE programUUID = UUID_TO_BIN(?)
     `
-	// Execute query and retrieve results
 	var programTagsDB []*ProgramTagDB
 	if err := adapter.client.db.SelectContext(ctx, &programTagsDB, query, programID); err != nil {
 		return nil, err
 	}
-
-	// Convert database models to domain models
 	var programTags []*model.ProgramTag
 	for _, programTagDB := range programTagsDB {
 		mappedProgramTag := programTagDB.ToDomainModel()
 		programTags = append(programTags, &mappedProgramTag)
 	}
-
 	return programTags, nil
 }
 
 // FindByTagIDAndProgramID retrieves all programTag records from the database
 // for a given tag ID and program ID.
+// It takes a context, the tag's UUID, and the program's UUID, and returns a slice of model.ProgramTag and an error if the operation fails.
 func (adapter *programTagAdapter) FindByTagIDAndProgramID(ctx context.Context, tagID, programID string) ([]*model.ProgramTag, error) {
-	// SQL query to select programTag records by tag ID and program ID
 	const query = `
         SELECT * FROM program_tag WHERE tagUUID = UUID_TO_BIN(?) AND programUUID = UUID_TO_BIN(?)
     `
-	// Execute query and retrieve results
 	var programTagsDB []*ProgramTagDB
 	if err := adapter.client.db.SelectContext(ctx, &programTagsDB, query, tagID, programID); err != nil {
 		return nil, err
 	}
-	// Convert database models to domain models
 	var programTags []*model.ProgramTag
 	for _, programTagDB := range programTagsDB {
 		mappedProgramTag := programTagDB.ToDomainModel()
@@ -138,17 +116,15 @@ func (adapter *programTagAdapter) FindByTagIDAndProgramID(ctx context.Context, t
 }
 
 // FindByTagID retrieves all programTag records from the database for a given tag ID.
+// It takes a context and the tag's UUID, and returns a slice of model.ProgramTag and an error if the operation fails.
 func (adapter *programTagAdapter) FindByTagID(ctx context.Context, tagID string) ([]*model.ProgramTag, error) {
-	// SQL query to select programTag records by tag ID
 	const query = `
         SELECT * FROM program_tag WHERE tagUUID = UUID_TO_BIN(?)
     `
-	// Execute query and retrieve results
 	var programTagsDB []*ProgramTagDB
 	if err := adapter.client.db.SelectContext(ctx, &programTagsDB, query, tagID); err != nil {
 		return nil, err
 	}
-	// Convert database models to domain models
 	var programTags []*model.ProgramTag
 	for _, programTagDB := range programTagsDB {
 		mappedProgramTag := programTagDB.ToDomainModel()
@@ -165,6 +141,7 @@ type ProgramTagDB struct {
 }
 
 // ToDomainModel converts a ProgramTagDB database model to a model.ProgramTag domain model.
+// It returns the corresponding model.ProgramTag.
 func (db *ProgramTagDB) ToDomainModel() model.ProgramTag {
 	return model.ProgramTag{
 		ID:        db.UUID.String(),
@@ -174,6 +151,7 @@ func (db *ProgramTagDB) ToDomainModel() model.ProgramTag {
 }
 
 // FromDomainModel converts a model.ProgramTag domain model to a ProgramTagDB database model.
+// It sets the fields of the ProgramTagDB based on the given model.ProgramTag.
 func (db *ProgramTagDB) FromDomainModel(domain model.ProgramTag) {
 	db.UUID = uuid.MustParse(domain.ID)
 	db.ProgramID = uuid.MustParse(domain.ProgramID)

@@ -1,4 +1,37 @@
 definitions:
+  pkg.BlockProgramsResponse:
+    properties:
+      ID:
+        type: string
+      description:
+        type: string
+      name:
+        type: string
+      position:
+        type: integer
+    type: object
+  pkg.BlockResponse:
+    properties:
+      ID:
+        type: string
+      description:
+        type: string
+      kind:
+        type: string
+      name:
+        type: string
+    type: object
+  pkg.CategoryResponse:
+    properties:
+      ID:
+        type: string
+      description:
+        type: string
+      name:
+        type: string
+      parentID:
+        type: string
+    type: object
   pkg.CreateBlockRequestJSON:
     properties:
       description:
@@ -58,9 +91,33 @@ definitions:
       name:
         type: string
     type: object
+  pkg.EpisodeResponse:
+    properties:
+      ID:
+        type: string
+      description:
+        type: string
+      name:
+        type: string
+      position:
+        type: integer
+      programID:
+        type: string
+    type: object
   pkg.ErrorJSON:
     properties:
       error:
+        type: string
+    type: object
+  pkg.MediaResponse:
+    properties:
+      ID:
+        type: string
+      directLink:
+        type: string
+      episodeID:
+        type: string
+      kind:
         type: string
     type: object
   pkg.OverwriteBlocksRequestJSON:
@@ -80,6 +137,24 @@ definitions:
         additionalProperties:
           type: integer
         type: object
+    type: object
+  pkg.ProgramResponse:
+    properties:
+      ID:
+        type: string
+      description:
+        type: string
+      name:
+        type: string
+    type: object
+  pkg.TagResponse:
+    properties:
+      ID:
+        type: string
+      description:
+        type: string
+      name:
+        type: string
     type: object
   pkg.UpdateBlockRequestJSON:
     properties:
@@ -140,6 +215,15 @@ definitions:
       name:
         type: string
     type: object
+  pkg.WallResponse:
+    properties:
+      ID:
+        type: string
+      description:
+        type: string
+      name:
+        type: string
+    type: object
 host: localhost:8080
 info:
   contact:
@@ -151,6 +235,25 @@ info:
   version: 1.0.0
 paths:
   /private/blocks:
+    get:
+      description: Find all blocks
+      operationId: find-all-blocks
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/pkg.BlockResponse'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/pkg.ErrorJSON'
+      summary: Find all blocks
+      tags:
+      - blocks
     post:
       description: Create a new block
       operationId: create-block
@@ -175,24 +278,6 @@ paths:
       summary: Create a new block
       tags:
       - blocks
-  /private/blocks/:
-    get:
-      description: Find all blocks
-      operationId: find-all-blocks
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: ok
-          schema:
-            type: string
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/pkg.ErrorJSON'
-      summary: Find all blocks
-      tags:
-      - blocks
   /private/blocks/{uuid}:
     delete:
       description: Delete a block
@@ -207,7 +292,7 @@ paths:
       - application/json
       responses:
         "200":
-          description: ok
+          description: deleted
           schema:
             type: string
         "500":
@@ -230,9 +315,9 @@ paths:
       - application/json
       responses:
         "200":
-          description: ok
+          description: OK
           schema:
-            type: string
+            $ref: '#/definitions/pkg.BlockResponse'
         "500":
           description: Internal Server Error
           schema:
@@ -271,7 +356,7 @@ paths:
       - blocks
   /private/blocks/{uuid}/programs:
     get:
-      description: Find all block's programs
+      description: Find all programs of a block
       operationId: find-block-programs
       parameters:
       - description: uuid
@@ -283,16 +368,18 @@ paths:
       - application/json
       responses:
         "200":
-          description: ok
+          description: OK
           schema:
-            type: string
+            items:
+              $ref: '#/definitions/pkg.BlockProgramsResponse'
+            type: array
         "500":
           description: Internal Server Error
           schema:
             $ref: '#/definitions/pkg.ErrorJSON'
-      summary: Find all block's programs
+      summary: Find all programs of a block
       tags:
-      - walls
+      - blocks
   /private/blocks/{uuid}/programs/overwrite:
     put:
       description: Overwrite the programs of a specific block by replacing all existing
@@ -329,6 +416,25 @@ paths:
       tags:
       - blocks
   /private/categories:
+    get:
+      description: Find all categories
+      operationId: find-all-categories
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/pkg.CategoryResponse'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/pkg.ErrorJSON'
+      summary: Find all categories
+      tags:
+      - categories
     post:
       description: Create a new category
       operationId: create-category
@@ -353,24 +459,6 @@ paths:
       summary: Create a new category
       tags:
       - categories
-  /private/categories/:
-    get:
-      description: Find all categories
-      operationId: find-all-categories
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: ok
-          schema:
-            type: string
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/pkg.ErrorJSON'
-      summary: Find all categories
-      tags:
-      - categories
   /private/categories/{uuid}:
     delete:
       description: Delete a category
@@ -385,7 +473,7 @@ paths:
       - application/json
       responses:
         "200":
-          description: ok
+          description: deleted
           schema:
             type: string
         "500":
@@ -408,9 +496,9 @@ paths:
       - application/json
       responses:
         "200":
-          description: ok
+          description: OK
           schema:
-            type: string
+            $ref: '#/definitions/pkg.CategoryResponse'
         "500":
           description: Internal Server Error
           schema:
@@ -450,7 +538,7 @@ paths:
   /private/categories/{uuid}/programs:
     get:
       description: Find all category's programs
-      operationId: find-cat-programs
+      operationId: find-category-programs
       parameters:
       - description: uuid
         in: path
@@ -461,9 +549,11 @@ paths:
       - application/json
       responses:
         "200":
-          description: ok
+          description: OK
           schema:
-            type: string
+            items:
+              $ref: '#/definitions/pkg.ProgramResponse'
+            type: array
         "500":
           description: Internal Server Error
           schema:
@@ -472,6 +562,25 @@ paths:
       tags:
       - categories
   /private/episodes:
+    get:
+      description: Find all episodes
+      operationId: find-all-episodes
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/pkg.EpisodeResponse'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/pkg.ErrorJSON'
+      summary: Find all episodes
+      tags:
+      - episodes
     post:
       description: Create a new episode
       operationId: create-episode
@@ -496,27 +605,9 @@ paths:
       summary: Create a new episode
       tags:
       - episodes
-  /private/episodes/:
-    get:
-      description: Find all episodes
-      operationId: find-all-episodes
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: ok
-          schema:
-            type: string
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/pkg.ErrorJSON'
-      summary: Find all episodes
-      tags:
-      - episodes
   /private/episodes/{uuid}:
     delete:
-      description: Delete a episode
+      description: Delete an episode
       operationId: delete-episode
       parameters:
       - description: uuid
@@ -528,18 +619,18 @@ paths:
       - application/json
       responses:
         "200":
-          description: ok
+          description: deleted
           schema:
             type: string
         "500":
           description: Internal Server Error
           schema:
             $ref: '#/definitions/pkg.ErrorJSON'
-      summary: Delete a episode
+      summary: Delete an episode
       tags:
       - episodes
     get:
-      description: Find a episode
+      description: Find an episode
       operationId: find-episode
       parameters:
       - description: uuid
@@ -551,14 +642,14 @@ paths:
       - application/json
       responses:
         "200":
-          description: ok
+          description: OK
           schema:
-            type: string
+            $ref: '#/definitions/pkg.EpisodeResponse'
         "500":
           description: Internal Server Error
           schema:
             $ref: '#/definitions/pkg.ErrorJSON'
-      summary: Find a episode
+      summary: Find an episode
       tags:
       - episodes
     put:
@@ -591,6 +682,25 @@ paths:
       tags:
       - episodes
   /private/medias:
+    get:
+      description: Find all medias
+      operationId: find-all-medias
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/pkg.MediaResponse'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/pkg.ErrorJSON'
+      summary: Find all medias
+      tags:
+      - medias
     post:
       description: Create a new media
       operationId: create-media
@@ -615,24 +725,6 @@ paths:
       summary: Create a new media
       tags:
       - medias
-  /private/medias/:
-    get:
-      description: Find all medias
-      operationId: find-all-medias
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: ok
-          schema:
-            type: string
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/pkg.ErrorJSON'
-      summary: Find all medias
-      tags:
-      - medias
   /private/medias/{uuid}:
     delete:
       description: Delete a media
@@ -647,7 +739,7 @@ paths:
       - application/json
       responses:
         "200":
-          description: ok
+          description: deleted
           schema:
             type: string
         "500":
@@ -670,9 +762,9 @@ paths:
       - application/json
       responses:
         "200":
-          description: ok
+          description: OK
           schema:
-            type: string
+            $ref: '#/definitions/pkg.MediaResponse'
         "500":
           description: Internal Server Error
           schema:
@@ -710,6 +802,25 @@ paths:
       tags:
       - medias
   /private/programs:
+    get:
+      description: Find all programs
+      operationId: find-all-programs
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/pkg.ProgramResponse'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/pkg.ErrorJSON'
+      summary: Find all programs
+      tags:
+      - programs
     post:
       description: Create a new program
       operationId: create-program
@@ -734,24 +845,6 @@ paths:
       summary: Create a new program
       tags:
       - programs
-  /private/programs/:
-    get:
-      description: Find all programs
-      operationId: find-all-programs
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: ok
-          schema:
-            type: string
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/pkg.ErrorJSON'
-      summary: Find all programs
-      tags:
-      - programs
   /private/programs/{uuid}:
     delete:
       description: Delete a program
@@ -766,7 +859,7 @@ paths:
       - application/json
       responses:
         "200":
-          description: ok
+          description: deleted
           schema:
             type: string
         "500":
@@ -789,9 +882,9 @@ paths:
       - application/json
       responses:
         "200":
-          description: ok
+          description: OK
           schema:
-            type: string
+            $ref: '#/definitions/pkg.ProgramResponse'
         "500":
           description: Internal Server Error
           schema:
@@ -842,9 +935,11 @@ paths:
       - application/json
       responses:
         "200":
-          description: ok
+          description: OK
           schema:
-            type: string
+            items:
+              $ref: '#/definitions/pkg.CategoryResponse'
+            type: array
         "500":
           description: Internal Server Error
           schema:
@@ -903,9 +998,11 @@ paths:
       - application/json
       responses:
         "200":
-          description: ok
+          description: OK
           schema:
-            type: string
+            items:
+              $ref: '#/definitions/pkg.EpisodeResponse'
+            type: array
         "500":
           description: Internal Server Error
           schema:
@@ -927,9 +1024,11 @@ paths:
       - application/json
       responses:
         "200":
-          description: ok
+          description: OK
           schema:
-            type: string
+            items:
+              $ref: '#/definitions/pkg.TagResponse'
+            type: array
         "500":
           description: Internal Server Error
           schema:
@@ -975,6 +1074,25 @@ paths:
       tags:
       - programs
   /private/tags:
+    get:
+      description: Find all tags
+      operationId: find-all-tags
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/pkg.TagResponse'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/pkg.ErrorJSON'
+      summary: Find all tags
+      tags:
+      - tags
     post:
       description: Create a new tag
       operationId: create-tag
@@ -999,24 +1117,6 @@ paths:
       summary: Create a new tag
       tags:
       - tags
-  /private/tags/:
-    get:
-      description: Find all tags
-      operationId: find-all-tags
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: ok
-          schema:
-            type: string
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/pkg.ErrorJSON'
-      summary: Find all tags
-      tags:
-      - tags
   /private/tags/{uuid}:
     delete:
       description: Delete a tag
@@ -1031,7 +1131,7 @@ paths:
       - application/json
       responses:
         "200":
-          description: ok
+          description: deleted
           schema:
             type: string
         "500":
@@ -1054,9 +1154,9 @@ paths:
       - application/json
       responses:
         "200":
-          description: ok
+          description: OK
           schema:
-            type: string
+            $ref: '#/definitions/pkg.TagResponse'
         "500":
           description: Internal Server Error
           schema:
@@ -1107,9 +1207,11 @@ paths:
       - application/json
       responses:
         "200":
-          description: ok
+          description: OK
           schema:
-            type: string
+            items:
+              $ref: '#/definitions/pkg.ProgramResponse'
+            type: array
         "500":
           description: Internal Server Error
           schema:
@@ -1118,6 +1220,25 @@ paths:
       tags:
       - tags
   /private/walls:
+    get:
+      description: Find all walls
+      operationId: find-all-walls
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/pkg.WallResponse'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/pkg.ErrorJSON'
+      summary: Find all walls
+      tags:
+      - walls
     post:
       description: Create a new wall
       operationId: create-wall
@@ -1142,24 +1263,6 @@ paths:
       summary: Create a new wall
       tags:
       - walls
-  /private/walls/:
-    get:
-      description: Find all walls
-      operationId: find-all-walls
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: ok
-          schema:
-            type: string
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/pkg.ErrorJSON'
-      summary: Find all walls
-      tags:
-      - walls
   /private/walls/{uuid}:
     delete:
       description: Delete a wall
@@ -1174,7 +1277,7 @@ paths:
       - application/json
       responses:
         "200":
-          description: ok
+          description: deleted
           schema:
             type: string
         "500":
@@ -1197,9 +1300,9 @@ paths:
       - application/json
       responses:
         "200":
-          description: ok
+          description: OK
           schema:
-            type: string
+            $ref: '#/definitions/pkg.WallResponse'
         "500":
           description: Internal Server Error
           schema:
@@ -1250,9 +1353,11 @@ paths:
       - application/json
       responses:
         "200":
-          description: ok
+          description: OK
           schema:
-            type: string
+            items:
+              $ref: '#/definitions/pkg.BlockResponse'
+            type: array
         "500":
           description: Internal Server Error
           schema:

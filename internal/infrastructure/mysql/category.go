@@ -1,9 +1,9 @@
+// Package mysql provides MySQL implementations of the persistence interfaces.
 package mysql
 
 import (
 	"context"
 	"database/sql"
-	"fmt"
 	"github.com/google/uuid"
 	"github.com/khedhrije/podcaster-backoffice-api/internal/domain/model"
 	"github.com/khedhrije/podcaster-backoffice-api/internal/domain/port"
@@ -16,6 +16,7 @@ type categoryAdapter struct {
 }
 
 // NewCategoryAdapter creates a new category adapter with the provided MySQL client.
+// It returns an implementation of the CategoryPersister interface.
 func NewCategoryAdapter(client *client) port.CategoryPersister {
 	return &categoryAdapter{
 		client: client,
@@ -23,40 +24,31 @@ func NewCategoryAdapter(client *client) port.CategoryPersister {
 }
 
 // Create inserts a new category record into the database.
+// It takes a context and a model.Category, and returns an error if the operation fails.
 func (adapter *categoryAdapter) Create(ctx context.Context, category model.Category) error {
-	// SQL query to insert a new category record
 	const query = `
         INSERT INTO category (UUID, name, description, parentUUID)
         VALUES (UUID_TO_BIN(:UUID), :name, :description, UUID_TO_BIN(:parentUUID))
     `
-	// Convert domain model to database model
 	var categoryDB CategoryDB
 	categoryDB.FromDomainModel(category)
-	// Execute named query
 	_, err := adapter.client.db.NamedExecContext(ctx, query, categoryDB)
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }
 
 // Delete removes a category record from the database based on its UUID.
+// It takes a context and the category's UUID, and returns an error if the operation fails.
 func (adapter *categoryAdapter) Delete(ctx context.Context, categoryUUID string) error {
-	// SQL query to delete a category record by UUID
 	const query = `
         DELETE FROM category WHERE UUID = UUID_TO_BIN(?);
     `
-	// Execute named query
 	_, err := adapter.client.db.ExecContext(ctx, query, categoryUUID)
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }
 
 // Update updates an existing category record in the database.
+// It takes a context, the category's UUID, and the updated model.Category, and returns an error if the operation fails.
 func (adapter *categoryAdapter) Update(ctx context.Context, categoryUUID string, updates model.Category) error {
-	// SQL query to update a category record
 	const query = `
         UPDATE category SET 
                              name = COALESCE(:name, name), 
@@ -64,34 +56,23 @@ func (adapter *categoryAdapter) Update(ctx context.Context, categoryUUID string,
                              parentUUID = COALESCE(NULLIF(UUID_TO_BIN(:parentUUID), UUID_TO_BIN('00000000-0000-0000-0000-000000000000')), parentUUID)
                         WHERE UUID = UUID_TO_BIN(:UUID);
     `
-	// Set UUID for updates
 	updates.ID = categoryUUID
-	// Convert domain model to database model
 	var categoryDB CategoryDB
 	categoryDB.FromDomainModel(updates)
-
-	fmt.Println("------_>", categoryDB.UUID)
-	fmt.Println("------_>", categoryDB.ParentID)
-	// Execute named query
 	_, err := adapter.client.db.NamedExecContext(ctx, query, categoryDB)
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }
 
 // FindAll retrieves all category records from the database.
+// It takes a context and returns a slice of model.Category and an error if the operation fails.
 func (adapter *categoryAdapter) FindAll(ctx context.Context) ([]*model.Category, error) {
-	// SQL query to select all category records
 	const query = `
         SELECT * FROM category;
     `
-	// Execute query and retrieve results
 	var categoriesDB []*CategoryDB
 	if err := adapter.client.db.SelectContext(ctx, &categoriesDB, query); err != nil {
 		return nil, err
 	}
-	// Convert database models to domain models
 	var categories []*model.Category
 	for _, categoryDB := range categoriesDB {
 		mappedCategory := categoryDB.ToDomainModel()
@@ -100,18 +81,16 @@ func (adapter *categoryAdapter) FindAll(ctx context.Context) ([]*model.Category,
 	return categories, nil
 }
 
-// FindByUUID retrieves a category record from the database by its UUID.
+// Find retrieves a category record from the database by its UUID.
+// It takes a context and the category's UUID, and returns a model.Category and an error if the operation fails.
 func (adapter *categoryAdapter) Find(ctx context.Context, categoryUUID string) (*model.Category, error) {
-	// SQL query to select a category record by UUID
 	const query = `
         SELECT * FROM category WHERE UUID = UUID_TO_BIN(?);
     `
-	// Execute query and retrieve results
 	var categoryDB CategoryDB
 	if err := adapter.client.db.GetContext(ctx, &categoryDB, query, categoryUUID); err != nil {
 		return nil, err
 	}
-	// Convert database model to domain model
 	result := categoryDB.ToDomainModel()
 	return &result, nil
 }
@@ -127,6 +106,7 @@ type CategoryDB struct {
 }
 
 // ToDomainModel converts a CategoryDB database model to a model.Category domain model.
+// It returns the corresponding model.Category.
 func (db *CategoryDB) ToDomainModel() model.Category {
 	return model.Category{
 		ID:          db.UUID.String(),
@@ -139,6 +119,7 @@ func (db *CategoryDB) ToDomainModel() model.Category {
 }
 
 // FromDomainModel converts a model.Category domain model to a CategoryDB database model.
+// It sets the fields of the CategoryDB based on the given model.Category.
 func (db *CategoryDB) FromDomainModel(domain model.Category) {
 	db.UUID = uuid.MustParse(domain.ID)
 	db.Name = sql.NullString{String: domain.Name, Valid: domain.Name != ""}

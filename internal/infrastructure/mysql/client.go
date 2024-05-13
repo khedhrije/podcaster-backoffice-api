@@ -1,7 +1,8 @@
+// Package mysql provides MySQL implementations of the persistence interfaces.
 package mysql
 
 import (
-	_ "github.com/go-sql-driver/mysql"
+	_ "github.com/go-sql-driver/mysql" // Import MySQL driver
 	"github.com/jmoiron/sqlx"
 	"github.com/khedhrije/podcaster-backoffice-api/internal/configuration"
 	"log"
@@ -13,6 +14,7 @@ type client struct {
 }
 
 // NewClient creates a new MySQL client using the provided configuration.
+// It initializes the database connection and sets connection pool settings based on the provided AppConfig.
 func NewClient(config *configuration.AppConfig) *client {
 	db, err := openDB(config.DatabaseConfig.DSN, config.DatabaseConfig)
 	if err != nil {
@@ -22,6 +24,7 @@ func NewClient(config *configuration.AppConfig) *client {
 }
 
 // openDB opens a new database connection using the provided DSN and database configuration.
+// It sets the maximum number of open connections, idle connections, and the maximum lifetime of connections.
 func openDB(dsn string, config configuration.DatabaseConfig) (*sqlx.DB, error) {
 	conn, err := sqlx.Open(config.Driver, dsn)
 	if err != nil {

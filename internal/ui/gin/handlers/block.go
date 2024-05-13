@@ -27,10 +27,14 @@ type Block interface {
 	// Delete returns a Gin handler function for deleting a block by its UUID.
 	Delete() gin.HandlerFunc
 
+	// FindPrograms returns a Gin handler function for finding all programs of a block.
 	FindPrograms() gin.HandlerFunc
+
+	// OverwritePrograms returns a Gin handler function for overwriting the programs of a block.
 	OverwritePrograms() gin.HandlerFunc
 }
 
+// blockHandler is an implementation of the Block interface.
 type blockHandler struct {
 	api api.Block
 }
@@ -69,6 +73,7 @@ func (handler blockHandler) Create() gin.HandlerFunc {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
+		c.JSON(http.StatusOK, "ok")
 	}
 }
 
@@ -103,6 +108,7 @@ func (handler blockHandler) Update() gin.HandlerFunc {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
+		c.JSON(http.StatusOK, "ok")
 	}
 }
 
@@ -114,7 +120,7 @@ func (handler blockHandler) Update() gin.HandlerFunc {
 // @ID find-block
 // @Param uuid path string true "uuid"
 // @Produce json
-// @Success 200 {string} string "ok"
+// @Success 200 {object} pkg.BlockResponse
 // @Failure 500 {object} pkg.ErrorJSON
 // @Router /private/blocks/{uuid} [get]
 func (handler blockHandler) Find() gin.HandlerFunc {
@@ -142,9 +148,9 @@ func (handler blockHandler) Find() gin.HandlerFunc {
 // @Tags blocks
 // @ID find-all-blocks
 // @Produce json
-// @Success 200 {string} string "ok"
+// @Success 200 {array} pkg.BlockResponse
 // @Failure 500 {object} pkg.ErrorJSON
-// @Router /private/blocks/ [get]
+// @Router /private/blocks [get]
 func (handler blockHandler) FindAll() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Call API to find all blocks
@@ -168,7 +174,7 @@ func (handler blockHandler) FindAll() gin.HandlerFunc {
 // @ID delete-block
 // @Param uuid path string true "uuid"
 // @Produce json
-// @Success 200 {string} string "ok"
+// @Success 200 {string} string "deleted"
 // @Failure 500 {object} pkg.ErrorJSON
 // @Router /private/blocks/{uuid} [delete]
 func (handler blockHandler) Delete() gin.HandlerFunc {
@@ -188,27 +194,26 @@ func (handler blockHandler) Delete() gin.HandlerFunc {
 	}
 }
 
-// FindPrograms returns a Gin handler function for finding all block's programs.
+// FindPrograms returns a Gin handler function for finding all programs of a block.
 //
-// @Summary Find all block's programs
-// @Description Find all block's programs
-// @Tags walls
+// @Summary Find all programs of a block
+// @Description Find all programs of a block
+// @Tags blocks
 // @ID find-block-programs
 // @Param uuid path string true "uuid"
 // @Produce json
-// @Success 200 {string} string "ok"
+// @Success 200 {array} pkg.BlockProgramsResponse
 // @Failure 500 {object} pkg.ErrorJSON
 // @Router /private/blocks/{uuid}/programs [get]
 func (handler blockHandler) FindPrograms() gin.HandlerFunc {
 	return func(c *gin.Context) {
-
-		// Extract wall UUID from path
+		// Extract block UUID from path
 		blockUUID := c.Param("uuid")
 
-		// Call API to find all walls
+		// Call API to find all programs of the block
 		programs, err := handler.api.FindPrograms(c, blockUUID)
 		if err != nil {
-			log.Error().Msg("error finding all block's program: " + err.Error())
+			log.Error().Msg("error finding all programs of the block: " + err.Error())
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
@@ -233,7 +238,6 @@ func (handler blockHandler) FindPrograms() gin.HandlerFunc {
 // @Router /private/blocks/{uuid}/programs/overwrite [put]
 func (handler blockHandler) OverwritePrograms() gin.HandlerFunc {
 	return func(c *gin.Context) {
-
 		// Extract block UUID from path
 		blockUUID := c.Param("uuid")
 
@@ -245,9 +249,9 @@ func (handler blockHandler) OverwritePrograms() gin.HandlerFunc {
 			return
 		}
 
-		// Call API to overwrite blocks
+		// Call API to overwrite programs
 		if err := handler.api.OverwritePrograms(c, blockUUID, jsonRequest); err != nil {
-			log.Error().Msg("error overwriting blocks: " + err.Error())
+			log.Error().Msg("error overwriting programs: " + err.Error())
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
@@ -255,8 +259,4 @@ func (handler blockHandler) OverwritePrograms() gin.HandlerFunc {
 		// Return response
 		c.JSON(http.StatusOK, "ok")
 	}
-}
-
-type OverwriteProgramsRequest interface {
-	OrderedPrograms() map[string]int
 }

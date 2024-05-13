@@ -11,22 +11,20 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-// Bootstrap struct holds all the components necessary for the application to run.
-// It contains configuration settings and the main application router.
+// Bootstrap struct encapsulates the configuration settings and the HTTP router necessary for the application to run.
 type Bootstrap struct {
-	Config *configuration.AppConfig // Configuration settings for the application
+	Config *configuration.AppConfig // Application configuration settings
 	Router *gin.Engine              // HTTP router for handling web requests
 }
 
-// InitBootstrap initializes the bootstrap process.
-// It's a public wrapper around the private initBootstrap function for initializing the Bootstrap struct.
+// InitBootstrap initializes the bootstrap process and returns a Bootstrap instance.
+// It serves as a public entry point for the initialization process.
 func InitBootstrap() Bootstrap {
 	return initBootstrap()
 }
 
-// initBootstrap handles the actual initialization logic for the Bootstrap struct.
-// It includes setting up configurations, database connections, middleware, and routes.
-// It panics if the configuration is not set.
+// initBootstrap sets up the Bootstrap struct by initializing configurations, database connections, middleware, and routes.
+// It panics if the configuration is not set, ensuring that the application does not run with nil configurations.
 func initBootstrap() Bootstrap {
 	if configuration.Config == nil {
 		log.Panic().Msg("configuration is nil")
@@ -35,10 +33,10 @@ func initBootstrap() Bootstrap {
 	app := Bootstrap{}
 	app.Config = configuration.Config
 
-	// Initialize MySQL client
+	// Initialize MySQL client using application configuration
 	mysqlClient := mysql.NewClient(app.Config)
 
-	// Initialize MySQL adapters for different domain models
+	// Initialize MySQL adapters for different domain models, setting up the data access layer
 	wallAdapter := mysql.NewWallAdapter(mysqlClient)
 	wallBlockAdapter := mysql.NewWallBlockAdapter(mysqlClient)
 	blockAdapter := mysql.NewBlockAdapter(mysqlClient)
@@ -51,7 +49,7 @@ func initBootstrap() Bootstrap {
 	categoryAdapter := mysql.NewCategoryAdapter(mysqlClient)
 	programCategoryAdapter := mysql.NewProgramCategoryAdapter(mysqlClient)
 
-	// Init apis
+	// Initialize APIs for different domain models, enabling business logic operations
 	wallApi := api.NewWallApi(wallAdapter, wallBlockAdapter, blockAdapter)
 	blockApi := api.NewBlockApi(blockAdapter, blockProgramAdapter, programAdapter)
 	programApi := api.NewProgramApi(programAdapter, episodeAdapter, programTagAdapter, tagAdapter, programCategoryAdapter, categoryAdapter)
@@ -60,30 +58,31 @@ func initBootstrap() Bootstrap {
 	tagApi := api.NewTagApi(tagAdapter, programTagAdapter, programAdapter)
 	catApi := api.NewCategoryApi(categoryAdapter, programCategoryAdapter, programAdapter)
 
-	// Init handlers
+	// Initialize handlers for different APIs, setting up the presentation layer
 	wallHandler := handlers.NewWallHandler(wallApi)
 	blockHandler := handlers.NewBlockHandler(blockApi)
 	programHandler := handlers.NewProgramHandler(programApi)
 	episodeHandler := handlers.NewEpisodeHandler(episodeApi)
-	mediaHanlder := handlers.NewMediaHandler(mediaApi)
-	tagHanlder := handlers.NewTagHandler(tagApi)
-	catHanlder := handlers.NewCategoryHandler(catApi)
+	mediaHandler := handlers.NewMediaHandler(mediaApi)
+	tagHandler := handlers.NewTagHandler(tagApi)
+	catHandler := handlers.NewCategoryHandler(catApi)
 
+	// Create the router with the initialized handlers, configuring the request handling
 	r := router.CreateRouter(
 		wallHandler,
 		blockHandler,
 		programHandler,
 		episodeHandler,
-		mediaHanlder,
-		tagHanlder,
-		catHanlder,
+		mediaHandler,
+		tagHandler,
+		catHandler,
 	)
 	app.Router = r
 	return app
 }
 
-// Run starts the application by running the HTTP server.
-// It logs a fatal error if the server cannot be started.
+// Run starts the application by running the HTTP server on the configured host address and port.
+// It logs a fatal error if the server cannot be started, ensuring that the failure is captured and reported.
 func (b Bootstrap) Run() {
 	dsn := fmt.Sprintf("%s:%d", b.Config.HostAddress, b.Config.HostPort)
 	if errRun := b.Router.Run(dsn); errRun != nil {

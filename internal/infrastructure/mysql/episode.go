@@ -1,3 +1,4 @@
+// Package mysql provides MySQL implementations of the persistence interfaces.
 package mysql
 
 import (
@@ -15,23 +16,23 @@ type episodeAdapter struct {
 }
 
 // NewEpisodeAdapter creates a new episode adapter with the provided MySQL client.
+// It returns an implementation of the EpisodePersister interface.
 func NewEpisodeAdapter(client *client) port.EpisodePersister {
 	return &episodeAdapter{
 		client: client,
 	}
 }
 
+// FindByProgramID retrieves all episode records from the database for a given program ID.
+// It takes a context and the program's ID, and returns a slice of model.Episode and an error if the operation fails.
 func (adapter *episodeAdapter) FindByProgramID(ctx context.Context, id string) ([]*model.Episode, error) {
-	// SQL query to select all episode records
 	const query = `
         SELECT * FROM episode WHERE programUUID = UUID_TO_BIN(?);
     `
-	// Execute query and retrieve results
 	var episodesDB []*EpisodeDB
 	if err := adapter.client.db.SelectContext(ctx, &episodesDB, query, id); err != nil {
 		return nil, err
 	}
-	// Convert database models to domain models
 	var episodes []*model.Episode
 	for _, episodeDB := range episodesDB {
 		mappedEpisode := episodeDB.ToDomainModel()
@@ -41,40 +42,31 @@ func (adapter *episodeAdapter) FindByProgramID(ctx context.Context, id string) (
 }
 
 // Create inserts a new episode record into the database.
+// It takes a context and a model.Episode, and returns an error if the operation fails.
 func (adapter *episodeAdapter) Create(ctx context.Context, episode model.Episode) error {
-	// SQL query to insert a new episode record
 	const query = `
         INSERT INTO episode (UUID, name, description, position, programUUID)
         VALUES (UUID_TO_BIN(:UUID), :name, :description, :position, UUID_TO_BIN(:programUUID));
     `
-	// Convert domain model to database model
 	var episodeDB EpisodeDB
 	episodeDB.FromDomainModel(episode)
-	// Execute named query
 	_, err := adapter.client.db.NamedExecContext(ctx, query, episodeDB)
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }
 
 // Delete removes an episode record from the database based on its UUID.
+// It takes a context and the episode's UUID, and returns an error if the operation fails.
 func (adapter *episodeAdapter) Delete(ctx context.Context, episodeUUID string) error {
-	// SQL query to delete an episode record by UUID
 	const query = `
         DELETE FROM episode WHERE UUID = UUID_TO_BIN(?);
     `
-	// Execute named query
 	_, err := adapter.client.db.ExecContext(ctx, query, episodeUUID)
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }
 
 // Update updates an existing episode record in the database.
+// It takes a context, the episode's UUID, and the updated model.Episode, and returns an error if the operation fails.
 func (adapter *episodeAdapter) Update(ctx context.Context, episodeUUID string, updates model.Episode) error {
-	// SQL query to update an episode record
 	const query = `
         UPDATE episode SET 
                              name = COALESCE(:name, name), 
@@ -83,31 +75,23 @@ func (adapter *episodeAdapter) Update(ctx context.Context, episodeUUID string, u
                              programUUID = COALESCE(NULLIF(UUID_TO_BIN(:programUUID), UUID_TO_BIN('00000000-0000-0000-0000-000000000000')), programUUID)
                         WHERE UUID = UUID_TO_BIN(:UUID);
     `
-	// Set UUID for updates
 	updates.ID = episodeUUID
-	// Convert domain model to database model
 	var episodeDB EpisodeDB
 	episodeDB.FromDomainModel(updates)
-	// Execute named query
 	_, err := adapter.client.db.NamedExecContext(ctx, query, episodeDB)
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }
 
 // FindAll retrieves all episode records from the database.
+// It takes a context and returns a slice of model.Episode and an error if the operation fails.
 func (adapter *episodeAdapter) FindAll(ctx context.Context) ([]*model.Episode, error) {
-	// SQL query to select all episode records
 	const query = `
         SELECT * FROM episode;
     `
-	// Execute query and retrieve results
 	var episodesDB []*EpisodeDB
 	if err := adapter.client.db.SelectContext(ctx, &episodesDB, query); err != nil {
 		return nil, err
 	}
-	// Convert database models to domain models
 	var episodes []*model.Episode
 	for _, episodeDB := range episodesDB {
 		mappedEpisode := episodeDB.ToDomainModel()
@@ -116,22 +100,19 @@ func (adapter *episodeAdapter) FindAll(ctx context.Context) ([]*model.Episode, e
 	return episodes, nil
 }
 
-// FindByUUID retrieves an episode record from the database by its UUID.
+// Find retrieves an episode record from the database by its UUID.
+// It takes a context and the episode's UUID, and returns a model.Episode and an error if the operation fails.
 func (adapter *episodeAdapter) Find(ctx context.Context, episodeUUID string) (*model.Episode, error) {
-	// SQL query to select an episode record by UUID
 	const query = `
         SELECT * FROM episode WHERE UUID = UUID_TO_BIN(?)
     `
-	// Execute query and retrieve results
 	var episodesDB []*EpisodeDB
 	if err := adapter.client.db.SelectContext(ctx, &episodesDB, query, episodeUUID); err != nil {
 		return nil, err
 	}
-	// Check if the record exists
 	if len(episodesDB) == 0 {
 		return nil, nil
 	}
-	// Convert database model to domain model
 	result := episodesDB[0].ToDomainModel()
 	return &result, nil
 }
@@ -148,6 +129,7 @@ type EpisodeDB struct {
 }
 
 // ToDomainModel converts an EpisodeDB database model to a model.Episode domain model.
+// It returns the corresponding model.Episode.
 func (db *EpisodeDB) ToDomainModel() model.Episode {
 	return model.Episode{
 		ID:          db.UUID.String(),
@@ -159,6 +141,7 @@ func (db *EpisodeDB) ToDomainModel() model.Episode {
 }
 
 // FromDomainModel converts a model.Episode domain model to an EpisodeDB database model.
+// It sets the fields of the EpisodeDB based on the given model.Episode.
 func (db *EpisodeDB) FromDomainModel(domain model.Episode) {
 	db.UUID = uuid.MustParse(domain.ID)
 	db.Name = sql.NullString{String: domain.Name, Valid: domain.Name != ""}
@@ -168,5 +151,4 @@ func (db *EpisodeDB) FromDomainModel(domain model.Episode) {
 	if domain.ProgramID != "" {
 		db.ProgramID = uuid.MustParse(domain.ProgramID)
 	}
-
 }

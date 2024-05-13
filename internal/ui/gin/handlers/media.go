@@ -28,6 +28,7 @@ type Media interface {
 	Delete() gin.HandlerFunc
 }
 
+// mediaHandler is an implementation of the Media interface.
 type mediaHandler struct {
 	api api.Media
 }
@@ -66,6 +67,7 @@ func (handler mediaHandler) Create() gin.HandlerFunc {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
+		c.JSON(http.StatusOK, "ok")
 	}
 }
 
@@ -87,7 +89,7 @@ func (handler mediaHandler) Update() gin.HandlerFunc {
 		mediaUUID := c.Param("uuid")
 
 		// Extract body request
-		var jsonRequest pkg.CreateMediaRequestJSON
+		var jsonRequest pkg.UpdateMediaRequestJSON
 		if err := c.ShouldBindJSON(&jsonRequest); err != nil {
 			log.Ctx(c).Error().Err(err).Msg("error binding request")
 			c.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
@@ -100,6 +102,7 @@ func (handler mediaHandler) Update() gin.HandlerFunc {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
+		c.JSON(http.StatusOK, "ok")
 	}
 }
 
@@ -111,7 +114,7 @@ func (handler mediaHandler) Update() gin.HandlerFunc {
 // @ID find-media
 // @Param uuid path string true "uuid"
 // @Produce json
-// @Success 200 {string} string "ok"
+// @Success 200 {object} pkg.MediaResponse
 // @Failure 500 {object} pkg.ErrorJSON
 // @Router /private/medias/{uuid} [get]
 func (handler mediaHandler) Find() gin.HandlerFunc {
@@ -139,9 +142,9 @@ func (handler mediaHandler) Find() gin.HandlerFunc {
 // @Tags medias
 // @ID find-all-medias
 // @Produce json
-// @Success 200 {string} string "ok"
+// @Success 200 {array} pkg.MediaResponse
 // @Failure 500 {object} pkg.ErrorJSON
-// @Router /private/medias/ [get]
+// @Router /private/medias [get]
 func (handler mediaHandler) FindAll() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Call API to find all medias
@@ -165,7 +168,7 @@ func (handler mediaHandler) FindAll() gin.HandlerFunc {
 // @ID delete-media
 // @Param uuid path string true "uuid"
 // @Produce json
-// @Success 200 {string} string "ok"
+// @Success 200 {string} string "deleted"
 // @Failure 500 {object} pkg.ErrorJSON
 // @Router /private/medias/{uuid} [delete]
 func (handler mediaHandler) Delete() gin.HandlerFunc {

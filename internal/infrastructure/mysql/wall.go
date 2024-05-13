@@ -1,3 +1,4 @@
+// Package mysql provides MySQL implementations of the persistence interfaces.
 package mysql
 
 import (
@@ -15,6 +16,7 @@ type wallAdapter struct {
 }
 
 // NewWallAdapter creates a new wall adapter with the provided MySQL client.
+// It returns an implementation of the WallPersister interface.
 func NewWallAdapter(client *client) port.WallPersister {
 	return &wallAdapter{
 		client: client,
@@ -22,71 +24,54 @@ func NewWallAdapter(client *client) port.WallPersister {
 }
 
 // Create inserts a new wall record into the database.
+// It takes a context and a model.Wall, and returns an error if the operation fails.
 func (adapter wallAdapter) Create(ctx context.Context, wall model.Wall) error {
-	// SQL query to insert a new wall record
 	const query = `
         INSERT INTO wall (UUID, name, description)
         VALUES (UUID_TO_BIN(:UUID), :name, :description)
     `
-	// Convert domain model to database model
 	var wallDB WallDB
 	wallDB.FromDomainModel(wall)
-	// Execute named query
 	_, err := adapter.client.db.NamedExecContext(ctx, query, wallDB)
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }
 
 // Delete removes a wall record from the database based on its UUID.
+// It takes a context and the wall's UUID, and returns an error if the operation fails.
 func (adapter wallAdapter) Delete(ctx context.Context, wallUUID string) error {
-	// SQL query to delete a wall record by UUID
 	const query = `
         DELETE FROM wall WHERE UUID = UUID_TO_BIN(?)
     `
-	// Execute named query
 	_, err := adapter.client.db.ExecContext(ctx, query, wallUUID)
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }
 
 // Update updates an existing wall record in the database.
+// It takes a context, the wall's UUID, and the updated model.Wall, and returns an error if the operation fails.
 func (adapter wallAdapter) Update(ctx context.Context, wallUUID string, updates model.Wall) error {
-	// SQL query to update a wall record
 	const query = `
         UPDATE wall SET 
                              name = COALESCE(:name, name), 
                              description = COALESCE(:description, description)
                         WHERE UUID = UUID_TO_BIN(:UUID)
     `
-	// Set UUID for updates
 	updates.ID = wallUUID
-	// Convert domain model to database model
 	var wallDB WallDB
 	wallDB.FromDomainModel(updates)
-	// Execute named query
 	_, err := adapter.client.db.NamedExecContext(ctx, query, wallDB)
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }
 
 // FindAll retrieves all wall records from the database.
+// It takes a context and returns a slice of model.Wall and an error if the operation fails.
 func (adapter wallAdapter) FindAll(ctx context.Context) ([]*model.Wall, error) {
-	// SQL query to select all wall records
 	const query = `
         SELECT * FROM wall
     `
-	// Execute query and retrieve results
 	var wallsDB []*WallDB
 	if err := adapter.client.db.SelectContext(ctx, &wallsDB, query); err != nil {
 		return nil, err
 	}
-	// Convert database models to domain models
 	var walls []*model.Wall
 	for _, wallDB := range wallsDB {
 		mappedWall := wallDB.ToDomainModel()
@@ -95,22 +80,19 @@ func (adapter wallAdapter) FindAll(ctx context.Context) ([]*model.Wall, error) {
 	return walls, nil
 }
 
-// FindByUUID retrieves a wall record from the database by its UUID.
+// Find retrieves a wall record from the database by its UUID.
+// It takes a context and the wall's UUID, and returns a model.Wall and an error if the operation fails.
 func (adapter wallAdapter) Find(ctx context.Context, wallUUID string) (*model.Wall, error) {
-	// SQL query to select a wall record by UUID
 	const query = `
         SELECT * FROM wall WHERE UUID = UUID_TO_BIN(?)
     `
-	// Execute query and retrieve results
 	var wallsDB []*WallDB
 	if err := adapter.client.db.SelectContext(ctx, &wallsDB, query, wallUUID); err != nil {
 		return nil, err
 	}
-	// Check if the record exists
 	if len(wallsDB) == 0 {
 		return nil, nil
 	}
-	// Convert database model to domain model
 	result := wallsDB[0].ToDomainModel()
 	return &result, nil
 }
@@ -125,6 +107,7 @@ type WallDB struct {
 }
 
 // ToDomainModel converts a WallDB database model to a model.Wall domain model.
+// It returns the corresponding model.Wall.
 func (db *WallDB) ToDomainModel() model.Wall {
 	return model.Wall{
 		ID:          db.UUID.String(),
@@ -134,6 +117,7 @@ func (db *WallDB) ToDomainModel() model.Wall {
 }
 
 // FromDomainModel converts a model.Wall domain model to a WallDB database model.
+// It sets the fields of the WallDB based on the given model.Wall.
 func (db *WallDB) FromDomainModel(domain model.Wall) {
 	db.UUID = uuid.MustParse(domain.ID)
 	db.Name = sql.NullString{String: domain.Name, Valid: domain.Name != ""}

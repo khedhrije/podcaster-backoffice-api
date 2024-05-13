@@ -12,22 +12,23 @@ import (
 
 // Episode represents the interface for managing episodes.
 type Episode interface {
-	// Create returns a Gin handler function for creating a episode.
+	// Create returns a Gin handler function for creating an episode.
 	Create() gin.HandlerFunc
 
-	// Update returns a Gin handler function for updating a episode.
+	// Update returns a Gin handler function for updating an episode.
 	Update() gin.HandlerFunc
 
-	// Find returns a Gin handler function for finding a episode by its UUID.
+	// Find returns a Gin handler function for finding an episode by its UUID.
 	Find() gin.HandlerFunc
 
 	// FindAll returns a Gin handler function for finding all episodes.
 	FindAll() gin.HandlerFunc
 
-	// Delete returns a Gin handler function for deleting a episode by its UUID.
+	// Delete returns a Gin handler function for deleting an episode by its UUID.
 	Delete() gin.HandlerFunc
 }
 
+// episodeHandler is an implementation of the Episode interface.
 type episodeHandler struct {
 	api api.Episode
 }
@@ -39,7 +40,7 @@ func NewEpisodeHandler(api api.Episode) Episode {
 	}
 }
 
-// Create returns a Gin handler function for creating a episode.
+// Create returns a Gin handler function for creating an episode.
 //
 // @Summary Create a new episode
 // @Description Create a new episode
@@ -66,10 +67,11 @@ func (handler episodeHandler) Create() gin.HandlerFunc {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
+		c.JSON(http.StatusOK, "ok")
 	}
 }
 
-// Update returns a Gin handler function for updating a episode.
+// Update returns a Gin handler function for updating an episode.
 //
 // @Summary Update episode
 // @Description Update episode
@@ -100,18 +102,19 @@ func (handler episodeHandler) Update() gin.HandlerFunc {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
+		c.JSON(http.StatusOK, "ok")
 	}
 }
 
-// Find returns a Gin handler function for finding a episode by its UUID.
+// Find returns a Gin handler function for finding an episode by its UUID.
 //
-// @Summary Find a episode
-// @Description Find a episode
+// @Summary Find an episode
+// @Description Find an episode
 // @Tags episodes
 // @ID find-episode
 // @Param uuid path string true "uuid"
 // @Produce json
-// @Success 200 {string} string "ok"
+// @Success 200 {object} pkg.EpisodeResponse
 // @Failure 500 {object} pkg.ErrorJSON
 // @Router /private/episodes/{uuid} [get]
 func (handler episodeHandler) Find() gin.HandlerFunc {
@@ -139,9 +142,9 @@ func (handler episodeHandler) Find() gin.HandlerFunc {
 // @Tags episodes
 // @ID find-all-episodes
 // @Produce json
-// @Success 200 {string} string "ok"
+// @Success 200 {array} pkg.EpisodeResponse
 // @Failure 500 {object} pkg.ErrorJSON
-// @Router /private/episodes/ [get]
+// @Router /private/episodes [get]
 func (handler episodeHandler) FindAll() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Call API to find all episodes
@@ -157,15 +160,15 @@ func (handler episodeHandler) FindAll() gin.HandlerFunc {
 	}
 }
 
-// Delete returns a Gin handler function for deleting a episode by its UUID.
+// Delete returns a Gin handler function for deleting an episode by its UUID.
 //
-// @Summary Delete a episode
-// @Description Delete a episode
+// @Summary Delete an episode
+// @Description Delete an episode
 // @Tags episodes
 // @ID delete-episode
 // @Param uuid path string true "uuid"
 // @Produce json
-// @Success 200 {string} string "ok"
+// @Success 200 {string} string "deleted"
 // @Failure 500 {object} pkg.ErrorJSON
 // @Router /private/episodes/{uuid} [delete]
 func (handler episodeHandler) Delete() gin.HandlerFunc {

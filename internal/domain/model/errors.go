@@ -1,3 +1,4 @@
+// Package model defines the data structures for the application domain.
 package model
 
 import (
@@ -13,7 +14,7 @@ type ValidationError struct {
 
 // Error returns a string representation of the ValidationError, combining the field and message.
 func (ve ValidationError) Error() string {
-	return fmt.Sprintf("%v : %v", ve.Field, ve.Message)
+	return fmt.Sprintf("%v: %v", ve.Field, ve.Message)
 }
 
 // ValidationErrors is a slice of ValidationError, used to aggregate multiple field errors into a single error instance.
