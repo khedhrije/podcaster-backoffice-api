@@ -37,6 +37,7 @@ type CategoryResponse struct {
 	ID          string `json:"ID"`
 	Name        string `json:"name"`
 	Description string `json:"description"`
+	ParentID    string `json:"parentID"`
 }
 
 // BlockResponse represents the response structure for blocks.

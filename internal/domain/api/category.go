@@ -15,12 +15,14 @@ import (
 type CreateCategoryRequest interface {
 	Name() string
 	Description() string
+	ParentID() string
 }
 
 // UpdateCategoryRequest represents the interface for updating categories.
 type UpdateCategoryRequest interface {
 	Name() string
 	Description() string
+	ParentID() string
 }
 
 // Category represents the interface for managing categories.
@@ -62,6 +64,9 @@ func (api categoryApi) Create(ctx context.Context, req CreateCategoryRequest) er
 		ID:          uuid.New().String(),
 		Name:        req.Name(),
 		Description: req.Description(),
+		Parent: &model.Category{
+			ID: req.ParentID(),
+		},
 	}
 	// call adapter
 	if err := api.categoryAdapter.Create(ctx, category); err != nil {
@@ -92,10 +97,17 @@ func (api categoryApi) Update(ctx context.Context, uuid string, updates UpdateCa
 		log.Ctx(ctx).Error().Err(vErrs).Interface("updates", updates).Msg("request was not validated")
 		return fmt.Errorf("request was not validated: %w", vErrs)
 	}
+
 	// Map to domain model
-	category := model.Category{
-		Name:        updates.Name(),
-		Description: updates.Description(),
+	category := model.Category{}
+	if updates.Name() != "" {
+		category.Name = updates.Name()
+	}
+	if updates.Description() != "" {
+		category.Description = updates.Description()
+	}
+	if updates.Description() != "" {
+		category.Description = updates.Description()
 	}
 	// call adapter
 	if err := api.categoryAdapter.Update(ctx, uuid, category); err != nil {
@@ -112,12 +124,6 @@ func updateCategoryRequestValidation(ctx context.Context, uuid string, req Updat
 	if uuid == "" {
 		vErrs = append(vErrs, model.ValidationError{Field: "uuid", Message: "cannot be empty"})
 	}
-	if req.Name() == "" {
-		vErrs = append(vErrs, model.ValidationError{Field: "name", Message: "cannot be empty"})
-	}
-	if req.Description() == "" {
-		vErrs = append(vErrs, model.ValidationError{Field: "description", Message: "cannot be empty"})
-	}
 	return vErrs
 }
 
@@ -131,11 +137,16 @@ func (api categoryApi) Find(ctx context.Context, uuid string) (*pkg.CategoryResp
 		return nil, fmt.Errorf("error occurred while finding category: %w", err)
 	}
 
+	parentID := ""
+	if category.Parent != nil {
+		parentID = category.Parent.ID
+	}
 	// Map to response
 	response := &pkg.CategoryResponse{
 		ID:          category.ID,
 		Name:        category.Name,
 		Description: category.Description,
+		ParentID:    parentID,
 	}
 	// return result
 	return response, nil
@@ -153,10 +164,15 @@ func (api categoryApi) FindAll(ctx context.Context) ([]*pkg.CategoryResponse, er
 	// Map to response
 	var response []*pkg.CategoryResponse
 	for _, category := range categorieslice {
+		parentID := ""
+		if category.Parent != nil {
+			parentID = category.Parent.ID
+		}
 		response = append(response, &pkg.CategoryResponse{
 			ID:          category.ID,
 			Name:        category.Name,
 			Description: category.Description,
+			ParentID:    parentID,
 		})
 	}
 	// return result

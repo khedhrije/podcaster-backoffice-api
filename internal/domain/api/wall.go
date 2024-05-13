@@ -135,12 +135,6 @@ func updateWallRequestValidation(ctx context.Context, uuid string, req UpdateWal
 	if uuid == "" {
 		vErrs = append(vErrs, model.ValidationError{Field: "uuid", Message: "cannot be empty"})
 	}
-	if req.Name() == "" {
-		vErrs = append(vErrs, model.ValidationError{Field: "name", Message: "cannot be empty"})
-	}
-	if req.Description() == "" {
-		vErrs = append(vErrs, model.ValidationError{Field: "description", Message: "cannot be empty"})
-	}
 	return vErrs
 }
 

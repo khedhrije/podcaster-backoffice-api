@@ -132,6 +132,7 @@ func (req UpdateMediaRequestJSON) Kind() string {
 type CreateCategoryRequestJSON struct {
 	NameJSON        string `json:"name"`
 	DescriptionJSON string `json:"description"`
+	ParentIDJSON    string `json:"parentID"`
 }
 
 // Name returns the name of the category.
@@ -144,10 +145,16 @@ func (req CreateCategoryRequestJSON) Description() string {
 	return req.DescriptionJSON
 }
 
+// ParentID returns the parentID of the category.
+func (req CreateCategoryRequestJSON) ParentID() string {
+	return req.ParentIDJSON
+}
+
 // UpdateCategoryRequestJSON represents a JSON request for updating categories.
 type UpdateCategoryRequestJSON struct {
 	NameJSON        string `json:"name"`
 	DescriptionJSON string `json:"description"`
+	ParentIDJSON    string `json:"parentID"`
 }
 
 // Name returns the name of the category update request.
@@ -160,10 +167,16 @@ func (req UpdateCategoryRequestJSON) Description() string {
 	return req.DescriptionJSON
 }
 
+// ParentID returns the parentID of the category.
+func (req UpdateCategoryRequestJSON) ParentID() string {
+	return req.ParentIDJSON
+}
+
 // CreateBlockRequestJSON represents a JSON request for creating blocks.
 type CreateBlockRequestJSON struct {
 	NameJSON        string `json:"name"`
 	DescriptionJSON string `json:"description"`
+	KindJSON        string `json:"kind"`
 }
 
 // Name returns the name of the block.
@@ -176,10 +189,16 @@ func (req CreateBlockRequestJSON) Description() string {
 	return req.DescriptionJSON
 }
 
+// Kind returns the kind of the block.
+func (req CreateBlockRequestJSON) Kind() string {
+	return req.KindJSON
+}
+
 // UpdateBlockRequestJSON represents a JSON request for updating blocks.
 type UpdateBlockRequestJSON struct {
 	NameJSON        string `json:"name"`
 	DescriptionJSON string `json:"description"`
+	KindJSON        string `json:"kind"`
 }
 
 // Name returns the name of the block update request.
@@ -190,6 +209,11 @@ func (req UpdateBlockRequestJSON) Name() string {
 // Description returns the description of the block update request.
 func (req UpdateBlockRequestJSON) Description() string {
 	return req.DescriptionJSON
+}
+
+// Kind returns the kind of the block.
+func (req UpdateBlockRequestJSON) Kind() string {
+	return req.KindJSON
 }
 
 // CreateEpisodeRequestJSON represents a JSON request for creating episodes.

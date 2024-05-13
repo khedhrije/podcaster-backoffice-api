@@ -3,6 +3,8 @@ definitions:
     properties:
       description:
         type: string
+      kind:
+        type: string
       name:
         type: string
     type: object
@@ -11,6 +13,8 @@ definitions:
       description:
         type: string
       name:
+        type: string
+      parentID:
         type: string
     type: object
   pkg.CreateEpisodeRequestJSON:
@@ -56,6 +60,8 @@ definitions:
   pkg.UpdateBlockRequestJSON:
     properties:
       description:
+        type: string
+      kind:
         type: string
       name:
         type: string

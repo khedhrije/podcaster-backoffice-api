@@ -59,7 +59,7 @@ func (adapter wallAdapter) Update(ctx context.Context, wallUUID string, updates 
 	const query = `
         UPDATE wall SET 
                              name = COALESCE(:name, name), 
-                             description = COALESCE(:description, description), 
+                             description = COALESCE(:description, description)
                         WHERE UUID = UUID_TO_BIN(:UUID)
     `
 	// Set UUID for updates

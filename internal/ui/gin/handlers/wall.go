@@ -89,7 +89,7 @@ func (handler wallHandler) Update() gin.HandlerFunc {
 		wallUUID := c.Param("uuid")
 
 		// Extract body request
-		var jsonRequest api.CreateWallRequest
+		var jsonRequest pkg.CreateWallRequestJSON
 		if err := c.ShouldBindJSON(&jsonRequest); err != nil {
 			log.Ctx(c).Error().Err(err).Msg("error binding request")
 			c.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})

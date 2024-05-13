@@ -80,7 +80,7 @@ func (adapter *blockAdapter) Update(ctx context.Context, blockUUID string, updat
 func (adapter *blockAdapter) FindAll(ctx context.Context) ([]*model.Block, error) {
 	// SQL query to select all block records
 	const query = `
-        SELECT * FROM block
+        SELECT * FROM block;
     `
 	// Execute query and retrieve results
 	var blocksDB []*BlockDB
@@ -100,7 +100,7 @@ func (adapter *blockAdapter) FindAll(ctx context.Context) ([]*model.Block, error
 func (adapter *blockAdapter) Find(ctx context.Context, blockUUID string) (*model.Block, error) {
 	// SQL query to select a block record by UUID
 	const query = `
-        SELECT * FROM block WHERE UUID = UUID_TO_BIN(?)
+        SELECT * FROM block WHERE UUID = UUID_TO_BIN(?);
     `
 	// Execute query and retrieve results
 	var blocksDB []*BlockDB

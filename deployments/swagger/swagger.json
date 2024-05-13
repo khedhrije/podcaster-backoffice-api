@@ -1518,6 +1518,9 @@
                 "description": {
                     "type": "string"
                 },
+                "kind": {
+                    "type": "string"
+                },
                 "name": {
                     "type": "string"
                 }
@@ -1530,6 +1533,9 @@
                     "type": "string"
                 },
                 "name": {
+                    "type": "string"
+                },
+                "parentID": {
                     "type": "string"
                 }
             }
@@ -1601,6 +1607,9 @@
             "type": "object",
             "properties": {
                 "description": {
+                    "type": "string"
+                },
+                "kind": {
                     "type": "string"
                 },
                 "name": {

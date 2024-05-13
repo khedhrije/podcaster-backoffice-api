@@ -43,7 +43,7 @@ func (adapter *categoryAdapter) Create(ctx context.Context, category model.Categ
 func (adapter *categoryAdapter) Delete(ctx context.Context, categoryUUID string) error {
 	// SQL query to delete a category record by UUID
 	const query = `
-        DELETE FROM category WHERE UUID = UUID_TO_BIN(?)
+        DELETE FROM category WHERE UUID = UUID_TO_BIN(?);
     `
 	// Execute named query
 	_, err := adapter.client.db.ExecContext(ctx, query, categoryUUID)
@@ -61,7 +61,7 @@ func (adapter *categoryAdapter) Update(ctx context.Context, categoryUUID string,
                              name = COALESCE(:name, name), 
                              description = COALESCE(:description, description),
                              parentUUID = UUID_TO_BIN(:parentUUID)
-                        WHERE UUID = UUID_TO_BIN(:UUID)
+                        WHERE UUID = UUID_TO_BIN(:UUID);
     `
 	// Set UUID for updates
 	updates.ID = categoryUUID
@@ -80,7 +80,7 @@ func (adapter *categoryAdapter) Update(ctx context.Context, categoryUUID string,
 func (adapter *categoryAdapter) FindAll(ctx context.Context) ([]*model.Category, error) {
 	// SQL query to select all category records
 	const query = `
-        SELECT * FROM category
+        SELECT * FROM category;
     `
 	// Execute query and retrieve results
 	var categoriesDB []*CategoryDB
@@ -100,7 +100,7 @@ func (adapter *categoryAdapter) FindAll(ctx context.Context) ([]*model.Category,
 func (adapter *categoryAdapter) Find(ctx context.Context, categoryUUID string) (*model.Category, error) {
 	// SQL query to select a category record by UUID
 	const query = `
-        SELECT * FROM category WHERE UUID = UUID_TO_BIN(?)
+        SELECT * FROM category WHERE UUID = UUID_TO_BIN(?);
     `
 	// Execute query and retrieve results
 	var categoryDB CategoryDB
@@ -115,9 +115,9 @@ func (adapter *categoryAdapter) Find(ctx context.Context, categoryUUID string) (
 // CategoryDB is a struct representing the category database model.
 type CategoryDB struct {
 	UUID        uuid.UUID      `db:"UUID"`
-	Name        string         `db:"name"`
-	Description string         `db:"description"`
-	ParentID    sql.NullString `db:"parentUUID"`
+	Name        sql.NullString `db:"name"`
+	Description sql.NullString `db:"description"`
+	ParentID    uuid.UUID      `db:"parentUUID"`
 	CreatedAt   sql.NullTime   `db:"createdAt"`
 	UpdatedAt   sql.NullTime   `db:"updatedAt"`
 }
@@ -126,10 +126,10 @@ type CategoryDB struct {
 func (db *CategoryDB) ToDomainModel() model.Category {
 	return model.Category{
 		ID:          db.UUID.String(),
-		Name:        db.Name,
-		Description: db.Description,
+		Name:        db.Name.String,
+		Description: db.Description.String,
 		Parent: &model.Category{
-			ID: db.ParentID.String,
+			ID: db.ParentID.String(),
 		},
 	}
 }
@@ -137,11 +137,10 @@ func (db *CategoryDB) ToDomainModel() model.Category {
 // FromDomainModel converts a model.Category domain model to a CategoryDB database model.
 func (db *CategoryDB) FromDomainModel(domain model.Category) {
 	db.UUID = uuid.MustParse(domain.ID)
-	db.Name = domain.Name
-	db.Description = domain.Description
-	if domain.Parent.ID != "" {
-		db.ParentID = sql.NullString{String: domain.Parent.ID, Valid: true}
-	} else {
-		db.ParentID = sql.NullString{Valid: false}
+	db.Name = sql.NullString{String: domain.Name, Valid: domain.Name != ""}
+	db.Description = sql.NullString{String: domain.Description, Valid: domain.Description != ""}
+
+	if domain.Parent != nil && domain.Parent.ID != "" {
+		db.ParentID = uuid.MustParse(domain.ID)
 	}
 }

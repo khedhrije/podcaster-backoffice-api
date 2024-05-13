@@ -15,12 +15,14 @@ import (
 type CreateBlockRequest interface {
 	Name() string
 	Description() string
+	Kind() string
 }
 
 // UpdateBlockRequest represents the interface for updating blocks.
 type UpdateBlockRequest interface {
 	Name() string
 	Description() string
+	Kind() string
 }
 
 // Block represents the interface for managing blocks.
@@ -62,6 +64,7 @@ func (api blockApi) Create(ctx context.Context, req CreateBlockRequest) error {
 		ID:          uuid.New().String(),
 		Name:        req.Name(),
 		Description: req.Description(),
+		Kind:        req.Kind(),
 	}
 	// call adapter
 	if err := api.blockAdapter.Create(ctx, block); err != nil {
@@ -93,10 +96,17 @@ func (api blockApi) Update(ctx context.Context, uuid string, updates UpdateBlock
 		return fmt.Errorf("request was not validated: %w", vErrs)
 	}
 	// Map to domain model
-	block := model.Block{
-		Name:        updates.Name(),
-		Description: updates.Description(),
+	block := model.Block{}
+	if updates.Name() != "" {
+		block.Name = updates.Name()
 	}
+	if updates.Description() != "" {
+		block.Kind = updates.Description()
+	}
+	if updates.Kind() != "" {
+		block.Kind = updates.Kind()
+	}
+
 	// call adapter
 	if err := api.blockAdapter.Update(ctx, uuid, block); err != nil {
 		log.Ctx(ctx).Error().Err(err).Interface("block", block).Msg("error while updating block")
@@ -111,12 +121,6 @@ func updateBlockRequestValidation(ctx context.Context, uuid string, req UpdateBl
 	var vErrs []model.ValidationError
 	if uuid == "" {
 		vErrs = append(vErrs, model.ValidationError{Field: "uuid", Message: "cannot be empty"})
-	}
-	if req.Name() == "" {
-		vErrs = append(vErrs, model.ValidationError{Field: "name", Message: "cannot be empty"})
-	}
-	if req.Description() == "" {
-		vErrs = append(vErrs, model.ValidationError{Field: "description", Message: "cannot be empty"})
 	}
 	return vErrs
 }
@@ -136,6 +140,7 @@ func (api blockApi) Find(ctx context.Context, uuid string) (*pkg.BlockResponse, 
 		ID:          block.ID,
 		Name:        block.Name,
 		Description: block.Description,
+		Kind:        block.Kind,
 	}
 	// return result
 	return response, nil
@@ -157,6 +162,7 @@ func (api blockApi) FindAll(ctx context.Context) ([]*pkg.BlockResponse, error) {
 			ID:          block.ID,
 			Name:        block.Name,
 			Description: block.Description,
+			Kind:        block.Kind,
 		})
 	}
 	// return result
