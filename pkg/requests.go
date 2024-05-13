@@ -283,3 +283,29 @@ func (req UpdateEpisodeRequestJSON) ProgramID() string {
 func (req UpdateEpisodeRequestJSON) Position() int {
 	return req.PositionJSON
 }
+
+type OverwriteBlocksRequestJSON struct {
+	WallIDJSON        string         `json:"wallID"`
+	OrderedBlocksJSON map[string]int `json:"orderedBlocks"`
+}
+
+func (req OverwriteBlocksRequestJSON) WallID() string {
+	return req.WallIDJSON
+}
+
+func (req OverwriteBlocksRequestJSON) OrderedBlocks() map[string]int {
+	return req.OrderedBlocksJSON
+}
+
+type OverwriteProgramsRequestJSON struct {
+	BlockIDJSON         string         `json:"blockID"`
+	OrderedProgramsJSON map[string]int `json:"orderedPrograms"`
+}
+
+func (req OverwriteProgramsRequestJSON) BlockID() string {
+	return req.BlockIDJSON
+}
+
+func (req OverwriteProgramsRequestJSON) OrderedPrograms() map[string]int {
+	return req.OrderedProgramsJSON
+}

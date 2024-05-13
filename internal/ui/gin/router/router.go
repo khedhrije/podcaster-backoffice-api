@@ -34,6 +34,7 @@ func CreateRouter(wall handlers.Wall, block handlers.Block, program handlers.Pro
 			walls.GET("", wall.FindAll())
 			walls.DELETE("/:uuid", wall.Delete())
 			walls.GET("/:uuid/blocks", wall.FindBlocks())
+			walls.PUT("/:uuid/blocks/overwrite", wall.OverwriteBlocks())
 		}
 
 		// Routes for managing blocks
@@ -45,6 +46,7 @@ func CreateRouter(wall handlers.Wall, block handlers.Block, program handlers.Pro
 			blocks.GET("", block.FindAll())
 			blocks.DELETE("/:uuid", block.Delete())
 			blocks.GET("/:uuid/programs", block.FindPrograms())
+			blocks.PUT("/:uuid/programs/overwrite", block.OverwritePrograms())
 		}
 
 		// Routes for managing programs

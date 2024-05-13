@@ -28,6 +28,7 @@ type Wall interface {
 	Delete() gin.HandlerFunc
 
 	FindBlocks() gin.HandlerFunc
+	OverwriteBlocks() gin.HandlerFunc
 }
 
 type wallHandler struct {
@@ -214,5 +215,44 @@ func (handler wallHandler) FindBlocks() gin.HandlerFunc {
 
 		// Return response
 		c.JSON(http.StatusOK, walls)
+	}
+}
+
+// OverwriteBlocks returns a Gin handler function for overwriting blocks.
+//
+// @Summary Overwrite blocks of a wall
+// @Description Overwrite the blocks of a specific wall by replacing all existing blocks with new ones
+// @Tags walls
+// @ID overwrite-wall-blocks
+// @Param uuid path string true "UUID of the wall"
+// @Param request body pkg.OverwriteBlocksRequestJSON true "List of blocks' UUIDs to set"
+// @Produce json
+// @Success 200 {string} string "ok"
+// @Failure 422 {object} pkg.ErrorJSON "Unprocessable Entity"
+// @Failure 500 {object} pkg.ErrorJSON "Internal Server Error"
+// @Router /private/walls/{uuid}/blocks/overwrite [put]
+func (handler wallHandler) OverwriteBlocks() gin.HandlerFunc {
+	return func(c *gin.Context) {
+
+		// Extract wall UUID from path
+		wallUUID := c.Param("uuid")
+
+		// Extract body request
+		var jsonRequest pkg.OverwriteBlocksRequestJSON
+		if err := c.ShouldBindJSON(&jsonRequest); err != nil {
+			log.Ctx(c).Error().Err(err).Msg("error binding request")
+			c.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
+			return
+		}
+
+		// Call API to overwrite blocks
+		if err := handler.api.OverwriteBlocks(c, wallUUID, jsonRequest); err != nil {
+			log.Error().Msg("error overwriting blocks: " + err.Error())
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+
+		// Return response
+		c.JSON(http.StatusOK, "ok")
 	}
 }

@@ -28,6 +28,7 @@ type Block interface {
 	Delete() gin.HandlerFunc
 
 	FindPrograms() gin.HandlerFunc
+	OverwritePrograms() gin.HandlerFunc
 }
 
 type blockHandler struct {
@@ -215,4 +216,47 @@ func (handler blockHandler) FindPrograms() gin.HandlerFunc {
 		// Return response
 		c.JSON(http.StatusOK, programs)
 	}
+}
+
+// OverwritePrograms returns a Gin handler function for overwriting programs.
+//
+// @Summary Overwrite programs of a block
+// @Description Overwrite the programs of a specific block by replacing all existing programs with new ones
+// @Tags programs
+// @ID overwrite-block-programs
+// @Param uuid path string true "UUID of the block"
+// @Param request body pkg.OverwriteProgramsRequestJSON true "List of programs' UUIDs to set"
+// @Produce json
+// @Success 200 {string} string "ok"
+// @Failure 422 {object} pkg.ErrorJSON "Unprocessable Entity"
+// @Failure 500 {object} pkg.ErrorJSON "Internal Server Error"
+// @Router /private/blocks/{uuid}/programs/overwrite [put]
+func (handler blockHandler) OverwritePrograms() gin.HandlerFunc {
+	return func(c *gin.Context) {
+
+		// Extract block UUID from path
+		blockUUID := c.Param("uuid")
+
+		// Extract body request
+		var jsonRequest pkg.OverwriteProgramsRequestJSON
+		if err := c.ShouldBindJSON(&jsonRequest); err != nil {
+			log.Ctx(c).Error().Err(err).Msg("error binding request")
+			c.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
+			return
+		}
+
+		// Call API to overwrite blocks
+		if err := handler.api.OverwritePrograms(c, blockUUID, jsonRequest); err != nil {
+			log.Error().Msg("error overwriting blocks: " + err.Error())
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+
+		// Return response
+		c.JSON(http.StatusOK, "ok")
+	}
+}
+
+type OverwriteProgramsRequest interface {
+	OrderedPrograms() map[string]int
 }

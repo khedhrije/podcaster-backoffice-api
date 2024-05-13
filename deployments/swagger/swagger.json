@@ -226,6 +226,57 @@
                 }
             }
         },
+        "/private/blocks/{uuid}/programs/overwrite": {
+            "put": {
+                "description": "Overwrite the programs of a specific block by replacing all existing programs with new ones",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "programs"
+                ],
+                "summary": "Overwrite programs of a block",
+                "operationId": "overwrite-block-programs",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "UUID of the block",
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "List of programs' UUIDs to set",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/pkg.OverwriteProgramsRequestJSON"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "ok",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.ErrorJSON"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.ErrorJSON"
+                        }
+                    }
+                }
+            }
+        },
         "/private/categories": {
             "post": {
                 "description": "Create a new category",
@@ -1509,6 +1560,57 @@
                     }
                 }
             }
+        },
+        "/private/walls/{uuid}/blocks/overwrite": {
+            "put": {
+                "description": "Overwrite the blocks of a specific wall by replacing all existing blocks with new ones",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "walls"
+                ],
+                "summary": "Overwrite blocks of a wall",
+                "operationId": "overwrite-wall-blocks",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "UUID of the wall",
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "List of blocks' UUIDs to set",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/pkg.OverwriteBlocksRequestJSON"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "ok",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.ErrorJSON"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.ErrorJSON"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -1609,6 +1711,34 @@
             "properties": {
                 "error": {
                     "type": "string"
+                }
+            }
+        },
+        "pkg.OverwriteBlocksRequestJSON": {
+            "type": "object",
+            "properties": {
+                "orderedBlocks": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "integer"
+                    }
+                },
+                "wallID": {
+                    "type": "string"
+                }
+            }
+        },
+        "pkg.OverwriteProgramsRequestJSON": {
+            "type": "object",
+            "properties": {
+                "blockID": {
+                    "type": "string"
+                },
+                "orderedPrograms": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "integer"
+                    }
                 }
             }
         },

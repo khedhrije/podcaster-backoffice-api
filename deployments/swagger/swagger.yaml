@@ -63,6 +63,24 @@ definitions:
       error:
         type: string
     type: object
+  pkg.OverwriteBlocksRequestJSON:
+    properties:
+      orderedBlocks:
+        additionalProperties:
+          type: integer
+        type: object
+      wallID:
+        type: string
+    type: object
+  pkg.OverwriteProgramsRequestJSON:
+    properties:
+      blockID:
+        type: string
+      orderedPrograms:
+        additionalProperties:
+          type: integer
+        type: object
+    type: object
   pkg.UpdateBlockRequestJSON:
     properties:
       description:
@@ -275,6 +293,41 @@ paths:
       summary: Find all block's programs
       tags:
       - walls
+  /private/blocks/{uuid}/programs/overwrite:
+    put:
+      description: Overwrite the programs of a specific block by replacing all existing
+        programs with new ones
+      operationId: overwrite-block-programs
+      parameters:
+      - description: UUID of the block
+        in: path
+        name: uuid
+        required: true
+        type: string
+      - description: List of programs' UUIDs to set
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/pkg.OverwriteProgramsRequestJSON'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/pkg.ErrorJSON'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/pkg.ErrorJSON'
+      summary: Overwrite programs of a block
+      tags:
+      - programs
   /private/categories:
     post:
       description: Create a new category
@@ -1131,6 +1184,41 @@ paths:
           schema:
             $ref: '#/definitions/pkg.ErrorJSON'
       summary: Find all wall's blocks
+      tags:
+      - walls
+  /private/walls/{uuid}/blocks/overwrite:
+    put:
+      description: Overwrite the blocks of a specific wall by replacing all existing
+        blocks with new ones
+      operationId: overwrite-wall-blocks
+      parameters:
+      - description: UUID of the wall
+        in: path
+        name: uuid
+        required: true
+        type: string
+      - description: List of blocks' UUIDs to set
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/pkg.OverwriteBlocksRequestJSON'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/pkg.ErrorJSON'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/pkg.ErrorJSON'
+      summary: Overwrite blocks of a wall
       tags:
       - walls
 securityDefinitions:

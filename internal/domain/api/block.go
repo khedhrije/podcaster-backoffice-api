@@ -33,6 +33,7 @@ type Block interface {
 	FindAll(ctx context.Context) ([]*pkg.BlockResponse, error)
 	Delete(ctx context.Context, uuid string) error
 	FindPrograms(ctx context.Context, uuid string) ([]*pkg.BlockProgramsResponse, error)
+	OverwritePrograms(ctx context.Context, blockID string, req OverwriteProgramsRequest) error
 }
 
 // blockApi is an implementation of the Block interface.
@@ -205,4 +206,43 @@ func (api blockApi) FindPrograms(ctx context.Context, uuid string) ([]*pkg.Block
 	}
 
 	return response, nil
+}
+
+func (api blockApi) OverwritePrograms(ctx context.Context, blockID string, req OverwriteProgramsRequest) error {
+
+	// Find all existing associations by wallID
+	associations, err := api.blockProgramAdapter.FindByBlockID(ctx, blockID)
+	if err != nil {
+		return err
+	}
+
+	// Remove all existing association for the wall
+	for _, association := range associations {
+		err = api.blockProgramAdapter.Delete(ctx, association.ID)
+		if err != nil {
+			return err
+		}
+	}
+
+	// Create all new associations
+	for programID, position := range req.OrderedPrograms() {
+		wallBlock := model.BlockProgram{
+			ID:        uuid.New().String(),
+			BlockID:   blockID,
+			ProgramID: programID,
+			Position:  position,
+		}
+
+		// Call adapter to create wall
+		if err := api.blockProgramAdapter.Create(ctx, wallBlock); err != nil {
+			log.Ctx(ctx).Error().Err(err).Interface("wallBlock", wallBlock).Msg("error while creating wall")
+			return fmt.Errorf("error occurred while creating wall: %w", err)
+		}
+	}
+
+	return nil
+}
+
+type OverwriteProgramsRequest interface {
+	OrderedPrograms() map[string]int
 }

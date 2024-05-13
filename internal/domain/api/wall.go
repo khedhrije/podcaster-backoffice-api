@@ -19,6 +19,7 @@ type Wall interface {
 	FindAll(ctx context.Context) ([]*pkg.WallResponse, error)
 	Delete(ctx context.Context, uuid string) error
 	FindBlocks(ctx context.Context, uuid string) ([]*pkg.WallBlocksResponse, error)
+	OverwriteBlocks(ctx context.Context, wallID string, req OverwriteBlocksRequest) error
 }
 
 // wallApi is an implementation of the Wall interface.
@@ -187,6 +188,46 @@ func (api wallApi) Delete(ctx context.Context, uuid string) error {
 		return fmt.Errorf("error occurred while deleting wall: %w", err)
 	}
 	return nil
+}
+
+func (api wallApi) OverwriteBlocks(ctx context.Context, wallID string, req OverwriteBlocksRequest) error {
+
+	// Find all existing associations by wallID
+	associations, err := api.wallBlockAdapter.FindByWallID(ctx, wallID)
+	if err != nil {
+		return err
+	}
+
+	// Remove all existing association for the wall
+	for _, association := range associations {
+		err = api.wallBlockAdapter.Delete(ctx, association.ID)
+		if err != nil {
+			return err
+		}
+	}
+
+	// Create all new associations
+	for blockID, position := range req.OrderedBlocks() {
+		wallBlock := model.WallBlock{
+			ID:       uuid.New().String(),
+			WallID:   wallID,
+			BlockID:  blockID,
+			Position: position,
+		}
+
+		// Call adapter to create wall
+		if err := api.wallBlockAdapter.Create(ctx, wallBlock); err != nil {
+			log.Ctx(ctx).Error().Err(err).Interface("wallBlock", wallBlock).Msg("error while creating wall")
+			return fmt.Errorf("error occurred while creating wall: %w", err)
+		}
+	}
+
+	return nil
+}
+
+// OverwriteBlocksRequest represents the interface for overwriting wallBlock associations.
+type OverwriteBlocksRequest interface {
+	OrderedBlocks() map[string]int
 }
 
 // CreateWallRequest represents the interface for creating walls.
