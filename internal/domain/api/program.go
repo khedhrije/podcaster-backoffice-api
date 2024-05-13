@@ -33,6 +33,8 @@ type Program interface {
 	FindEpisodes(ctx context.Context, uuid string) ([]*pkg.EpisodeResponse, error)
 	FindTags(ctx context.Context, uuid string) ([]*pkg.TagResponse, error)
 	FindCats(ctx context.Context, uuid string) ([]*pkg.CategoryResponse, error)
+	OverwriteCategories(ctx context.Context, programID string, cats []string) error
+	OverwriteTags(ctx context.Context, programID string, tags []string) error
 }
 
 // programApi is an implementation of the Program interface.
@@ -265,4 +267,72 @@ func (api programApi) FindCats(ctx context.Context, uuid string) ([]*pkg.Categor
 
 	// return result
 	return response, nil
+}
+
+func (api programApi) OverwriteCategories(ctx context.Context, programID string, catIDs []string) error {
+
+	// Find all existing associations by wallID
+	associations, err := api.programCatAdapter.FindByProgramID(ctx, programID)
+	if err != nil {
+		return err
+	}
+
+	// Remove all existing association for the wall
+	for _, association := range associations {
+		err = api.programCatAdapter.Delete(ctx, association.ID)
+		if err != nil {
+			return err
+		}
+	}
+
+	// Create all new associations
+	for _, catID := range catIDs {
+		wallBlock := model.ProgramCategory{
+			ID:         uuid.New().String(),
+			ProgramID:  programID,
+			CategoryID: catID,
+		}
+
+		// Call adapter to create wall
+		if err := api.programCatAdapter.Create(ctx, wallBlock); err != nil {
+			log.Ctx(ctx).Error().Err(err).Interface("wallBlock", wallBlock).Msg("error while creating wall")
+			return fmt.Errorf("error occurred while creating wall: %w", err)
+		}
+	}
+
+	return nil
+}
+
+func (api programApi) OverwriteTags(ctx context.Context, programID string, tagIDs []string) error {
+
+	// Find all existing associations by wallID
+	associations, err := api.programTagAdapter.FindByProgramID(ctx, programID)
+	if err != nil {
+		return err
+	}
+
+	// Remove all existing association for the wall
+	for _, association := range associations {
+		err = api.programTagAdapter.Delete(ctx, association.ID)
+		if err != nil {
+			return err
+		}
+	}
+
+	// Create all new associations
+	for _, catID := range tagIDs {
+		programCategory := model.ProgramTag{
+			ID:        uuid.New().String(),
+			ProgramID: programID,
+			TagID:     catID,
+		}
+
+		// Call adapter to create wall
+		if err := api.programTagAdapter.Create(ctx, programCategory); err != nil {
+			log.Ctx(ctx).Error().Err(err).Interface("programCategory", programCategory).Msg("error while creating wall")
+			return fmt.Errorf("error occurred while creating wall: %w", err)
+		}
+	}
+
+	return nil
 }

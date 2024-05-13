@@ -60,6 +60,8 @@ func CreateRouter(wall handlers.Wall, block handlers.Block, program handlers.Pro
 			programs.GET("/:uuid/episodes", program.FindEpisodes())
 			programs.GET("/:uuid/tags", program.FindTags())
 			programs.GET("/:uuid/categories", program.FindCategories())
+			programs.PUT("/:uuid/tags/overwrite", program.OverwriteTags())
+			programs.PUT("/:uuid/categories/overwrite", program.OverwriteCategories())
 		}
 
 		// Routes for managing episodes

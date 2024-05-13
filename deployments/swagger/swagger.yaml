@@ -327,7 +327,7 @@ paths:
             $ref: '#/definitions/pkg.ErrorJSON'
       summary: Overwrite programs of a block
       tags:
-      - programs
+      - blocks
   /private/categories:
     post:
       description: Create a new category
@@ -852,6 +852,43 @@ paths:
       summary: Find a program's categories
       tags:
       - programs
+  /private/programs/{uuid}/categories/overwrite:
+    put:
+      description: Overwrite the categories of a specific program by replacing all
+        existing categories with new ones
+      operationId: overwrite-program-categories
+      parameters:
+      - description: UUID of the program
+        in: path
+        name: uuid
+        required: true
+        type: string
+      - description: List of categories' UUIDs to set
+        in: body
+        name: request
+        required: true
+        schema:
+          items:
+            type: string
+          type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/pkg.ErrorJSON'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/pkg.ErrorJSON'
+      summary: Overwrite categories of a program
+      tags:
+      - programs
   /private/programs/{uuid}/episodes:
     get:
       description: Find a program's episodes
@@ -898,6 +935,43 @@ paths:
           schema:
             $ref: '#/definitions/pkg.ErrorJSON'
       summary: Find a program's tags
+      tags:
+      - programs
+  /private/programs/{uuid}/tags/overwrite:
+    put:
+      description: Overwrite the tags of a specific program by replacing all existing
+        tags with new ones
+      operationId: overwrite-program-tags
+      parameters:
+      - description: UUID of the program
+        in: path
+        name: uuid
+        required: true
+        type: string
+      - description: List of tags UUIDs to set
+        in: body
+        name: request
+        required: true
+        schema:
+          items:
+            type: string
+          type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/pkg.ErrorJSON'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/pkg.ErrorJSON'
+      summary: Overwrite tags of a program
       tags:
       - programs
   /private/tags:

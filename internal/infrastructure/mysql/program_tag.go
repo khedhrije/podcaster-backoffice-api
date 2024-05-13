@@ -105,12 +105,14 @@ func (adapter *programTagAdapter) FindByProgramID(ctx context.Context, programID
 	if err := adapter.client.db.SelectContext(ctx, &programTagsDB, query, programID); err != nil {
 		return nil, err
 	}
+
 	// Convert database models to domain models
 	var programTags []*model.ProgramTag
 	for _, programTagDB := range programTagsDB {
 		mappedProgramTag := programTagDB.ToDomainModel()
 		programTags = append(programTags, &mappedProgramTag)
 	}
+
 	return programTags, nil
 }
 

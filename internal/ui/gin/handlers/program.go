@@ -30,6 +30,9 @@ type Program interface {
 	FindEpisodes() gin.HandlerFunc
 	FindTags() gin.HandlerFunc
 	FindCategories() gin.HandlerFunc
+
+	OverwriteCategories() gin.HandlerFunc
+	OverwriteTags() gin.HandlerFunc
 }
 
 type programHandler struct {
@@ -273,5 +276,77 @@ func (handler programHandler) FindCategories() gin.HandlerFunc {
 
 		// Return response
 		c.JSON(http.StatusOK, categories)
+	}
+}
+
+// OverwriteCategories returns a Gin handler function for overwriting categories.
+//
+// @Summary Overwrite categories of a program
+// @Description Overwrite the categories of a specific program by replacing all existing categories with new ones
+// @Tags programs
+// @ID overwrite-program-categories
+// @Param uuid path string true "UUID of the program"
+// @Param request body []string true "List of categories' UUIDs to set"
+// @Produce json
+// @Success 200 {string} string "ok"
+// @Failure 422 {object} pkg.ErrorJSON "Unprocessable Entity"
+// @Failure 500 {object} pkg.ErrorJSON "Internal Server Error"
+// @Router /private/programs/{uuid}/categories/overwrite [put]
+func (handler programHandler) OverwriteCategories() gin.HandlerFunc {
+	return func(c *gin.Context) {
+
+		// Extract program UUID from path
+		programUUID := c.Param("uuid")
+
+		// Extract body request
+		var jsonRequest []string
+		if err := c.ShouldBindJSON(&jsonRequest); err != nil {
+			log.Ctx(c).Error().Err(err).Msg("error binding request")
+			c.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
+			return
+		}
+
+		// Call API
+		if err := handler.api.OverwriteCategories(c, programUUID, jsonRequest); err != nil {
+			log.Error().Msg("error finding program's categories: " + err.Error())
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+	}
+}
+
+// OverwriteTags returns a Gin handler function for overwriting categories.
+//
+// @Summary Overwrite tags of a program
+// @Description Overwrite the tags of a specific program by replacing all existing tags with new ones
+// @Tags programs
+// @ID overwrite-program-tags
+// @Param uuid path string true "UUID of the program"
+// @Param request body []string true "List of tags UUIDs to set"
+// @Produce json
+// @Success 200 {string} string "ok"
+// @Failure 422 {object} pkg.ErrorJSON "Unprocessable Entity"
+// @Failure 500 {object} pkg.ErrorJSON "Internal Server Error"
+// @Router /private/programs/{uuid}/tags/overwrite [put]
+func (handler programHandler) OverwriteTags() gin.HandlerFunc {
+	return func(c *gin.Context) {
+
+		// Extract program UUID from path
+		programUUID := c.Param("uuid")
+
+		// Extract body request
+		var jsonRequest []string
+		if err := c.ShouldBindJSON(&jsonRequest); err != nil {
+			log.Ctx(c).Error().Err(err).Msg("error binding request")
+			c.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
+			return
+		}
+
+		// Call API
+		if err := handler.api.OverwriteTags(c, programUUID, jsonRequest); err != nil {
+			log.Error().Msg("error finding program's tags: " + err.Error())
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
 	}
 }

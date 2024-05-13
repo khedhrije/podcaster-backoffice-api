@@ -222,7 +222,7 @@ func (handler blockHandler) FindPrograms() gin.HandlerFunc {
 //
 // @Summary Overwrite programs of a block
 // @Description Overwrite the programs of a specific block by replacing all existing programs with new ones
-// @Tags programs
+// @Tags blocks
 // @ID overwrite-block-programs
 // @Param uuid path string true "UUID of the block"
 // @Param request body pkg.OverwriteProgramsRequestJSON true "List of programs' UUIDs to set"

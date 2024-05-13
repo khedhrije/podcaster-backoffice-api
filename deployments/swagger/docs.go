@@ -241,7 +241,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "programs"
+                    "blocks"
                 ],
                 "summary": "Overwrite programs of a block",
                 "operationId": "overwrite-block-programs",
@@ -1069,6 +1069,60 @@ const docTemplate = `{
                 }
             }
         },
+        "/private/programs/{uuid}/categories/overwrite": {
+            "put": {
+                "description": "Overwrite the categories of a specific program by replacing all existing categories with new ones",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "programs"
+                ],
+                "summary": "Overwrite categories of a program",
+                "operationId": "overwrite-program-categories",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "UUID of the program",
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "List of categories' UUIDs to set",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "ok",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.ErrorJSON"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.ErrorJSON"
+                        }
+                    }
+                }
+            }
+        },
         "/private/programs/{uuid}/episodes": {
             "get": {
                 "description": "Find a program's episodes",
@@ -1130,6 +1184,60 @@ const docTemplate = `{
                         "description": "ok",
                         "schema": {
                             "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.ErrorJSON"
+                        }
+                    }
+                }
+            }
+        },
+        "/private/programs/{uuid}/tags/overwrite": {
+            "put": {
+                "description": "Overwrite the tags of a specific program by replacing all existing tags with new ones",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "programs"
+                ],
+                "summary": "Overwrite tags of a program",
+                "operationId": "overwrite-program-tags",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "UUID of the program",
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "List of tags UUIDs to set",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "ok",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.ErrorJSON"
                         }
                     },
                     "500": {
