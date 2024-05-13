@@ -54,6 +54,8 @@ func NewTagHandler(api api.Tag) Tag {
 // @Success 200 {string} string "ok"
 // @Failure 500 {object} pkg.ErrorJSON
 // @Router /private/tags [post]
+//
+// @Security Bearer-APIKey || Bearer-JWT
 func (handler tagHandler) Create() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Extract body request
@@ -86,6 +88,8 @@ func (handler tagHandler) Create() gin.HandlerFunc {
 // @Success 200 {string} string "ok"
 // @Failure 500 {object} pkg.ErrorJSON
 // @Router /private/tags/{uuid} [put]
+//
+// @Security Bearer-APIKey || Bearer-JWT
 func (handler tagHandler) Update() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Extract tag UUID from path
@@ -120,6 +124,8 @@ func (handler tagHandler) Update() gin.HandlerFunc {
 // @Success 200 {object} pkg.TagResponse
 // @Failure 500 {object} pkg.ErrorJSON
 // @Router /private/tags/{uuid} [get]
+//
+// @Security Bearer-APIKey || Bearer-JWT
 func (handler tagHandler) Find() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Extract tag UUID from path
@@ -148,6 +154,8 @@ func (handler tagHandler) Find() gin.HandlerFunc {
 // @Success 200 {array} pkg.TagResponse
 // @Failure 500 {object} pkg.ErrorJSON
 // @Router /private/tags [get]
+//
+// @Security Bearer-APIKey || Bearer-JWT
 func (handler tagHandler) FindAll() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Call API to find all tags
@@ -174,6 +182,8 @@ func (handler tagHandler) FindAll() gin.HandlerFunc {
 // @Success 200 {string} string "deleted"
 // @Failure 500 {object} pkg.ErrorJSON
 // @Router /private/tags/{uuid} [delete]
+//
+// @Security Bearer-APIKey || Bearer-JWT
 func (handler tagHandler) Delete() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Extract tag UUID from path
@@ -202,6 +212,8 @@ func (handler tagHandler) Delete() gin.HandlerFunc {
 // @Success 200 {array} pkg.ProgramResponse
 // @Failure 500 {object} pkg.ErrorJSON
 // @Router /private/tags/{uuid}/programs [get]
+//
+// @Security Bearer-APIKey || Bearer-JWT
 func (handler tagHandler) FindPrograms() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Extract tag UUID from path

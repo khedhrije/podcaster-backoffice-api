@@ -171,6 +171,8 @@ func (handler mediaHandler) FindAll() gin.HandlerFunc {
 // @Success 200 {string} string "deleted"
 // @Failure 500 {object} pkg.ErrorJSON
 // @Router /private/medias/{uuid} [delete]
+//
+// @Security Bearer-APIKey || Bearer-JWT
 func (handler mediaHandler) Delete() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Extract media UUID from path

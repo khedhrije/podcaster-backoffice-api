@@ -56,6 +56,8 @@ func NewWallHandler(api api.Wall) Wall {
 // @Success 200 {string} string "ok"
 // @Failure 500 {object} pkg.ErrorJSON
 // @Router /private/walls [post]
+//
+// @Security Bearer-APIKey || Bearer-JWT
 func (handler wallHandler) Create() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var jsonRequest pkg.CreateWallRequestJSON
@@ -87,6 +89,8 @@ func (handler wallHandler) Create() gin.HandlerFunc {
 // @Success 200 {string} string "ok"
 // @Failure 500 {object} pkg.ErrorJSON
 // @Router /private/walls/{uuid} [put]
+//
+// @Security Bearer-APIKey || Bearer-JWT
 func (handler wallHandler) Update() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		wallUUID := c.Param("uuid")
@@ -119,6 +123,8 @@ func (handler wallHandler) Update() gin.HandlerFunc {
 // @Success 200 {object} pkg.WallResponse
 // @Failure 500 {object} pkg.ErrorJSON
 // @Router /private/walls/{uuid} [get]
+//
+// @Security Bearer-APIKey || Bearer-JWT
 func (handler wallHandler) Find() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		wallUUID := c.Param("uuid")
@@ -144,6 +150,8 @@ func (handler wallHandler) Find() gin.HandlerFunc {
 // @Success 200 {array} pkg.WallResponse
 // @Failure 500 {object} pkg.ErrorJSON
 // @Router /private/walls [get]
+//
+// @Security Bearer-APIKey || Bearer-JWT
 func (handler wallHandler) FindAll() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		walls, err := handler.api.FindAll(c)
@@ -168,6 +176,8 @@ func (handler wallHandler) FindAll() gin.HandlerFunc {
 // @Success 200 {string} string "deleted"
 // @Failure 500 {object} pkg.ErrorJSON
 // @Router /private/walls/{uuid} [delete]
+//
+// @Security Bearer-APIKey || Bearer-JWT
 func (handler wallHandler) Delete() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		wallUUID := c.Param("uuid")
@@ -193,6 +203,8 @@ func (handler wallHandler) Delete() gin.HandlerFunc {
 // @Success 200 {array} pkg.BlockResponse
 // @Failure 500 {object} pkg.ErrorJSON
 // @Router /private/walls/{uuid}/blocks [get]
+//
+// @Security Bearer-APIKey || Bearer-JWT
 func (handler wallHandler) FindBlocks() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		wallUUID := c.Param("uuid")
@@ -221,6 +233,8 @@ func (handler wallHandler) FindBlocks() gin.HandlerFunc {
 // @Failure 422 {object} pkg.ErrorJSON "Unprocessable Entity"
 // @Failure 500 {object} pkg.ErrorJSON "Internal Server Error"
 // @Router /private/walls/{uuid}/blocks/overwrite [put]
+//
+// @Security Bearer-APIKey || Bearer-JWT
 func (handler wallHandler) OverwriteBlocks() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		wallUUID := c.Param("uuid")

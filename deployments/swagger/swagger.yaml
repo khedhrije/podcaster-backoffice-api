@@ -251,6 +251,9 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/pkg.ErrorJSON'
+      security:
+      - Bearer-APIKey: []
+        Bearer-JWT: []
       summary: Find all blocks
       tags:
       - blocks
@@ -275,6 +278,9 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/pkg.ErrorJSON'
+      security:
+      - Bearer-APIKey: []
+        Bearer-JWT: []
       summary: Create a new block
       tags:
       - blocks
@@ -322,6 +328,9 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/pkg.ErrorJSON'
+      security:
+      - Bearer-APIKey: []
+        Bearer-JWT: []
       summary: Find a block
       tags:
       - blocks
@@ -351,6 +360,9 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/pkg.ErrorJSON'
+      security:
+      - Bearer-APIKey: []
+        Bearer-JWT: []
       summary: Update block
       tags:
       - blocks
@@ -377,6 +389,9 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/pkg.ErrorJSON'
+      security:
+      - Bearer-APIKey: []
+        Bearer-JWT: []
       summary: Find all programs of a block
       tags:
       - blocks
@@ -412,6 +427,9 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/pkg.ErrorJSON'
+      security:
+      - Bearer-APIKey: []
+        Bearer-JWT: []
       summary: Overwrite programs of a block
       tags:
       - blocks
@@ -432,6 +450,9 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/pkg.ErrorJSON'
+      security:
+      - Bearer-APIKey: []
+        Bearer-JWT: []
       summary: Find all categories
       tags:
       - categories
@@ -456,6 +477,9 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/pkg.ErrorJSON'
+      security:
+      - Bearer-APIKey: []
+        Bearer-JWT: []
       summary: Create a new category
       tags:
       - categories
@@ -480,6 +504,9 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/pkg.ErrorJSON'
+      security:
+      - Bearer-APIKey: []
+        Bearer-JWT: []
       summary: Delete a category
       tags:
       - categories
@@ -503,6 +530,9 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/pkg.ErrorJSON'
+      security:
+      - Bearer-APIKey: []
+        Bearer-JWT: []
       summary: Find a category
       tags:
       - categories
@@ -532,6 +562,9 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/pkg.ErrorJSON'
+      security:
+      - Bearer-APIKey: []
+        Bearer-JWT: []
       summary: Update category
       tags:
       - categories
@@ -558,6 +591,9 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/pkg.ErrorJSON'
+      security:
+      - Bearer-APIKey: []
+        Bearer-JWT: []
       summary: Find all category's programs
       tags:
       - categories
@@ -578,6 +614,9 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/pkg.ErrorJSON'
+      security:
+      - Bearer-APIKey: []
+        Bearer-JWT: []
       summary: Find all episodes
       tags:
       - episodes
@@ -602,6 +641,9 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/pkg.ErrorJSON'
+      security:
+      - Bearer-APIKey: []
+        Bearer-JWT: []
       summary: Create a new episode
       tags:
       - episodes
@@ -626,6 +668,9 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/pkg.ErrorJSON'
+      security:
+      - Bearer-APIKey: []
+        Bearer-JWT: []
       summary: Delete an episode
       tags:
       - episodes
@@ -649,6 +694,9 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/pkg.ErrorJSON'
+      security:
+      - Bearer-APIKey: []
+        Bearer-JWT: []
       summary: Find an episode
       tags:
       - episodes
@@ -678,6 +726,9 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/pkg.ErrorJSON'
+      security:
+      - Bearer-APIKey: []
+        Bearer-JWT: []
       summary: Update episode
       tags:
       - episodes
@@ -746,6 +797,9 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/pkg.ErrorJSON'
+      security:
+      - Bearer-APIKey: []
+        Bearer-JWT: []
       summary: Delete a media
       tags:
       - medias
@@ -818,6 +872,9 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/pkg.ErrorJSON'
+      security:
+      - Bearer-APIKey: []
+        Bearer-JWT: []
       summary: Find all programs
       tags:
       - programs
@@ -842,6 +899,9 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/pkg.ErrorJSON'
+      security:
+      - Bearer-APIKey: []
+        Bearer-JWT: []
       summary: Create a new program
       tags:
       - programs
@@ -866,6 +926,9 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/pkg.ErrorJSON'
+      security:
+      - Bearer-APIKey: []
+        Bearer-JWT: []
       summary: Delete a program
       tags:
       - programs
@@ -889,6 +952,9 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/pkg.ErrorJSON'
+      security:
+      - Bearer-APIKey: []
+        Bearer-JWT: []
       summary: Find a program
       tags:
       - programs
@@ -918,6 +984,9 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/pkg.ErrorJSON'
+      security:
+      - Bearer-APIKey: []
+        Bearer-JWT: []
       summary: Update program
       tags:
       - programs
@@ -944,6 +1013,9 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/pkg.ErrorJSON'
+      security:
+      - Bearer-APIKey: []
+        Bearer-JWT: []
       summary: Find a program's categories
       tags:
       - programs
@@ -981,6 +1053,9 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/pkg.ErrorJSON'
+      security:
+      - Bearer-APIKey: []
+        Bearer-JWT: []
       summary: Overwrite categories of a program
       tags:
       - programs
@@ -1007,6 +1082,9 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/pkg.ErrorJSON'
+      security:
+      - Bearer-APIKey: []
+        Bearer-JWT: []
       summary: Find a program's episodes
       tags:
       - programs
@@ -1033,6 +1111,9 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/pkg.ErrorJSON'
+      security:
+      - Bearer-APIKey: []
+        Bearer-JWT: []
       summary: Find a program's tags
       tags:
       - programs
@@ -1070,6 +1151,9 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/pkg.ErrorJSON'
+      security:
+      - Bearer-APIKey: []
+        Bearer-JWT: []
       summary: Overwrite tags of a program
       tags:
       - programs
@@ -1090,6 +1174,9 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/pkg.ErrorJSON'
+      security:
+      - Bearer-APIKey: []
+        Bearer-JWT: []
       summary: Find all tags
       tags:
       - tags
@@ -1114,6 +1201,9 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/pkg.ErrorJSON'
+      security:
+      - Bearer-APIKey: []
+        Bearer-JWT: []
       summary: Create a new tag
       tags:
       - tags
@@ -1138,6 +1228,9 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/pkg.ErrorJSON'
+      security:
+      - Bearer-APIKey: []
+        Bearer-JWT: []
       summary: Delete a tag
       tags:
       - tags
@@ -1161,6 +1254,9 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/pkg.ErrorJSON'
+      security:
+      - Bearer-APIKey: []
+        Bearer-JWT: []
       summary: Find a tag
       tags:
       - tags
@@ -1190,6 +1286,9 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/pkg.ErrorJSON'
+      security:
+      - Bearer-APIKey: []
+        Bearer-JWT: []
       summary: Update tag
       tags:
       - tags
@@ -1216,6 +1315,9 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/pkg.ErrorJSON'
+      security:
+      - Bearer-APIKey: []
+        Bearer-JWT: []
       summary: Find all tag's programs
       tags:
       - tags
@@ -1236,6 +1338,9 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/pkg.ErrorJSON'
+      security:
+      - Bearer-APIKey: []
+        Bearer-JWT: []
       summary: Find all walls
       tags:
       - walls
@@ -1260,6 +1365,9 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/pkg.ErrorJSON'
+      security:
+      - Bearer-APIKey: []
+        Bearer-JWT: []
       summary: Create a new wall
       tags:
       - walls
@@ -1284,6 +1392,9 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/pkg.ErrorJSON'
+      security:
+      - Bearer-APIKey: []
+        Bearer-JWT: []
       summary: Delete a wall
       tags:
       - walls
@@ -1307,6 +1418,9 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/pkg.ErrorJSON'
+      security:
+      - Bearer-APIKey: []
+        Bearer-JWT: []
       summary: Find a wall
       tags:
       - walls
@@ -1336,6 +1450,9 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/pkg.ErrorJSON'
+      security:
+      - Bearer-APIKey: []
+        Bearer-JWT: []
       summary: Update wall
       tags:
       - walls
@@ -1362,6 +1479,9 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/pkg.ErrorJSON'
+      security:
+      - Bearer-APIKey: []
+        Bearer-JWT: []
       summary: Find all wall's blocks
       tags:
       - walls
@@ -1397,6 +1517,9 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/pkg.ErrorJSON'
+      security:
+      - Bearer-APIKey: []
+        Bearer-JWT: []
       summary: Overwrite blocks of a wall
       tags:
       - walls

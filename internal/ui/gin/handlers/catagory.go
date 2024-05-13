@@ -54,6 +54,8 @@ func NewCategoryHandler(api api.Category) Category {
 // @Success 200 {string} string "ok"
 // @Failure 500 {object} pkg.ErrorJSON
 // @Router /private/categories [post]
+//
+// @Security Bearer-APIKey || Bearer-JWT
 func (handler categoryHandler) Create() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Extract body request
@@ -86,6 +88,8 @@ func (handler categoryHandler) Create() gin.HandlerFunc {
 // @Success 200 {string} string "ok"
 // @Failure 500 {object} pkg.ErrorJSON
 // @Router /private/categories/{uuid} [put]
+//
+// @Security Bearer-APIKey || Bearer-JWT
 func (handler categoryHandler) Update() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Extract category UUID from path
@@ -120,6 +124,8 @@ func (handler categoryHandler) Update() gin.HandlerFunc {
 // @Success 200 {object} pkg.CategoryResponse
 // @Failure 500 {object} pkg.ErrorJSON
 // @Router /private/categories/{uuid} [get]
+//
+// @Security Bearer-APIKey || Bearer-JWT
 func (handler categoryHandler) Find() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Extract category UUID from path
@@ -148,6 +154,8 @@ func (handler categoryHandler) Find() gin.HandlerFunc {
 // @Success 200 {array} pkg.CategoryResponse
 // @Failure 500 {object} pkg.ErrorJSON
 // @Router /private/categories [get]
+//
+// @Security Bearer-APIKey || Bearer-JWT
 func (handler categoryHandler) FindAll() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Call API to find all categories
@@ -174,6 +182,8 @@ func (handler categoryHandler) FindAll() gin.HandlerFunc {
 // @Success 200 {string} string "deleted"
 // @Failure 500 {object} pkg.ErrorJSON
 // @Router /private/categories/{uuid} [delete]
+//
+// @Security Bearer-APIKey || Bearer-JWT
 func (handler categoryHandler) Delete() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Extract category UUID from path
@@ -202,6 +212,8 @@ func (handler categoryHandler) Delete() gin.HandlerFunc {
 // @Success 200 {array} pkg.ProgramResponse
 // @Failure 500 {object} pkg.ErrorJSON
 // @Router /private/categories/{uuid}/programs [get]
+//
+// @Security Bearer-APIKey || Bearer-JWT
 func (handler categoryHandler) FindPrograms() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Extract category UUID from path

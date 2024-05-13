@@ -51,6 +51,8 @@ func NewEpisodeHandler(api api.Episode) Episode {
 // @Success 200 {string} string "ok"
 // @Failure 500 {object} pkg.ErrorJSON
 // @Router /private/episodes [post]
+//
+// @Security Bearer-APIKey || Bearer-JWT
 func (handler episodeHandler) Create() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Extract body request
@@ -83,6 +85,8 @@ func (handler episodeHandler) Create() gin.HandlerFunc {
 // @Success 200 {string} string "ok"
 // @Failure 500 {object} pkg.ErrorJSON
 // @Router /private/episodes/{uuid} [put]
+//
+// @Security Bearer-APIKey || Bearer-JWT
 func (handler episodeHandler) Update() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Extract episode UUID from path
@@ -117,6 +121,8 @@ func (handler episodeHandler) Update() gin.HandlerFunc {
 // @Success 200 {object} pkg.EpisodeResponse
 // @Failure 500 {object} pkg.ErrorJSON
 // @Router /private/episodes/{uuid} [get]
+//
+// @Security Bearer-APIKey || Bearer-JWT
 func (handler episodeHandler) Find() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Extract episode UUID from path
@@ -145,6 +151,8 @@ func (handler episodeHandler) Find() gin.HandlerFunc {
 // @Success 200 {array} pkg.EpisodeResponse
 // @Failure 500 {object} pkg.ErrorJSON
 // @Router /private/episodes [get]
+//
+// @Security Bearer-APIKey || Bearer-JWT
 func (handler episodeHandler) FindAll() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Call API to find all episodes
@@ -171,6 +179,8 @@ func (handler episodeHandler) FindAll() gin.HandlerFunc {
 // @Success 200 {string} string "deleted"
 // @Failure 500 {object} pkg.ErrorJSON
 // @Router /private/episodes/{uuid} [delete]
+//
+// @Security Bearer-APIKey || Bearer-JWT
 func (handler episodeHandler) Delete() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Extract episode UUID from path

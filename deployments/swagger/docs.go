@@ -22,6 +22,12 @@ const docTemplate = `{
     "paths": {
         "/private/blocks": {
             "get": {
+                "security": [
+                    {
+                        "Bearer-APIKey": [],
+                        "Bearer-JWT": []
+                    }
+                ],
                 "description": "Find all blocks",
                 "produces": [
                     "application/json"
@@ -50,6 +56,12 @@ const docTemplate = `{
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "Bearer-APIKey": [],
+                        "Bearer-JWT": []
+                    }
+                ],
                 "description": "Create a new block",
                 "produces": [
                     "application/json"
@@ -88,6 +100,12 @@ const docTemplate = `{
         },
         "/private/blocks/{uuid}": {
             "get": {
+                "security": [
+                    {
+                        "Bearer-APIKey": [],
+                        "Bearer-JWT": []
+                    }
+                ],
                 "description": "Find a block",
                 "produces": [
                     "application/json"
@@ -122,6 +140,12 @@ const docTemplate = `{
                 }
             },
             "put": {
+                "security": [
+                    {
+                        "Bearer-APIKey": [],
+                        "Bearer-JWT": []
+                    }
+                ],
                 "description": "Update block",
                 "produces": [
                     "application/json"
@@ -201,6 +225,12 @@ const docTemplate = `{
         },
         "/private/blocks/{uuid}/programs": {
             "get": {
+                "security": [
+                    {
+                        "Bearer-APIKey": [],
+                        "Bearer-JWT": []
+                    }
+                ],
                 "description": "Find all programs of a block",
                 "produces": [
                     "application/json"
@@ -240,6 +270,12 @@ const docTemplate = `{
         },
         "/private/blocks/{uuid}/programs/overwrite": {
             "put": {
+                "security": [
+                    {
+                        "Bearer-APIKey": [],
+                        "Bearer-JWT": []
+                    }
+                ],
                 "description": "Overwrite the programs of a specific block by replacing all existing programs with new ones",
                 "produces": [
                     "application/json"
@@ -291,6 +327,12 @@ const docTemplate = `{
         },
         "/private/categories": {
             "get": {
+                "security": [
+                    {
+                        "Bearer-APIKey": [],
+                        "Bearer-JWT": []
+                    }
+                ],
                 "description": "Find all categories",
                 "produces": [
                     "application/json"
@@ -319,6 +361,12 @@ const docTemplate = `{
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "Bearer-APIKey": [],
+                        "Bearer-JWT": []
+                    }
+                ],
                 "description": "Create a new category",
                 "produces": [
                     "application/json"
@@ -357,6 +405,12 @@ const docTemplate = `{
         },
         "/private/categories/{uuid}": {
             "get": {
+                "security": [
+                    {
+                        "Bearer-APIKey": [],
+                        "Bearer-JWT": []
+                    }
+                ],
                 "description": "Find a category",
                 "produces": [
                     "application/json"
@@ -391,6 +445,12 @@ const docTemplate = `{
                 }
             },
             "put": {
+                "security": [
+                    {
+                        "Bearer-APIKey": [],
+                        "Bearer-JWT": []
+                    }
+                ],
                 "description": "Update category",
                 "produces": [
                     "application/json"
@@ -434,6 +494,12 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "Bearer-APIKey": [],
+                        "Bearer-JWT": []
+                    }
+                ],
                 "description": "Delete a category",
                 "produces": [
                     "application/json"
@@ -470,6 +536,12 @@ const docTemplate = `{
         },
         "/private/categories/{uuid}/programs": {
             "get": {
+                "security": [
+                    {
+                        "Bearer-APIKey": [],
+                        "Bearer-JWT": []
+                    }
+                ],
                 "description": "Find all category's programs",
                 "produces": [
                     "application/json"
@@ -509,6 +581,12 @@ const docTemplate = `{
         },
         "/private/episodes": {
             "get": {
+                "security": [
+                    {
+                        "Bearer-APIKey": [],
+                        "Bearer-JWT": []
+                    }
+                ],
                 "description": "Find all episodes",
                 "produces": [
                     "application/json"
@@ -537,6 +615,12 @@ const docTemplate = `{
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "Bearer-APIKey": [],
+                        "Bearer-JWT": []
+                    }
+                ],
                 "description": "Create a new episode",
                 "produces": [
                     "application/json"
@@ -575,6 +659,12 @@ const docTemplate = `{
         },
         "/private/episodes/{uuid}": {
             "get": {
+                "security": [
+                    {
+                        "Bearer-APIKey": [],
+                        "Bearer-JWT": []
+                    }
+                ],
                 "description": "Find an episode",
                 "produces": [
                     "application/json"
@@ -609,6 +699,12 @@ const docTemplate = `{
                 }
             },
             "put": {
+                "security": [
+                    {
+                        "Bearer-APIKey": [],
+                        "Bearer-JWT": []
+                    }
+                ],
                 "description": "Update episode",
                 "produces": [
                     "application/json"
@@ -652,6 +748,12 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "Bearer-APIKey": [],
+                        "Bearer-JWT": []
+                    }
+                ],
                 "description": "Delete an episode",
                 "produces": [
                     "application/json"
@@ -831,6 +933,12 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "Bearer-APIKey": [],
+                        "Bearer-JWT": []
+                    }
+                ],
                 "description": "Delete a media",
                 "produces": [
                     "application/json"
@@ -867,6 +975,12 @@ const docTemplate = `{
         },
         "/private/programs": {
             "get": {
+                "security": [
+                    {
+                        "Bearer-APIKey": [],
+                        "Bearer-JWT": []
+                    }
+                ],
                 "description": "Find all programs",
                 "produces": [
                     "application/json"
@@ -895,6 +1009,12 @@ const docTemplate = `{
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "Bearer-APIKey": [],
+                        "Bearer-JWT": []
+                    }
+                ],
                 "description": "Create a new program",
                 "produces": [
                     "application/json"
@@ -933,6 +1053,12 @@ const docTemplate = `{
         },
         "/private/programs/{uuid}": {
             "get": {
+                "security": [
+                    {
+                        "Bearer-APIKey": [],
+                        "Bearer-JWT": []
+                    }
+                ],
                 "description": "Find a program",
                 "produces": [
                     "application/json"
@@ -967,6 +1093,12 @@ const docTemplate = `{
                 }
             },
             "put": {
+                "security": [
+                    {
+                        "Bearer-APIKey": [],
+                        "Bearer-JWT": []
+                    }
+                ],
                 "description": "Update program",
                 "produces": [
                     "application/json"
@@ -1010,6 +1142,12 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "Bearer-APIKey": [],
+                        "Bearer-JWT": []
+                    }
+                ],
                 "description": "Delete a program",
                 "produces": [
                     "application/json"
@@ -1046,6 +1184,12 @@ const docTemplate = `{
         },
         "/private/programs/{uuid}/categories": {
             "get": {
+                "security": [
+                    {
+                        "Bearer-APIKey": [],
+                        "Bearer-JWT": []
+                    }
+                ],
                 "description": "Find a program's categories",
                 "produces": [
                     "application/json"
@@ -1085,6 +1229,12 @@ const docTemplate = `{
         },
         "/private/programs/{uuid}/categories/overwrite": {
             "put": {
+                "security": [
+                    {
+                        "Bearer-APIKey": [],
+                        "Bearer-JWT": []
+                    }
+                ],
                 "description": "Overwrite the categories of a specific program by replacing all existing categories with new ones",
                 "produces": [
                     "application/json"
@@ -1139,6 +1289,12 @@ const docTemplate = `{
         },
         "/private/programs/{uuid}/episodes": {
             "get": {
+                "security": [
+                    {
+                        "Bearer-APIKey": [],
+                        "Bearer-JWT": []
+                    }
+                ],
                 "description": "Find a program's episodes",
                 "produces": [
                     "application/json"
@@ -1178,6 +1334,12 @@ const docTemplate = `{
         },
         "/private/programs/{uuid}/tags": {
             "get": {
+                "security": [
+                    {
+                        "Bearer-APIKey": [],
+                        "Bearer-JWT": []
+                    }
+                ],
                 "description": "Find a program's tags",
                 "produces": [
                     "application/json"
@@ -1217,6 +1379,12 @@ const docTemplate = `{
         },
         "/private/programs/{uuid}/tags/overwrite": {
             "put": {
+                "security": [
+                    {
+                        "Bearer-APIKey": [],
+                        "Bearer-JWT": []
+                    }
+                ],
                 "description": "Overwrite the tags of a specific program by replacing all existing tags with new ones",
                 "produces": [
                     "application/json"
@@ -1271,6 +1439,12 @@ const docTemplate = `{
         },
         "/private/tags": {
             "get": {
+                "security": [
+                    {
+                        "Bearer-APIKey": [],
+                        "Bearer-JWT": []
+                    }
+                ],
                 "description": "Find all tags",
                 "produces": [
                     "application/json"
@@ -1299,6 +1473,12 @@ const docTemplate = `{
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "Bearer-APIKey": [],
+                        "Bearer-JWT": []
+                    }
+                ],
                 "description": "Create a new tag",
                 "produces": [
                     "application/json"
@@ -1337,6 +1517,12 @@ const docTemplate = `{
         },
         "/private/tags/{uuid}": {
             "get": {
+                "security": [
+                    {
+                        "Bearer-APIKey": [],
+                        "Bearer-JWT": []
+                    }
+                ],
                 "description": "Find a tag",
                 "produces": [
                     "application/json"
@@ -1371,6 +1557,12 @@ const docTemplate = `{
                 }
             },
             "put": {
+                "security": [
+                    {
+                        "Bearer-APIKey": [],
+                        "Bearer-JWT": []
+                    }
+                ],
                 "description": "Update tag",
                 "produces": [
                     "application/json"
@@ -1414,6 +1606,12 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "Bearer-APIKey": [],
+                        "Bearer-JWT": []
+                    }
+                ],
                 "description": "Delete a tag",
                 "produces": [
                     "application/json"
@@ -1450,6 +1648,12 @@ const docTemplate = `{
         },
         "/private/tags/{uuid}/programs": {
             "get": {
+                "security": [
+                    {
+                        "Bearer-APIKey": [],
+                        "Bearer-JWT": []
+                    }
+                ],
                 "description": "Find all tag's programs",
                 "produces": [
                     "application/json"
@@ -1489,6 +1693,12 @@ const docTemplate = `{
         },
         "/private/walls": {
             "get": {
+                "security": [
+                    {
+                        "Bearer-APIKey": [],
+                        "Bearer-JWT": []
+                    }
+                ],
                 "description": "Find all walls",
                 "produces": [
                     "application/json"
@@ -1517,6 +1727,12 @@ const docTemplate = `{
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "Bearer-APIKey": [],
+                        "Bearer-JWT": []
+                    }
+                ],
                 "description": "Create a new wall",
                 "produces": [
                     "application/json"
@@ -1555,6 +1771,12 @@ const docTemplate = `{
         },
         "/private/walls/{uuid}": {
             "get": {
+                "security": [
+                    {
+                        "Bearer-APIKey": [],
+                        "Bearer-JWT": []
+                    }
+                ],
                 "description": "Find a wall",
                 "produces": [
                     "application/json"
@@ -1589,6 +1811,12 @@ const docTemplate = `{
                 }
             },
             "put": {
+                "security": [
+                    {
+                        "Bearer-APIKey": [],
+                        "Bearer-JWT": []
+                    }
+                ],
                 "description": "Update wall",
                 "produces": [
                     "application/json"
@@ -1632,6 +1860,12 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "Bearer-APIKey": [],
+                        "Bearer-JWT": []
+                    }
+                ],
                 "description": "Delete a wall",
                 "produces": [
                     "application/json"
@@ -1668,6 +1902,12 @@ const docTemplate = `{
         },
         "/private/walls/{uuid}/blocks": {
             "get": {
+                "security": [
+                    {
+                        "Bearer-APIKey": [],
+                        "Bearer-JWT": []
+                    }
+                ],
                 "description": "Find all wall's blocks",
                 "produces": [
                     "application/json"
@@ -1707,6 +1947,12 @@ const docTemplate = `{
         },
         "/private/walls/{uuid}/blocks/overwrite": {
             "put": {
+                "security": [
+                    {
+                        "Bearer-APIKey": [],
+                        "Bearer-JWT": []
+                    }
+                ],
                 "description": "Overwrite the blocks of a specific wall by replacing all existing blocks with new ones",
                 "produces": [
                     "application/json"

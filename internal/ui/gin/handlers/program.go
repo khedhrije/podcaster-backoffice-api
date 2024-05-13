@@ -65,6 +65,8 @@ func NewProgramHandler(api api.Program) Program {
 // @Success 200 {string} string "ok"
 // @Failure 500 {object} pkg.ErrorJSON
 // @Router /private/programs [post]
+//
+// @Security Bearer-APIKey || Bearer-JWT
 func (handler programHandler) Create() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Extract body request
@@ -97,6 +99,8 @@ func (handler programHandler) Create() gin.HandlerFunc {
 // @Success 200 {string} string "ok"
 // @Failure 500 {object} pkg.ErrorJSON
 // @Router /private/programs/{uuid} [put]
+//
+// @Security Bearer-APIKey || Bearer-JWT
 func (handler programHandler) Update() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Extract program UUID from path
@@ -131,6 +135,8 @@ func (handler programHandler) Update() gin.HandlerFunc {
 // @Success 200 {object} pkg.ProgramResponse
 // @Failure 500 {object} pkg.ErrorJSON
 // @Router /private/programs/{uuid} [get]
+//
+// @Security Bearer-APIKey || Bearer-JWT
 func (handler programHandler) Find() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Extract program UUID from path
@@ -159,6 +165,8 @@ func (handler programHandler) Find() gin.HandlerFunc {
 // @Success 200 {array} pkg.ProgramResponse
 // @Failure 500 {object} pkg.ErrorJSON
 // @Router /private/programs [get]
+//
+// @Security Bearer-APIKey || Bearer-JWT
 func (handler programHandler) FindAll() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Call API to find all programs
@@ -185,6 +193,8 @@ func (handler programHandler) FindAll() gin.HandlerFunc {
 // @Success 200 {string} string "deleted"
 // @Failure 500 {object} pkg.ErrorJSON
 // @Router /private/programs/{uuid} [delete]
+//
+// @Security Bearer-APIKey || Bearer-JWT
 func (handler programHandler) Delete() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Extract program UUID from path
@@ -213,6 +223,8 @@ func (handler programHandler) Delete() gin.HandlerFunc {
 // @Success 200 {array} pkg.EpisodeResponse
 // @Failure 500 {object} pkg.ErrorJSON
 // @Router /private/programs/{uuid}/episodes [get]
+//
+// @Security Bearer-APIKey || Bearer-JWT
 func (handler programHandler) FindEpisodes() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Extract program UUID from path
@@ -242,6 +254,8 @@ func (handler programHandler) FindEpisodes() gin.HandlerFunc {
 // @Success 200 {array} pkg.TagResponse
 // @Failure 500 {object} pkg.ErrorJSON
 // @Router /private/programs/{uuid}/tags [get]
+//
+// @Security Bearer-APIKey || Bearer-JWT
 func (handler programHandler) FindTags() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Extract program UUID from path
@@ -271,6 +285,8 @@ func (handler programHandler) FindTags() gin.HandlerFunc {
 // @Success 200 {array} pkg.CategoryResponse
 // @Failure 500 {object} pkg.ErrorJSON
 // @Router /private/programs/{uuid}/categories [get]
+//
+// @Security Bearer-APIKey || Bearer-JWT
 func (handler programHandler) FindCategories() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Extract program UUID from path
@@ -302,6 +318,8 @@ func (handler programHandler) FindCategories() gin.HandlerFunc {
 // @Failure 422 {object} pkg.ErrorJSON "Unprocessable Entity"
 // @Failure 500 {object} pkg.ErrorJSON "Internal Server Error"
 // @Router /private/programs/{uuid}/categories/overwrite [put]
+//
+// @Security Bearer-APIKey || Bearer-JWT
 func (handler programHandler) OverwriteCategories() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Extract program UUID from path
@@ -340,6 +358,8 @@ func (handler programHandler) OverwriteCategories() gin.HandlerFunc {
 // @Failure 422 {object} pkg.ErrorJSON "Unprocessable Entity"
 // @Failure 500 {object} pkg.ErrorJSON "Internal Server Error"
 // @Router /private/programs/{uuid}/tags/overwrite [put]
+//
+// @Security Bearer-APIKey || Bearer-JWT
 func (handler programHandler) OverwriteTags() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Extract program UUID from path

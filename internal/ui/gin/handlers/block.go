@@ -57,6 +57,8 @@ func NewBlockHandler(api api.Block) Block {
 // @Success 200 {string} string "ok"
 // @Failure 500 {object} pkg.ErrorJSON
 // @Router /private/blocks [post]
+//
+// @Security Bearer-APIKey || Bearer-JWT
 func (handler blockHandler) Create() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Extract body request
@@ -89,6 +91,8 @@ func (handler blockHandler) Create() gin.HandlerFunc {
 // @Success 200 {string} string "ok"
 // @Failure 500 {object} pkg.ErrorJSON
 // @Router /private/blocks/{uuid} [put]
+//
+// @Security Bearer-APIKey || Bearer-JWT
 func (handler blockHandler) Update() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Extract block UUID from path
@@ -123,6 +127,8 @@ func (handler blockHandler) Update() gin.HandlerFunc {
 // @Success 200 {object} pkg.BlockResponse
 // @Failure 500 {object} pkg.ErrorJSON
 // @Router /private/blocks/{uuid} [get]
+//
+// @Security Bearer-APIKey || Bearer-JWT
 func (handler blockHandler) Find() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Extract block UUID from path
@@ -151,6 +157,8 @@ func (handler blockHandler) Find() gin.HandlerFunc {
 // @Success 200 {array} pkg.BlockResponse
 // @Failure 500 {object} pkg.ErrorJSON
 // @Router /private/blocks [get]
+//
+// @Security Bearer-APIKey || Bearer-JWT
 func (handler blockHandler) FindAll() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Call API to find all blocks
@@ -205,6 +213,8 @@ func (handler blockHandler) Delete() gin.HandlerFunc {
 // @Success 200 {array} pkg.BlockProgramsResponse
 // @Failure 500 {object} pkg.ErrorJSON
 // @Router /private/blocks/{uuid}/programs [get]
+//
+// @Security Bearer-APIKey || Bearer-JWT
 func (handler blockHandler) FindPrograms() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Extract block UUID from path
@@ -236,6 +246,8 @@ func (handler blockHandler) FindPrograms() gin.HandlerFunc {
 // @Failure 422 {object} pkg.ErrorJSON "Unprocessable Entity"
 // @Failure 500 {object} pkg.ErrorJSON "Internal Server Error"
 // @Router /private/blocks/{uuid}/programs/overwrite [put]
+//
+// @Security Bearer-APIKey || Bearer-JWT
 func (handler blockHandler) OverwritePrograms() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Extract block UUID from path
