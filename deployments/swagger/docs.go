@@ -1571,6 +1571,9 @@ const docTemplate = `{
                 "directLink": {
                     "type": "string"
                 },
+                "episodeID": {
+                    "type": "string"
+                },
                 "kind": {
                     "type": "string"
                 }
@@ -1666,6 +1669,9 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "directLink": {
+                    "type": "string"
+                },
+                "episodeID": {
                     "type": "string"
                 },
                 "kind": {

@@ -30,6 +30,7 @@ type MediaResponse struct {
 	ID         string `json:"ID"`
 	DirectLink string `json:"directLink"`
 	Kind       string `json:"kind"`
+	EpisodeID  string `json:"episodeID"`
 }
 
 // CategoryResponse represents the response structure for categories.

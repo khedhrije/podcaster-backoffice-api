@@ -32,6 +32,8 @@ definitions:
     properties:
       directLink:
         type: string
+      episodeID:
+        type: string
       kind:
         type: string
     type: object
@@ -93,6 +95,8 @@ definitions:
   pkg.UpdateMediaRequestJSON:
     properties:
       directLink:
+        type: string
+      episodeID:
         type: string
       kind:
         type: string

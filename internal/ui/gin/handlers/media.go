@@ -2,6 +2,7 @@
 package handlers
 
 import (
+	"github.com/khedhrije/podcaster-backoffice-api/pkg"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -52,7 +53,7 @@ func NewMediaHandler(api api.Media) Media {
 func (handler mediaHandler) Create() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Extract body request
-		var jsonRequest api.CreateMediaRequest
+		var jsonRequest pkg.CreateMediaRequestJSON
 		if err := c.ShouldBindJSON(&jsonRequest); err != nil {
 			log.Ctx(c).Error().Err(err).Msg("error binding request")
 			c.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
@@ -86,7 +87,7 @@ func (handler mediaHandler) Update() gin.HandlerFunc {
 		mediaUUID := c.Param("uuid")
 
 		// Extract body request
-		var jsonRequest api.CreateMediaRequest
+		var jsonRequest pkg.CreateMediaRequestJSON
 		if err := c.ShouldBindJSON(&jsonRequest); err != nil {
 			log.Ctx(c).Error().Err(err).Msg("error binding request")
 			c.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})

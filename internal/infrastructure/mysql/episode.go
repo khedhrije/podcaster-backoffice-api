@@ -24,7 +24,7 @@ func NewEpisodeAdapter(client *client) port.EpisodePersister {
 func (adapter *episodeAdapter) FindByProgramID(ctx context.Context, id string) ([]*model.Episode, error) {
 	// SQL query to select all episode records
 	const query = `
-        SELECT * FROM episode WHERE programID = UUID_TO_BIN(?);
+        SELECT * FROM episode WHERE programUUID = UUID_TO_BIN(?);
     `
 	// Execute query and retrieve results
 	var episodesDB []*EpisodeDB
@@ -79,8 +79,8 @@ func (adapter *episodeAdapter) Update(ctx context.Context, episodeUUID string, u
         UPDATE episode SET 
                              name = COALESCE(:name, name), 
                              description = COALESCE(:description, description), 
-                             position = COALESCE(:position, position),
-                             programUUID = UUID_TO_BIN(:programUUID)
+                             position = COALESCE(NULLIF(:position, 0), position),
+                             programUUID = COALESCE(NULLIF(UUID_TO_BIN(:programUUID), UUID_TO_BIN('00000000-0000-0000-0000-000000000000')), programUUID)
                         WHERE UUID = UUID_TO_BIN(:UUID);
     `
 	// Set UUID for updates
@@ -164,7 +164,7 @@ func (db *EpisodeDB) FromDomainModel(domain model.Episode) {
 	db.Name = sql.NullString{String: domain.Name, Valid: domain.Name != ""}
 	db.Description = sql.NullString{String: domain.Description, Valid: domain.Description != ""}
 	db.Position = domain.Position
-
+	db.ProgramID = uuid.Nil
 	if domain.ProgramID != "" {
 		db.ProgramID = uuid.MustParse(domain.ProgramID)
 	}

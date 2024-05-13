@@ -43,7 +43,7 @@ func (adapter *mediaAdapter) Create(ctx context.Context, media model.Media) erro
 func (adapter *mediaAdapter) Delete(ctx context.Context, mediaUUID string) error {
 	// SQL query to delete a media record by UUID
 	const query = `
-        DELETE FROM media WHERE UUID = UUID_TO_BIN(?)
+        DELETE FROM media WHERE UUID = UUID_TO_BIN(?);
     `
 	// Execute named query
 	_, err := adapter.client.db.ExecContext(ctx, query, mediaUUID)
@@ -60,9 +60,10 @@ func (adapter *mediaAdapter) Update(ctx context.Context, mediaUUID string, updat
         UPDATE media SET 
                              direct_link = COALESCE(:direct_link, direct_link), 
                              kind = COALESCE(:kind, kind), 
-                             episodeUUID = UUID_TO_BIN(:episodeUUID)
+                             episodeUUID = COALESCE(NULLIF(UUID_TO_BIN(:episodeUUID), UUID_TO_BIN('00000000-0000-0000-0000-000000000000')), episodeUUID)
                         WHERE UUID = UUID_TO_BIN(:UUID)
     `
+
 	// Set UUID for updates
 	updates.ID = mediaUUID
 	// Convert domain model to database model
@@ -80,7 +81,7 @@ func (adapter *mediaAdapter) Update(ctx context.Context, mediaUUID string, updat
 func (adapter *mediaAdapter) FindAll(ctx context.Context) ([]*model.Media, error) {
 	// SQL query to select all media records
 	const query = `
-        SELECT * FROM media
+        SELECT * FROM media;
     `
 	// Execute query and retrieve results
 	var mediaDB []*MediaDB
@@ -93,14 +94,15 @@ func (adapter *mediaAdapter) FindAll(ctx context.Context) ([]*model.Media, error
 		mappedMedia := mediaEntry.ToDomainModel()
 		media = append(media, &mappedMedia)
 	}
+
 	return media, nil
 }
 
-// FindByUUID retrieves a media record from the database by its UUID.
+// Find retrieves a media record from the database by its UUID.
 func (adapter *mediaAdapter) Find(ctx context.Context, mediaUUID string) (*model.Media, error) {
 	// SQL query to select a media record by UUID
 	const query = `
-        SELECT * FROM media WHERE UUID = UUID_TO_BIN(?)
+        SELECT * FROM media WHERE UUID = UUID_TO_BIN(?);
     `
 	// Execute query and retrieve results
 	var mediaDB MediaDB
@@ -112,7 +114,7 @@ func (adapter *mediaAdapter) Find(ctx context.Context, mediaUUID string) (*model
 	return &result, nil
 }
 
-// MediaDB is a struct representing the media database model.
+// MediaDB is a struct representing the media dactabase model.
 type MediaDB struct {
 	UUID       uuid.UUID      `db:"UUID"`
 	DirectLink sql.NullString `db:"direct_link"`
@@ -135,5 +137,9 @@ func (db *MediaDB) FromDomainModel(domain model.Media) {
 	db.UUID = uuid.MustParse(domain.ID)
 	db.DirectLink = sql.NullString{String: domain.DirectLink, Valid: domain.DirectLink != ""}
 	db.Kind = sql.NullString{String: domain.Kind, Valid: domain.Kind != ""}
-	db.EpisodeID = uuid.MustParse(domain.EpisodeID)
+	db.EpisodeID = uuid.Nil
+	if domain.EpisodeID != "" {
+		db.EpisodeID = uuid.MustParse(domain.EpisodeID)
+	}
+
 }

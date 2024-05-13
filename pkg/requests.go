@@ -100,6 +100,7 @@ func (req UpdateProgramRequestJSON) Description() string {
 type CreateMediaRequestJSON struct {
 	DirectLinkJSON string `json:"directLink"`
 	KindJSON       string `json:"kind"`
+	EpisodeIDJSON  string `json:"episodeID"`
 }
 
 // DirectLink returns the directLink of the media.
@@ -112,10 +113,16 @@ func (req CreateMediaRequestJSON) Kind() string {
 	return req.KindJSON
 }
 
+// EpisodeID returns the epiosdeID of the media.
+func (req CreateMediaRequestJSON) EpisodeID() string {
+	return req.EpisodeIDJSON
+}
+
 // UpdateMediaRequestJSON represents a JSON request for updating medias.
 type UpdateMediaRequestJSON struct {
 	DirectLinkJSON string `json:"directLink"`
 	KindJSON       string `json:"kind"`
+	EpisodeIDJSON  string `json:"episodeID"`
 }
 
 // DirectLink returns the directLink of the media update request.
@@ -126,6 +133,11 @@ func (req UpdateMediaRequestJSON) DirectLink() string {
 // Kind returns the kind of the media update request.
 func (req UpdateMediaRequestJSON) Kind() string {
 	return req.KindJSON
+}
+
+// EpisodeID returns the epiosdeID of the media.
+func (req UpdateMediaRequestJSON) EpisodeID() string {
+	return req.EpisodeIDJSON
 }
 
 // CreateCategoryRequestJSON represents a JSON request for creating categories.

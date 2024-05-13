@@ -101,7 +101,7 @@ func (api blockApi) Update(ctx context.Context, uuid string, updates UpdateBlock
 		block.Name = updates.Name()
 	}
 	if updates.Description() != "" {
-		block.Kind = updates.Description()
+		block.Description = updates.Description()
 	}
 	if updates.Kind() != "" {
 		block.Kind = updates.Kind()

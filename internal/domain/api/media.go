@@ -20,18 +20,12 @@ type Media interface {
 	Delete(ctx context.Context, uuid string) error
 }
 
-// UpdateMediaRequest represents the interface for updating medias.
-type UpdateMediaRequest interface {
-	DirectLink() string
-	Kind() string
-}
-
 // mediaApi is an implementation of the Media interface.
 type mediaApi struct {
 	mediaAdapter port.MediaPersister
 }
 
-// New creates a new instance of Media.
+// NewMediaApi creates a new instance of Media.
 func NewMediaApi(mediaAdapter port.MediaPersister) Media {
 	return &mediaApi{
 		mediaAdapter: mediaAdapter,
@@ -51,6 +45,7 @@ func (api mediaApi) Create(ctx context.Context, req CreateMediaRequest) error {
 		ID:         uuid.New().String(),
 		DirectLink: req.DirectLink(),
 		Kind:       req.Kind(),
+		EpisodeID:  req.EpisodeID(),
 	}
 	// call adapter
 	if err := api.mediaAdapter.Create(ctx, media); err != nil {
@@ -70,6 +65,12 @@ func createMediaRequestValidation(ctx context.Context, req CreateMediaRequest) m
 	if req.Kind() == "" {
 		vErrs = append(vErrs, model.ValidationError{Field: "kind", Message: "is required"})
 	}
+	if req.Kind() == "" {
+		vErrs = append(vErrs, model.ValidationError{Field: "kind", Message: "is required"})
+	}
+	if req.EpisodeID() == "" {
+		vErrs = append(vErrs, model.ValidationError{Field: "episodeID", Message: "cannot be empty"})
+	}
 	return vErrs
 }
 
@@ -82,10 +83,17 @@ func (api mediaApi) Update(ctx context.Context, uuid string, updates UpdateMedia
 		return fmt.Errorf("request was not validated: %w", vErrs)
 	}
 	// Map to domain model
-	media := model.Media{
-		DirectLink: updates.DirectLink(),
-		Kind:       updates.Kind(),
+	media := model.Media{}
+	if updates.DirectLink() != "" {
+		media.DirectLink = updates.DirectLink()
 	}
+	if updates.Kind() != "" {
+		media.Kind = updates.Kind()
+	}
+	if updates.EpisodeID() != "" {
+		media.EpisodeID = updates.EpisodeID()
+	}
+
 	// call adapter
 	if err := api.mediaAdapter.Update(ctx, uuid, media); err != nil {
 		log.Ctx(ctx).Error().Err(err).Interface("media", media).Msg("error while updating media")
@@ -101,12 +109,7 @@ func updateMediaRequestValidation(ctx context.Context, uuid string, req UpdateMe
 	if uuid == "" {
 		vErrs = append(vErrs, model.ValidationError{Field: "uuid", Message: "cannot be empty"})
 	}
-	if req.DirectLink() == "" {
-		vErrs = append(vErrs, model.ValidationError{Field: "directLink", Message: "cannot be empty"})
-	}
-	if req.Kind() == "" {
-		vErrs = append(vErrs, model.ValidationError{Field: "kind", Message: "cannot be empty"})
-	}
+
 	return vErrs
 }
 
@@ -125,6 +128,7 @@ func (api mediaApi) Find(ctx context.Context, uuid string) (*pkg.MediaResponse, 
 		ID:         media.ID,
 		DirectLink: media.DirectLink,
 		Kind:       media.Kind,
+		EpisodeID:  media.EpisodeID,
 	}
 	// return result
 	return response, nil
@@ -146,6 +150,7 @@ func (api mediaApi) FindAll(ctx context.Context) ([]*pkg.MediaResponse, error) {
 			ID:         media.ID,
 			DirectLink: media.DirectLink,
 			Kind:       media.Kind,
+			EpisodeID:  media.EpisodeID,
 		})
 	}
 	// return result
@@ -165,4 +170,12 @@ func (api mediaApi) Delete(ctx context.Context, uuid string) error {
 type CreateMediaRequest interface {
 	DirectLink() string
 	Kind() string
+	EpisodeID() string
+}
+
+// UpdateMediaRequest represents the interface for updating medias.
+type UpdateMediaRequest interface {
+	DirectLink() string
+	Kind() string
+	EpisodeID() string
 }

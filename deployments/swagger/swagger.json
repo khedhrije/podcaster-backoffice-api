@@ -1563,6 +1563,9 @@
                 "directLink": {
                     "type": "string"
                 },
+                "episodeID": {
+                    "type": "string"
+                },
                 "kind": {
                     "type": "string"
                 }
@@ -1658,6 +1661,9 @@
             "type": "object",
             "properties": {
                 "directLink": {
+                    "type": "string"
+                },
+                "episodeID": {
                     "type": "string"
                 },
                 "kind": {

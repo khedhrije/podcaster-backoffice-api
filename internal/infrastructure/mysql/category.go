@@ -3,6 +3,7 @@ package mysql
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"github.com/google/uuid"
 	"github.com/khedhrije/podcaster-backoffice-api/internal/domain/model"
 	"github.com/khedhrije/podcaster-backoffice-api/internal/domain/port"
@@ -60,7 +61,7 @@ func (adapter *categoryAdapter) Update(ctx context.Context, categoryUUID string,
         UPDATE category SET 
                              name = COALESCE(:name, name), 
                              description = COALESCE(:description, description),
-                             parentUUID = UUID_TO_BIN(:parentUUID)
+                             parentUUID = COALESCE(NULLIF(UUID_TO_BIN(:parentUUID), UUID_TO_BIN('00000000-0000-0000-0000-000000000000')), parentUUID)
                         WHERE UUID = UUID_TO_BIN(:UUID);
     `
 	// Set UUID for updates
@@ -68,6 +69,9 @@ func (adapter *categoryAdapter) Update(ctx context.Context, categoryUUID string,
 	// Convert domain model to database model
 	var categoryDB CategoryDB
 	categoryDB.FromDomainModel(updates)
+
+	fmt.Println("------_>", categoryDB.UUID)
+	fmt.Println("------_>", categoryDB.ParentID)
 	// Execute named query
 	_, err := adapter.client.db.NamedExecContext(ctx, query, categoryDB)
 	if err != nil {
@@ -139,8 +143,8 @@ func (db *CategoryDB) FromDomainModel(domain model.Category) {
 	db.UUID = uuid.MustParse(domain.ID)
 	db.Name = sql.NullString{String: domain.Name, Valid: domain.Name != ""}
 	db.Description = sql.NullString{String: domain.Description, Valid: domain.Description != ""}
-
+	db.ParentID = uuid.Nil
 	if domain.Parent != nil && domain.Parent.ID != "" {
-		db.ParentID = uuid.MustParse(domain.ID)
+		db.ParentID = uuid.MustParse(domain.Parent.ID)
 	}
 }

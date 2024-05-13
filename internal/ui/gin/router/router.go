@@ -71,7 +71,7 @@ func CreateRouter(wall handlers.Wall, block handlers.Block, program handlers.Pro
 		}
 
 		// Routes for managing media
-		mediaRoutes := private.Group("/media")
+		mediaRoutes := private.Group("/medias")
 		{
 			mediaRoutes.POST("", media.Create())
 			mediaRoutes.PUT("/:uuid", media.Update())
