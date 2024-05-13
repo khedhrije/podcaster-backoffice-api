@@ -164,5 +164,9 @@ func (db *EpisodeDB) FromDomainModel(domain model.Episode) {
 	db.Name = sql.NullString{String: domain.Name, Valid: domain.Name != ""}
 	db.Description = sql.NullString{String: domain.Description, Valid: domain.Description != ""}
 	db.Position = domain.Position
-	db.ProgramID = uuid.MustParse(domain.ProgramID)
+
+	if domain.ProgramID != "" {
+		db.ProgramID = uuid.MustParse(domain.ProgramID)
+	}
+
 }

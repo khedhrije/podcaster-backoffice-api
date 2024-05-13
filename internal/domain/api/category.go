@@ -106,9 +106,6 @@ func (api categoryApi) Update(ctx context.Context, uuid string, updates UpdateCa
 	if updates.Description() != "" {
 		category.Description = updates.Description()
 	}
-	if updates.Description() != "" {
-		category.Description = updates.Description()
-	}
 	// call adapter
 	if err := api.categoryAdapter.Update(ctx, uuid, category); err != nil {
 		log.Ctx(ctx).Error().Err(err).Interface("category", category).Msg("error while updating category")
