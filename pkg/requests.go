@@ -220,6 +220,8 @@ func (req UpdateBlockRequestJSON) Kind() string {
 type CreateEpisodeRequestJSON struct {
 	NameJSON        string `json:"name"`
 	DescriptionJSON string `json:"description"`
+	ProgramIDJSON   string `json:"programID"`
+	PositionJSON    int    `json:"position"`
 }
 
 // Name returns the name of the episode.
@@ -232,10 +234,22 @@ func (req CreateEpisodeRequestJSON) Description() string {
 	return req.DescriptionJSON
 }
 
+// ProgramID returns the programID of the episode.
+func (req CreateEpisodeRequestJSON) ProgramID() string {
+	return req.ProgramIDJSON
+}
+
+// Position returns the position of the episode.
+func (req CreateEpisodeRequestJSON) Position() int {
+	return req.PositionJSON
+}
+
 // UpdateEpisodeRequestJSON represents a JSON request for updating episodes.
 type UpdateEpisodeRequestJSON struct {
 	NameJSON        string `json:"name"`
 	DescriptionJSON string `json:"description"`
+	ProgramIDJSON   string `json:"programID"`
+	PositionJSON    int    `json:"position"`
 }
 
 // Name returns the name of the episode update request.
@@ -246,4 +260,14 @@ func (req UpdateEpisodeRequestJSON) Name() string {
 // Description returns the description of the episode update request.
 func (req UpdateEpisodeRequestJSON) Description() string {
 	return req.DescriptionJSON
+}
+
+// ProgramID returns the programID of the episode.
+func (req UpdateEpisodeRequestJSON) ProgramID() string {
+	return req.ProgramIDJSON
+}
+
+// Position returns the position of the episode.
+func (req UpdateEpisodeRequestJSON) Position() int {
+	return req.PositionJSON
 }

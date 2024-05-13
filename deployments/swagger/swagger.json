@@ -1548,6 +1548,12 @@
                 },
                 "name": {
                     "type": "string"
+                },
+                "position": {
+                    "type": "integer"
+                },
+                "programID": {
+                    "type": "string"
                 }
             }
         },
@@ -1625,6 +1631,9 @@
                 },
                 "name": {
                     "type": "string"
+                },
+                "parentID": {
+                    "type": "string"
                 }
             }
         },
@@ -1635,6 +1644,12 @@
                     "type": "string"
                 },
                 "name": {
+                    "type": "string"
+                },
+                "position": {
+                    "type": "integer"
+                },
+                "programID": {
                     "type": "string"
                 }
             }

@@ -45,7 +45,7 @@ func (adapter *episodeAdapter) Create(ctx context.Context, episode model.Episode
 	// SQL query to insert a new episode record
 	const query = `
         INSERT INTO episode (UUID, name, description, position, programUUID)
-        VALUES (UUID_TO_BIN(:UUID), :name, :description, :position, UUID_TO_BIN(:programUUID))
+        VALUES (UUID_TO_BIN(:UUID), :name, :description, :position, UUID_TO_BIN(:programUUID));
     `
 	// Convert domain model to database model
 	var episodeDB EpisodeDB
@@ -62,7 +62,7 @@ func (adapter *episodeAdapter) Create(ctx context.Context, episode model.Episode
 func (adapter *episodeAdapter) Delete(ctx context.Context, episodeUUID string) error {
 	// SQL query to delete an episode record by UUID
 	const query = `
-        DELETE FROM episode WHERE UUID = UUID_TO_BIN(?)
+        DELETE FROM episode WHERE UUID = UUID_TO_BIN(?);
     `
 	// Execute named query
 	_, err := adapter.client.db.ExecContext(ctx, query, episodeUUID)
@@ -81,7 +81,7 @@ func (adapter *episodeAdapter) Update(ctx context.Context, episodeUUID string, u
                              description = COALESCE(:description, description), 
                              position = COALESCE(:position, position),
                              programUUID = UUID_TO_BIN(:programUUID)
-                        WHERE UUID = UUID_TO_BIN(:UUID)
+                        WHERE UUID = UUID_TO_BIN(:UUID);
     `
 	// Set UUID for updates
 	updates.ID = episodeUUID

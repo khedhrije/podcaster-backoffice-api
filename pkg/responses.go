@@ -53,6 +53,8 @@ type EpisodeResponse struct {
 	ID          string `json:"ID"`
 	Name        string `json:"name"`
 	Description string `json:"description"`
+	ProgramID   string `json:"programID"`
+	Position    int    `json:"position"`
 }
 
 type WallBlocksResponse struct {

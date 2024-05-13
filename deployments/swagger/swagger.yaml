@@ -23,6 +23,10 @@ definitions:
         type: string
       name:
         type: string
+      position:
+        type: integer
+      programID:
+        type: string
     type: object
   pkg.CreateMediaRequestJSON:
     properties:
@@ -72,12 +76,18 @@ definitions:
         type: string
       name:
         type: string
+      parentID:
+        type: string
     type: object
   pkg.UpdateEpisodeRequestJSON:
     properties:
       description:
         type: string
       name:
+        type: string
+      position:
+        type: integer
+      programID:
         type: string
     type: object
   pkg.UpdateMediaRequestJSON:

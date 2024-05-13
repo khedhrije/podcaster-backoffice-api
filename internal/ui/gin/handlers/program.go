@@ -2,6 +2,7 @@
 package handlers
 
 import (
+	"github.com/khedhrije/podcaster-backoffice-api/pkg"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -56,7 +57,7 @@ func NewProgramHandler(api api.Program) Program {
 func (handler programHandler) Create() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Extract body request
-		var jsonRequest api.CreateProgramRequest
+		var jsonRequest pkg.CreateProgramRequestJSON
 		if err := c.ShouldBindJSON(&jsonRequest); err != nil {
 			log.Ctx(c).Error().Err(err).Msg("error binding request")
 			c.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
@@ -90,7 +91,7 @@ func (handler programHandler) Update() gin.HandlerFunc {
 		programUUID := c.Param("uuid")
 
 		// Extract body request
-		var jsonRequest api.CreateProgramRequest
+		var jsonRequest pkg.UpdateProgramRequestJSON
 		if err := c.ShouldBindJSON(&jsonRequest); err != nil {
 			log.Ctx(c).Error().Err(err).Msg("error binding request")
 			c.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})

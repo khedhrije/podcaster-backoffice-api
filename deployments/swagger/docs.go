@@ -1556,6 +1556,12 @@ const docTemplate = `{
                 },
                 "name": {
                     "type": "string"
+                },
+                "position": {
+                    "type": "integer"
+                },
+                "programID": {
+                    "type": "string"
                 }
             }
         },
@@ -1633,6 +1639,9 @@ const docTemplate = `{
                 },
                 "name": {
                     "type": "string"
+                },
+                "parentID": {
+                    "type": "string"
                 }
             }
         },
@@ -1643,6 +1652,12 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "name": {
+                    "type": "string"
+                },
+                "position": {
+                    "type": "integer"
+                },
+                "programID": {
                     "type": "string"
                 }
             }

@@ -20,12 +20,6 @@ type Episode interface {
 	Delete(ctx context.Context, uuid string) error
 }
 
-// UpdateEpisodeRequest represents the interface for updating episodes.
-type UpdateEpisodeRequest interface {
-	Name() string
-	Description() string
-}
-
 // episodeApi is an implementation of the Episode interface.
 type episodeApi struct {
 	episodeAdapter port.EpisodePersister
@@ -46,11 +40,14 @@ func (api episodeApi) Create(ctx context.Context, req CreateEpisodeRequest) erro
 		log.Ctx(ctx).Error().Err(vErrs).Interface("request", req).Msg("request was not validated")
 		return fmt.Errorf("request was not validated: %w", vErrs)
 	}
+
 	// Map to domain model
 	episode := model.Episode{
 		ID:          uuid.New().String(),
 		Name:        req.Name(),
 		Description: req.Description(),
+		ProgramID:   req.ProgramID(),
+		Position:    req.Position(),
 	}
 	// call adapter
 	if err := api.episodeAdapter.Create(ctx, episode); err != nil {
@@ -70,6 +67,10 @@ func createEpisodeRequestValidation(ctx context.Context, req CreateEpisodeReques
 	if req.Description() == "" {
 		vErrs = append(vErrs, model.ValidationError{Field: "description", Message: "is required"})
 	}
+
+	if req.Position() <= 0 {
+		vErrs = append(vErrs, model.ValidationError{Field: "position", Message: "should be greater than 0"})
+	}
 	return vErrs
 }
 
@@ -82,9 +83,18 @@ func (api episodeApi) Update(ctx context.Context, uuid string, updates UpdateEpi
 		return fmt.Errorf("request was not validated: %w", vErrs)
 	}
 	// Map to domain model
-	episode := model.Episode{
-		Name:        updates.Name(),
-		Description: updates.Description(),
+	episode := model.Episode{}
+	if updates.Name() != "" {
+		episode.Name = updates.Name()
+	}
+	if updates.Description() != "" {
+		episode.Description = updates.Description()
+	}
+	if updates.ProgramID() != "" {
+		episode.ProgramID = updates.ProgramID()
+	}
+	if updates.Position() != 0 {
+		episode.Position = updates.Position()
 	}
 	// call adapter
 	if err := api.episodeAdapter.Update(ctx, uuid, episode); err != nil {
@@ -100,12 +110,6 @@ func updateEpisodeRequestValidation(ctx context.Context, uuid string, req Update
 	var vErrs []model.ValidationError
 	if uuid == "" {
 		vErrs = append(vErrs, model.ValidationError{Field: "uuid", Message: "cannot be empty"})
-	}
-	if req.Name() == "" {
-		vErrs = append(vErrs, model.ValidationError{Field: "name", Message: "cannot be empty"})
-	}
-	if req.Description() == "" {
-		vErrs = append(vErrs, model.ValidationError{Field: "description", Message: "cannot be empty"})
 	}
 	return vErrs
 }
@@ -125,6 +129,8 @@ func (api episodeApi) Find(ctx context.Context, uuid string) (*pkg.EpisodeRespon
 		ID:          episode.ID,
 		Name:        episode.Name,
 		Description: episode.Description,
+		ProgramID:   episode.ProgramID,
+		Position:    episode.Position,
 	}
 	// return result
 	return response, nil
@@ -146,6 +152,8 @@ func (api episodeApi) FindAll(ctx context.Context) ([]*pkg.EpisodeResponse, erro
 			ID:          episode.ID,
 			Name:        episode.Name,
 			Description: episode.Description,
+			ProgramID:   episode.ProgramID,
+			Position:    episode.Position,
 		})
 	}
 	// return result
@@ -165,4 +173,14 @@ func (api episodeApi) Delete(ctx context.Context, uuid string) error {
 type CreateEpisodeRequest interface {
 	Name() string
 	Description() string
+	ProgramID() string
+	Position() int
+}
+
+// UpdateEpisodeRequest represents the interface for updating episodes.
+type UpdateEpisodeRequest interface {
+	Name() string
+	Description() string
+	ProgramID() string
+	Position() int
 }
