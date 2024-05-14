@@ -1,7 +1,10 @@
 package main
 
 import (
+	"fmt"
 	"github.com/khedhrije/podcaster-backoffice-api/internal/bootstrap"
+	"github.com/khedhrije/podcaster-backoffice-api/internal/configuration"
+	"github.com/rs/zerolog/log"
 )
 
 // @title           podcaster-backoffice-api
@@ -23,5 +26,10 @@ import (
 // @description Type "Bearer" followed by a space and a valid API key.
 func main() {
 	// Initialize the bootstrap process, which sets up the application
+	log.Info().
+		Interface("app", configuration.Config.Name).
+		Interface("env", configuration.Config.Env).
+		Interface("address", fmt.Sprintf("%s:%v", configuration.Config.HostAddress, configuration.Config.HostPort)).
+		Msg("app is ready")
 	bootstrap.InitBootstrap().Run()
 }
