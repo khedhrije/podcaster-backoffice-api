@@ -28,7 +28,7 @@ func CreateRouter(wall handlers.Wall, block handlers.Block, program handlers.Pro
 
 	// Define private routes that require authentication.
 	private := r.Group("/private")
-	private.Use(TokenValidatorMiddleware())
+	//private.Use(TokenValidatorMiddleware())
 	{
 		// Routes for managing walls.
 		walls := private.Group("/walls")
