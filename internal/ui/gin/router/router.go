@@ -2,6 +2,7 @@
 package router
 
 import (
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	spec "github.com/khedhrije/podcaster-backoffice-api/deployments/swagger"
 	"github.com/khedhrije/podcaster-backoffice-api/internal/configuration"
@@ -15,6 +16,9 @@ import (
 func CreateRouter(wall handlers.Wall, block handlers.Block, program handlers.Program, episode handlers.Episode, media handlers.Media, tag handlers.Tag, category handlers.Category) *gin.Engine {
 	// Initialize a new Gin router without any middleware by default.
 	r := gin.New()
+	r.Use(cors.Default())
+
+	r.GET("/health", health())
 
 	// Configure Swagger documentation URL based on the environment.
 	if configuration.Config.Env == "dev" {
