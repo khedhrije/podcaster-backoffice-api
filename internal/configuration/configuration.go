@@ -21,13 +21,14 @@ func init() {
 // AppConfig defines the structure of the application's configuration settings.
 // It includes various configurations such as server details, database settings, and cache configurations.
 type AppConfig struct {
-	Name           string         // Name of the application
-	Env            string         // Environment (e.g., development, production)
-	HostAddress    string         // Server host address
-	HostPort       int            // Server port number
-	DocsAddress    string         // Address for API documentation
+	Name           string // Name of the application
+	Env            string // Environment (e.g., development, production)
+	HostAddress    string // Server host address
+	HostPort       int    // Server port number
+	DocsAddress    string // Address for API documentation
+	AccountApi     AccountApi
 	DatabaseConfig DatabaseConfig // Configuration settings for the database
-	CacheConfig    CacheConfig    // Configuration settings for caching
+	CacheConfig    CacheConfig
 }
 
 // DatabaseConfig defines the configuration settings for the database connection.
@@ -47,6 +48,10 @@ type CacheConfig struct {
 	DSN string // Data source name for the cache
 }
 
+type AccountApi struct {
+	BaseURL string
+}
+
 // loadFromEnv loads configuration settings from environment variables and returns an AppConfig instance.
 // It uses viper to handle the environment variables and sets default values if specific configurations are not provided.
 func loadFromEnv() *AppConfig {
@@ -58,6 +63,9 @@ func loadFromEnv() *AppConfig {
 		HostAddress: viper.GetString("APP_PODCASTER_BACKOFFICE_API_HOST_ADDRESS"),      // Server host address
 		HostPort:    viper.GetInt("APP_PODCASTER_BACKOFFICE_API_HOST_PORT"),            // Server port number
 		DocsAddress: viper.GetString("APP_PODCASTER_BACKOFFICE_API_DOCS_HOST_ADDRESS"), // Address for API documentation
+		AccountApi: AccountApi{
+			BaseURL: viper.GetString("ACCOUNT-API-URL"),
+		},
 		DatabaseConfig: DatabaseConfig{
 			Driver:                 viper.GetString("MYSQL_DRIVER"),                    // Database driver
 			Name:                   viper.GetString("MYSQL_NAME"),                      // Database name

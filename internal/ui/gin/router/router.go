@@ -2,6 +2,9 @@
 package router
 
 import (
+	"strings"
+	"time"
+
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	spec "github.com/khedhrije/podcaster-backoffice-api/deployments/swagger"
@@ -9,30 +12,41 @@ import (
 	"github.com/khedhrije/podcaster-backoffice-api/internal/ui/gin/handlers"
 	swaggerfiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
-	"strings"
 )
 
 // CreateRouter sets up and returns a new Gin router with the defined routes.
 func CreateRouter(wall handlers.Wall, block handlers.Block, program handlers.Program, episode handlers.Episode, media handlers.Media, tag handlers.Tag, category handlers.Category) *gin.Engine {
 	// Initialize a new Gin router without any middleware by default.
 	r := gin.New()
-	r.Use(cors.Default())
 
+	// Customize CORS configuration if needed
+	corsConfig := cors.Config{
+		AllowOrigins:     []string{"*"}, // Change this to specific domains if needed
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: true,
+		AllowOriginFunc: func(origin string) bool {
+			return true
+		},
+		MaxAge: 12 * time.Hour,
+	}
+
+	// Apply the CORS middleware with the custom configuration
+	r.Use(cors.New(corsConfig))
+
+	// Health check route.
 	r.GET("/health", health())
 
 	// Configure Swagger documentation URL based on the environment.
-	if configuration.Config.Env == "dev" {
-		spec.SwaggerInfo.Host = configuration.Config.DocsAddress
-	} else {
-		spec.SwaggerInfo.Host = removeHTTPS(configuration.Config.DocsAddress)
-	}
+	configureSwagger()
 
 	// Set up the route for Swagger documentation.
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 
 	// Define private routes that require authentication.
 	private := r.Group("/private")
-	//private.Use(TokenValidatorMiddleware())
+	private.Use(TokenValidatorMiddleware())
 	{
 		// Routes for managing walls.
 		walls := private.Group("/walls")
@@ -120,13 +134,19 @@ func CreateRouter(wall handlers.Wall, block handlers.Block, program handlers.Pro
 	return r
 }
 
+// configureSwagger configures the Swagger documentation URL based on the environment.
+func configureSwagger() {
+	if configuration.Config.Env == "dev" {
+		spec.SwaggerInfo.Host = configuration.Config.DocsAddress
+	} else {
+		spec.SwaggerInfo.Host = removeHTTPS(configuration.Config.DocsAddress)
+	}
+}
+
 // removeHTTPS removes the "https://" prefix from a URL string.
 func removeHTTPS(url string) string {
-	// Check if the URL starts with "https://"
 	if strings.HasPrefix(url, "https://") {
-		// Remove "https://" from the URL
 		return strings.TrimPrefix(url, "https://")
 	}
-	// If the URL doesn't start with "https://", return it as is
 	return url
 }
